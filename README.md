@@ -35,7 +35,7 @@
 
 ## Libraries
 
-+ [Libraries](https://pypi.org/project/enlighten/)
++ [enlighten](https://pypi.org/project/enlighten/)
 
 
 ## Structure
