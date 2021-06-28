@@ -1,4 +1,4 @@
-baseURL = "/"
+baseURL = "/fuzzy-bear/"
 languageCode = "en-us"
 title = "Fuzzy Bear"
 description = "A blackbox fuzzing project"
