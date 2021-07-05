@@ -1,3 +1,5 @@
+import subprocess
+
 '''
 
 ::::::::::::::::: [Harness] :::::::::::::::::
@@ -8,4 +10,17 @@
       and sends them to the aggregator
 
 '''
+
+class Harness():
+  def __init__(self, binary) -> None:
+    self.binary = binary
+
+  def open_pipe(self, data):
+    pipe = subprocess.Popen(self.binary,
+                              stdin=subprocess.PIPE,
+                              stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE)
+    # send data as bytes to pipe
+    pipe.communicate(data.encode())
+    print(f"Return Code {pipe.returncode}")
 
