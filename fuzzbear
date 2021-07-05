@@ -1,0 +1,33 @@
+#!/usr/bin/python3
+from fuzzybear.Harness import Harness
+import sys
+
+# tmp
+import fuzzybear.Harness
+
+def print_banner():
+    print('''
+           ____    _____ _   _ ____________   __  ____  _____    _    ____  
+           \ \ \  |  ___| | | |__  /__  /\ \ / / | __ )| ____|  / \  |  _ \ 
+            \ \ \ | |_  | | | | / /  / /  \ V /  |  _ \|  _|   / _ \ | |_) |
+            / / / |  _| | |_| |/ /_ / /_   | |   | |_) | |___ / ___ \|  _ < 
+           /_/_/  |_|    \___//____/____|  |_|   |____/|_____/_/   \_\_| \_\
+    ''')
+
+
+if (len(sys.argv) < 2 or len(sys.argv) > 3):
+    print_banner()
+    print(f'''
+        
+        usage :: {sys.argv[0]} <file> [options]
+
+        ::::::::::::::::::::::::: [options] :::::::::::::::::::::::::
+
+        -l, --lol     we don't support options lol, but also use we
+                      should use argparser 
+    ''')
+
+else:
+    ## TMP TESTS ##
+    Harness = Harness(sys.argv[1])
+    Harness.open_pipe('A' * 500)
