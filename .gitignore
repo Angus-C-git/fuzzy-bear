@@ -2,3 +2,5 @@
 .vscode
 *.env
 docs/
+
+__pycache__/
