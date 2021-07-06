@@ -1,33 +1,32 @@
 #!/usr/bin/python3
-from fuzzybear.Harness import Harness
 import sys
+import argparse
 
-# tmp
-import fuzzybear.Harness
 
 def print_banner():
     print('''
-           ____    _____ _   _ ____________   __  ____  _____    _    ____  
-           \ \ \  |  ___| | | |__  /__  /\ \ / / | __ )| ____|  / \  |  _ \ 
-            \ \ \ | |_  | | | | / /  / /  \ V /  |  _ \|  _|   / _ \ | |_) |
-            / / / |  _| | |_| |/ /_ / /_   | |   | |_) | |___ / ___ \|  _ < 
-           /_/_/  |_|    \___//____/____|  |_|   |____/|_____/_/   \_\_| \_\
+         ____    _____ _   _ ____________   __  ____  _____    _    ____  
+         \ \ \  |  ___| | | |__  /__  /\ \ / / | __ )| ____|  / \  |  _ \ 
+          \ \ \ | |_  | | | | / /  / /  \ V /  |  _ \|  _|   / _ \ | |_) |
+          / / / |  _| | |_| |/ /_ / /_   | |   | |_) | |___ / ___ \|  _ < 
+         /_/_/  |_|    \___//____/____|  |_|   |____/|_____/_/   \_\_| \_\
+    
     ''')
 
 
-if (len(sys.argv) < 2 or len(sys.argv) > 3):
-    print_banner()
+print_banner()
+if (len(sys.argv) == 1):
+    
     print(f'''
-        
         usage :: {sys.argv[0]} <file> [options]
-
-        ::::::::::::::::::::::::: [options] :::::::::::::::::::::::::
-
-        -l, --lol     we don't support options lol, but also use we
-                      should use argparser 
     ''')
 
-else:
-    ## TMP TESTS ##
-    Harness = Harness(sys.argv[1])
-    Harness.open_pipe('A' * 500)
+# TODO :: indent this
+parser = argparse.ArgumentParser()
+parser.add_argument('-L', '--lol',
+                    dest = 'lol',
+                    action='store_true',
+                    help = 'we don\'t have any args yet'
+                    )
+
+args = parser.parse_args()
