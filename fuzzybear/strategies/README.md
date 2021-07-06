@@ -2,17 +2,15 @@
 
 ## Supported Strategies
 
-#### CSV
-
-#### HTML
+#### Plaintext
 
 #### JSON
 
-#### Markdown
+#### CSV
 
-#### Plaintext
+#### JPEG
 
-#### XML
+#### ELF
 
-#### YAML
+#### PDF
 
