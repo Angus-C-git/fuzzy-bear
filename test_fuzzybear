@@ -1,0 +1,98 @@
+#!/usr/bin/python3
+
+'''
+:::::::::::: Driver For Tests ::::::::::::
+
+    ► Stuff & things 
+
+'''
+
+# import outter path to expose core
+from pathlib import Path
+import sys
+# sys.path.append('../')
+
+from fuzzybear import Harness
+import argparse
+from pathlib import Path
+
+
+
+def print_banner():
+    print('''
+          ____    _____ _____ ____ _____   _____ _   _ ____________   __
+          \ \ \  |_   _| ____/ ___|_   _| |  ___| | | |__  /__  /\ \ / /
+           \ \ \   | | |  _| \___ \ | |   | |_  | | | | / /  / /  \ V / 
+           / / /   | | | |___ ___) || |   |  _| | |_| |/ /_ / /_   | |  
+          /_/_/    |_| |_____|____/ |_|   |_|    \___//____/____|  |_|  
+                                                              
+          ____  _____    _    ____  
+         | __ )| ____|  / \  |  _ \ 
+         |  _ \|  _|   / _ \ | |_) |
+         | |_) | |___ / ___ \|  _ < 
+         |____/|_____/_/   \_\_| \_\
+                           
+    ''')
+
+
+########################## :: [DEFINE TESTS] :: ##########################
+
+
+def test_harness():
+
+    TEST_DIR = './tests/components/harness/'
+
+    print(f'''
+        [>>] Runnings tests from {TEST_DIR}
+    ''')
+
+    for file in Path(f'{TEST_DIR}/ins').glob('*'):
+        input = "".join(open(file).readlines())
+        for binary in Path(f'{TEST_DIR}/bins').glob('*'):
+            print(f'''
+                ► Trying {file.name} against {binary.name}
+            ''')
+
+            harness = Harness(binary)
+            res = harness.open_pipe(input)
+
+            print(f'''
+                    [+] Response from {binary.name} was {res}
+            ''')
+
+
+###########################################################################
+
+print_banner()
+
+parser = argparse.ArgumentParser()
+
+
+'''
+parser.add_argument('-P', '--your-test',
+                    dest = 'test-name',
+                    action='store_true',
+                    help = 'what is your test'
+                    )
+'''
+
+parser.add_argument('-H', '--harness',
+                    dest = 'harness',
+                    action='store_true',
+                    help = 'test harness'
+                    )
+
+
+args = parser.parse_args()
+
+if (len(sys.argv) == 1): parser.print_help()
+
+'''
+:::::::::::: Call Tests ::::::::::::
+
+ ► if (args.test): test_name()
+'''
+
+if (args.harness): test_harness()
+
+
