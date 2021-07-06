@@ -1,1 +1,2 @@
 enlighten==1.6.0
+pwntools==4.5.1
