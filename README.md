@@ -11,7 +11,8 @@
 
 ## Usage
 
-![fuzzybear_usage](https://user-images.githubusercontent.com/44337835/124685031-cb1d4d80-df13-11eb-9c52-b8b5791f15d9.png)
+![fuzzybear_usage](https://user-images.githubusercontent.com/44337835/124685226-2ea77b00-df14-11eb-81db-94254b33e30c.png)
+
 
 `./fuzzbear <input> <binary>`
 
