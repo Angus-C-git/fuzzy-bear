@@ -11,6 +11,8 @@ from .Harness import Harness
 
 '''
 
+# TODO :: Someway to detect file formats
+
 
 class Aggregator():
 	def __init__(self, binary, input_file):

@@ -13,7 +13,7 @@
 
 ![GIF Of Usage]()
 
-`fuzzbear -i <input> <binary>`
+`./fuzzbear <input> <binary>`
 
 ## Components/Modules
 
