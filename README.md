@@ -11,7 +11,7 @@
 
 ## Usage
 
-![GIF Of Usage]()
+![fuzzybear_usage](https://user-images.githubusercontent.com/44337835/124685031-cb1d4d80-df13-11eb-9c52-b8b5791f15d9.png)
 
 `./fuzzbear <input> <binary>`
 
