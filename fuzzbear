@@ -1,32 +1,46 @@
 #!/usr/bin/python3
 import sys
 import argparse
-
+from argparse import FileType
+from fuzzybear import Aggregator
+from colorama import Fore, Style
 
 def print_banner():
-    print('''
-         ____    _____ _   _ ____________   __  ____  _____    _    ____  
-         \ \ \  |  ___| | | |__  /__  /\ \ / / | __ )| ____|  / \  |  _ \ 
-          \ \ \ | |_  | | | | / /  / /  \ V /  |  _ \|  _|   / _ \ | |_) |
-          / / / |  _| | |_| |/ /_ / /_   | |   | |_) | |___ / ___ \|  _ < 
-         /_/_/  |_|    \___//____/____|  |_|   |____/|_____/_/   \_\_| \_\
+    print(Fore.CYAN + '''
+    ____    _____ _   _ ____________   __  ____  _____    _    ____   
+    \ \ \  |  ___| | | |__  /__  /\ \ / / | __ )| ____|  / \  |  _ \  
+     \ \ \ | |_  | | | | / /  / /  \ V /  |  _ \|  _|   / _ \ | |_) | 
+     / / / |  _| | |_| |/ /_ / /_   | |   | |_) | |___ / ___ \|  _ <  
+    /_/_/  |_|    \___//____/____|  |_|   |____/|_____/_/   \_\_| \_\ 
     
     ''')
+    print(Style.RESET_ALL)
 
 
-print_banner()
-if (len(sys.argv) == 1):
-    
-    print(f'''
-        usage :: {sys.argv[0]} <file> [options]
-    ''')
+# TODO :: indent this help txt
+parser = argparse.ArgumentParser(description=print_banner(), 
+                                 epilog='Fuzzy Bear says - \'Happy Fuzzing\''
+                                )
 
-# TODO :: indent this
-parser = argparse.ArgumentParser()
+parser.add_argument('binary',
+                    metavar = '<binary>',
+                    help    = 'binary program to fuzz' 
+                   )
+parser.add_argument('input',
+                    metavar = '<input>',
+                    help  = 'sample foramtted input to the binary ' +
+                    '(Plaintext, JSON, XML, CSV, JPEG)'
+                   )    
 parser.add_argument('-L', '--lol',
-                    dest = 'lol',
-                    action='store_true',
-                    help = 'we don\'t have any args yet'
+                    dest   = 'lol',
+                    action ='store_true',
+                    help   = 'we don\'t have any other args yet'
                     )
 
 args = parser.parse_args()
+
+
+
+################################################################################################
+
+aggregator = Aggregator(args.binary, args.input)

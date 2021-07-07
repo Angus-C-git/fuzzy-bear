@@ -12,7 +12,7 @@ import subprocess
 
 
 class Harness():
-  def __init__(self, binary) -> None:
+  def __init__(self, binary):
     self.binary = binary
 
   def open_pipe(self, data):

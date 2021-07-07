@@ -1,16 +1,20 @@
+
 '''
 BASE CLASS
 
-Default broad strategy for fuzzing that supplies bad strings by default.
-
-    ► Other strategy classes inherit from this base class 
+    ► Other strategy classes inherit from this base class to build new strats
     ► Implements default methods like bitshifting, flipping and non data/format 
       specific operations 
-    ► Inherit this class to build others
+    ► Inherit this class to build other strategies 
 
 '''
 
 class Strategy():
-  def __init__(self) -> None:
-      pass
+	def __init__(self) -> None:
+		return
 
+	def emoji(self):
+		yield '🏴‍☠️'
+		yield '🔥'
+		yield '👌'
+		yield '😂'

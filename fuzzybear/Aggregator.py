@@ -1,19 +1,18 @@
+from .Harness import Harness
+
 '''
 ::::::::::::::::: [Aggregator] :::::::::::::::::
 
     ► Takes responses (or lack of) from the
       binary and decides what changes if any 
-      should be triggered 
-    ► Sends this response as a _SIGNAL to
-      the current strategies generator to 
-      handel
-
-     > _SIGNAL Codes  
-
-        - 0 :: Continue as before
-        - 1 :: Next generator
-        - 2 :: Next mutation
-        - 3 :: Increase current mutation lifespan
-        - 4 :: Increase current generator lifespan
+      should be triggered (maybe)
+    
+    ► Runner Class for strategies/generators 
 
 '''
+
+
+class Aggregator():
+	def __init__(self, binary, input_file):
+		print(f'	[DEBUG] Aggregator received targets {binary} {input_file}')
+		self.harness = Harness(binary)
