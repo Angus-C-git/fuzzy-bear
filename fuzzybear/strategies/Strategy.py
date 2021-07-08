@@ -10,7 +10,7 @@ BASE CLASS
 '''
 
 class Strategy():
-	def __init__(self) -> None:
+	def __init__(self):
 		return
 
 	def emoji(self):

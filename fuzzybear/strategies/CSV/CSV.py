@@ -9,12 +9,19 @@ import csv
 
 
 
-class CSV(Strategy):
+# random row number 10 - 1000
+
+
+
+class CSV(Strategy.Strategy):
     
     # parse csv input data
     def __init__(self, sample_input):
+        super()
         self.raw_data = csv.reader(sample_input)
         print(self.raw_data)
 
+    
 
+    
 
