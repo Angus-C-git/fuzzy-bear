@@ -18,7 +18,7 @@ strategies
 # within the size of csv
 def random_row_col(range):
     a, b = range
-    return (randint(0, a), randint(0, b))
+    return (randint(1, a), randint(1, b))
 
 
 def pack_csv(data):
@@ -82,6 +82,10 @@ class CSV(Strategy.Strategy):
 
  + Even tho it matters for some CSVs that the header 
  remains intact we can ignore this as it will eventually
- be resolved by the generator 
+ be resolved by the generator -> unless
 
+
+ + Things like adding rows and columns could be considered
+   a sub strategy because the data that goes into the extra fields
+   could also be fuzzed 
 '''
