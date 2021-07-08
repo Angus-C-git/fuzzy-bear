@@ -16,6 +16,8 @@ from fuzzybear import Harness
 import argparse
 from pathlib import Path
 
+## CSV TESTS ##
+from fuzzybear.strategies import CSV
 
 
 def print_banner():
@@ -43,7 +45,7 @@ def test_harness():
     TEST_DIR = './tests/components/harness/'
 
     print(f'''
-        [>>] Runnings tests from {TEST_DIR}
+        [>>] Running tests from {TEST_DIR}
     ''')
 
     for file in Path(f'{TEST_DIR}/ins').glob('*'):
@@ -59,6 +61,20 @@ def test_harness():
             print(f'''
                     [+] Response from {binary.name} was {res}
             ''')
+
+# test csv1
+def test_csv():
+    TEST_DIR = './tests/complete'
+    TEST_FILE = f'{TEST_DIR}/target-bins/csv1'
+    TEST_SAMPLE = f'{TEST_DIR}/target-ins/csv1.txt'
+
+    print(f"""
+        [>>] Running CSV test against {TEST_FILE.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
+    """)
+
+    csv_worker = CSV.CSV(TEST_FILE)
+    
+
 
 
 ###########################################################################
@@ -83,6 +99,12 @@ parser.add_argument('-H', '--harness',
                     )
 
 
+parser.add_argument('-CSV', '--CSV-codec',
+                    dest = 'CSV',
+                    action='store_true',
+                    help = 'test the csv codec binaries'
+                    )
+
 args = parser.parse_args()
 
 if (len(sys.argv) == 1): parser.print_help()
@@ -95,4 +117,4 @@ if (len(sys.argv) == 1): parser.print_help()
 
 if (args.harness): test_harness()
 
-
+if (args.CSV): test_csv()
