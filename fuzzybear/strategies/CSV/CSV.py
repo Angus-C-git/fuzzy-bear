@@ -49,7 +49,10 @@ class CSV(Strategy.Strategy):
             # print(mutation) 
             yield pack_csv(mutation)
         
-            
+        row, col = random_row_col(self.size)
+        for chonk in super().chonk():
+            mutation[row][col] = chonk
+            yield pack_csv(mutation)
 
 
 
