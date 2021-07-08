@@ -19,6 +19,10 @@ from pathlib import Path
 ## CSV TESTS ##
 from fuzzybear.strategies import CSV
 
+## <name> Test ##
+
+
+## ADD TEST IMPORT ## ^
 
 def print_banner():
     print('''
@@ -104,6 +108,10 @@ parser.add_argument('-CSV', '--CSV-codec',
                     action='store_true',
                     help = 'test the csv codec binaries'
                     )
+
+
+
+## Add command line args for your test ^
 
 args = parser.parse_args()
 
