@@ -19,10 +19,27 @@ from pathlib import Path
 ## CSV TESTS ##
 from fuzzybear.strategies import CSV
 
-## <name> Test ##
+## ELF Test ##
+from fuzzybear.strategies import ELF
 
+## JPEG Test ##
+from fuzzybear.strategies import JPEG
+
+## JSON Test ##
+# from fuzzybear.strategies import JSON 
+
+## PDF Test ##
+from fuzzybear.strategies import PDF
+
+## TXT Test ##
+from fuzzybear.strategies import TXT
+
+## XML Test ##
+from fuzzybear.strategies import XML
 
 ## ADD TEST IMPORT ## ^
+
+
 
 def print_banner():
     print('''
