@@ -13,7 +13,7 @@ from random import randint
 # within the size of csv
 def random_row_col(range):
     a, b = range
-    return (randint(0, b), randint(0, b))
+    return (randint(0, a), randint(0, b))
 
 
 def pack_csv(data):
