@@ -9,6 +9,11 @@ from  csv import reader
 from random import randint
 
 
+'''
+Utility methods for CSV 
+strategies
+'''
+
 # random row & column number
 # within the size of csv
 def random_row_col(range):
@@ -38,6 +43,22 @@ class CSV(Strategy.Strategy):
                     len(self.candidate_input[0]) - 1)
 
 
+    def add_entries(self):
+        # Generate random number of rows
+        # between 0 - 1000
+        rows, cols = random_row_col((100, 100))
+        # TODO :: Fix header
+        mutation = [self.candidate_input[0]]
+        print('\n\n', mutation)
+        for row in range(1, rows):
+            new_row = []
+            for col in range(1, cols):
+                new_row.append(str(col * row))     # could be anything really 
+            
+            mutation.append(new_row)
+
+        return mutation
+
     # run strategies
     def run(self):
         print(f"\n[DEBUG] mutating {self.candidate_input} \n")        
@@ -54,6 +75,7 @@ class CSV(Strategy.Strategy):
             mutation[row][col] = chonk
             yield pack_csv(mutation)
 
+        yield pack_csv(self.add_entries())
 
 
 '''dev_notes

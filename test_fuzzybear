@@ -100,7 +100,7 @@ def test_csv():
     
     # buf = ''
     # csv_writer = csv.writer(buf)
-    for x in range(10):
+    for x in range(5):
         for x in csv_worker.run():
             
             # @ here would mark the place the 
