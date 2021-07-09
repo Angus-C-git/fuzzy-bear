@@ -25,7 +25,9 @@ def pack_csv(data):
    return "\n".join((",".join(row_col) for row_col in data))
 
 
-
+# TODO :: Need a way to switch
+# up header preservation organically
+# see dev notes
 class CSV(Strategy.Strategy):
     
     # parse csv input data
