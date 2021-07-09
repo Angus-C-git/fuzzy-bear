@@ -26,6 +26,11 @@ def pack_csv(data):
 #insert data for certain key
 
 #insert key for certain value
+
+#packing function post insertion not needed python has
+#a converting function  
+
+"""
 class CSV(Strategy.Strategy):
     
     # parse csv input data
@@ -53,11 +58,5 @@ class CSV(Strategy.Strategy):
             mutation[row][col] = emoji   
             # print(mutation) 
             yield pack_csv(mutation)
-        
+"""       
             
-
-
-
-'''dev_notes
-
-'''
