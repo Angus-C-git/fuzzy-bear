@@ -105,7 +105,9 @@ def test_json():
         [>>] Running JSON test against {TEST_FILE.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
     """)
 
-    json_worker = JSON.JSON(TEST_FILE)   
+    json_worker = JSON.JSON(TEST_SAMPLE)
+    for x in json_worker.run():
+        print(x)   
 
 
 
