@@ -1,62 +1,77 @@
-'''
-CSV strategy driver Class
-    ► Generates strategies for csv based 
-      inputs
-'''
+#!/usr/bin/env python3
 from .. import Strategy
 import json
+import random
 from random import randint
 
 
-# random row & column number
-# within the size of csv
-def random_row_col(range):
-    a, b = range
-    return (randint(0, a), randint(0, b))
+def insert(key,value,json_obj):
+    json_obj[key] = value
+
+#given a value replace it
+def replace_val(find,replace,json_obj):
+    for item in json_obj.items():
+        if item[1] == find:
+            #print(item)
+            json_obj[item[0]] = replace
+            
+# random entry within dictionary
+def random_entry(json_obj):
+    itt = list(json_obj.items())
+    entry = random.choice(itt)
+    return entry
 
 
-def pack_csv(data):
-   return "\n".join((",".join(row_col) for row_col in data))
-
-
-#insert a row
-
-#insert data at random place
-
-#insert data for certain key
-
-#insert key for certain value
-
-#packing function post insertion not needed python has
-#a converting function  
 
 """
-class CSV(Strategy.Strategy):
+with open('json1.txt') as f:
+    json_data = json.load(f)
+    print(json_data)
+    print(len(json_data))
+    replace_val(12,3,json_data)
+    #print(json_data[1])
+    print("a random entry")
+    r = random_entry(json_data)
+    print(r)
+    print(json_data)
+"""
+
+class JSON(Strategy.Strategy):
     
     # parse csv input data
     def __init__(self, sample_input):
         super()
         self.sample_input = sample_input
-        self.parse_csv()
+        self.json.loads(sample_input)
+        self.size = len(sample_input)
 
+    """
+    def add_entries(self):
+        # Generate random number of rows
+        # between 0 - 1000
+        rows, cols = random_row_col((100, 100))
+        # TODO :: Fix header
+        mutation = [self.candidate_input[0]]
+        print('\n\n', mutation)
+        for row in range(1, rows):
+            new_row = []
+            for col in range(1, cols):
+                new_row.append(str(col * row))     # could be anything really 
+            
+            mutation.append(new_row)
 
-    def parse_csv(self):
-        with open(self.sample_input) as csvfile:
-            self.candidate_input = list(reader(csvfile))
-
-        self.size = (len(self.candidate_input) - 1, 
-                    len(self.candidate_input[0]) - 1)
-
-
+        return mutation
+    """
     # run strategies
     def run(self):
         print(f"\n[DEBUG] mutating {self.candidate_input} \n")        
-
-        row, col = random_row_col(self.size)
-        mutation = self.candidate_input
+        
+        mutation = json.loads(self.candidate_input)
+        rand_entry = random_entry(mutation)
+        
         for emoji in super().emoji():
-            mutation[row][col] = emoji   
-            # print(mutation) 
-            yield pack_csv(mutation)
-"""       
-            
+            mutation[rand_entry[1]] = emoji   
+            yield json.dumps(mutation)
+
+        #seperate strat!!!!
+        #yield pack_csv(self.add_entries())
