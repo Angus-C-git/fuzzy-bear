@@ -8,6 +8,7 @@
 '''
 
 # import outter path to expose core
+import csv
 from pathlib import Path
 import sys
 # sys.path.append('../')
@@ -76,7 +77,7 @@ def test_harness():
                 ► Trying {file.name} against {binary.name}
             ''')
 
-            harness = Harness(binary)
+            harness = Harness.Harness(binary)
             res = harness.open_pipe(input)
 
             print(f'''
@@ -86,16 +87,27 @@ def test_harness():
 # test csv1
 def test_csv():
     TEST_DIR = './tests/complete'
-    TEST_FILE = f'{TEST_DIR}/target-bins/csv1'
+    TEST_BINARY = f'{TEST_DIR}/target-bins/csv1'
     TEST_SAMPLE = f'{TEST_DIR}/target-ins/csv1.txt'
 
     print(f"""
-        [>>] Running CSV test against {TEST_FILE.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
+        [>>] Running CSV test against {TEST_BINARY.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
     """)
 
-    csv_worker = CSV.CSV(TEST_FILE)
-    
+    harness = Harness.Harness(TEST_BINARY)
 
+    csv_worker = CSV.CSV(TEST_SAMPLE)
+    
+    # buf = ''
+    # csv_writer = csv.writer(buf)
+    for x in range(5):
+        for x in csv_worker.run():
+            
+            # @ here would mark the place the 
+            # aggregator feeds harness
+            print(x)
+            print(f"\nPiping to harness, res was {harness.open_pipe(x)}\n")
+    
 
 
 ###########################################################################
