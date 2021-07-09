@@ -94,7 +94,18 @@ def test_csv():
     """)
 
     csv_worker = CSV.CSV(TEST_FILE)
-    
+
+# test json1
+def test_json():
+    TEST_DIR = './tests/complete'
+    TEST_FILE = f'{TEST_DIR}/target-bins/json1'
+    TEST_SAMPLE = f'{TEST_DIR}/target-ins/json1.txt'
+
+    print(f"""
+        [>>] Running JSON test against {TEST_FILE.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
+    """)
+
+    json_worker = JSON.JSON(TEST_FILE)   
 
 
 
@@ -128,6 +139,13 @@ parser.add_argument('-CSV', '--CSV-codec',
 
 
 
+parser.add_argument('-JSON', '--JSON-codec',
+                    dest = 'JSON',
+                    action='store_true',
+                    help = 'test the json codec binaries'
+                    )
+
+
 ## Add command line args for your test ^
 
 args = parser.parse_args()
@@ -143,3 +161,5 @@ if (len(sys.argv) == 1): parser.print_help()
 if (args.harness): test_harness()
 
 if (args.CSV): test_csv()
+
+if (args.JSON): test_json()
