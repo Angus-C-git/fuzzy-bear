@@ -3,15 +3,18 @@
 '''
 :::::::::::: Driver For Tests ::::::::::::
 
-    ► Stuff & things 
+    ► Exposes components of the fuzzer down
+      to a class level to simplify testing
+      of trivial operations without hooking
+      up the component to the rest of the
+      architecture 
 
 '''
 
-# import outter path to expose core
 import csv
 from pathlib import Path
 import sys
-# sys.path.append('../')
+from colorama import Fore, Style
 
 from fuzzybear import Harness
 import argparse
@@ -43,20 +46,22 @@ from fuzzybear.strategies import XML
 
 
 def print_banner():
-    print('''
-          ____    _____ _____ ____ _____   _____ _   _ ____________   __
-          \ \ \  |_   _| ____/ ___|_   _| |  ___| | | |__  /__  /\ \ / /
-           \ \ \   | | |  _| \___ \ | |   | |_  | | | | / /  / /  \ V / 
-           / / /   | | | |___ ___) || |   |  _| | |_| |/ /_ / /_   | |  
-          /_/_/    |_| |_____|____/ |_|   |_|    \___//____/____|  |_|  
-                                                              
-          ____  _____    _    ____  
-         | __ )| ____|  / \  |  _ \ 
-         |  _ \|  _|   / _ \ | |_) |
-         | |_) | |___ / ___ \|  _ < 
-         |____/|_____/_/   \_\_| \_\
+    print(Fore.CYAN + '''
+
+          ____    _____ _____ ____ _____   _____ _   _ ____________   __   
+          \ \ \  |_   _| ____/ ___|_   _| |  ___| | | |__  /__  /\ \ / /   
+           \ \ \   | | |  _| \___ \ | |   | |_  | | | | / /  / /  \ V /   
+           / / /   | | | |___ ___) || |   |  _| | |_| |/ /_ / /_   | |     
+          /_/_/    |_| |_____|____/ |_|   |_|    \___//____/____|  |_|     
+                                                                      
+          ____  _____    _    ____        
+         | __ )| ____|  / \  |  _ \      
+         |  _ \|  _|   / _ \ | |_) |          
+         | |_) | |___ / ___ \|  _ <             
+         |____/|_____/_/   \_\_| \_\          
                            
     ''')
+    print(Style.RESET_ALL)
 
 
 ########################## :: [DEFINE TESTS] :: ##########################
