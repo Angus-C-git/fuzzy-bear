@@ -20,7 +20,7 @@ from colorama import Fore, Style
 def write_crash(crashing_input):
 	print(Fore.RED + f'\n\n   [>>] CRASH DETECTED, dropping bad.txt')
 	print(Style.RESET_ALL)
-	
+
 	with open('./bad.txt', 'w') as crash:
 		crash.write(crashing_input)
 
@@ -36,9 +36,14 @@ class Aggregator():
 	# TODO :: Should internals be exported
 	# to standalone fuzzing class ?
 	def run_fuzzer(self):
-		# TODO :: run generator here 	<codec>
+		# TODO :: run generator here <codec>
 		# format runner 
 		Generator = get_generator(self.codec, self.base_file)
+
+		## Tmp handler
+		if (Generator is None): 
+			print(f'\n   [>>] The format of {self.base_file} is not supported')
+			return None
 
 		## TMP RUNNER >> ##
 		inputs = Generator.run()

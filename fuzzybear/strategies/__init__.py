@@ -8,18 +8,24 @@ from .PDF import PDF
 from .TXT import TXT
 from .XML import XML
 
-
+'''
+Resolves a particular codec to a supported
+generator or returns none if the appropriate
+generator cannot be found.
+'''
 def get_generator(codec, sample_input):
 
     _generators = {
-        'csv': CSV.CSV(sample_input),
-        'elf': ELF.ELF(sample_input),
-        'jpeg': JPEG.JPEG(sample_input),
-        # 'json': JSON.JSON(sample_input),          # TODO :: merge json branch to fix
-        'pdf': PDF.PDF(sample_input),
-        'plain': TXT.TXT(sample_input),
-        'octet-stream': TXT.TXT(sample_input),      # detects plaintext3 as octet-stream
-        'html': XML.XML(sample_input)               # detects xml as html
+        'csv': CSV.CSV,
+        'elf': ELF.ELF,
+        'jpeg': JPEG.JPEG,
+        'json': JSON.JSON,              
+        'pdf': PDF.PDF,
+        'plain': TXT.TXT,
+        'octet-stream': TXT.TXT,      # detects plaintext3 as octet-stream
+        'html': XML.XML               # detects xml as html
     }
 
-    return _generators[codec]
+    try: 
+        return _generators[codec](sample_input)
+    except KeyError: return None
