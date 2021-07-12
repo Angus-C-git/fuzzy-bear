@@ -46,7 +46,7 @@ from fuzzybear.strategies import XML
 
 
 def print_banner():
-    print(Fore.CYAN + '''
+    print(Fore.RED + '''
 
           ____    _____ _____ ____ _____   _____ _   _ ____________   __   
           \ \ \  |_   _| ____/ ___|_   _| |  ___| | | |__  /__  /\ \ / /   
@@ -92,8 +92,8 @@ def test_harness():
 # test csv1
 def test_csv():
     TEST_DIR = './tests/complete'
-    TEST_BINARY = f'{TEST_DIR}/target-bins/csv1'
-    TEST_SAMPLE = f'{TEST_DIR}/target-ins/csv1.txt'
+    TEST_BINARY = f'{TEST_DIR}/csv1'
+    TEST_SAMPLE = f'{TEST_DIR}/codecs/csv1.txt'
 
     print(f"""
         [>>] Running CSV test against {TEST_BINARY.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
@@ -110,7 +110,7 @@ def test_csv():
             
             # @ here would mark the place the 
             # aggregator feeds harness
-            print(x)
+            # print(x)
             print(f"\nPiping to harness, res was {harness.open_pipe(x)}\n")
     
 
