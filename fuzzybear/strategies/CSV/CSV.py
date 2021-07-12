@@ -51,7 +51,7 @@ class CSV(Strategy.Strategy):
         rows, cols = random_row_col((100, 100))
         # TODO :: Fix header
         mutation = [self.candidate_input[0]]
-        print('\n\n[DEBUG]', mutation)
+        print('\n\n   [DEBUG]', mutation)
         for row in range(1, rows):
             new_row = []
             for col in range(1, cols):
@@ -63,7 +63,7 @@ class CSV(Strategy.Strategy):
 
     # run strategies
     def run(self):
-        print(f"\n[DEBUG] mutating {self.candidate_input} \n")        
+        print(f"\n   [DEBUG] mutating {self.candidate_input} \n")        
 
         row, col = random_row_col(self.size)
         mutation = self.candidate_input
