@@ -22,8 +22,9 @@ def get_generator(codec, sample_input):
         'json': JSON.JSON,              
         'pdf': PDF.PDF,
         'plain': TXT.TXT,
-        'octet-stream': TXT.TXT,      # detects plaintext3 as octet-stream
-        'html': XML.XML               # detects xml as html
+        'octet-stream': TXT.TXT,       # detects plaintext3 as octet-stream
+        'html': XML.XML,               # detects xml as html
+        'xml': XML.XML
     }
 
     try: 
