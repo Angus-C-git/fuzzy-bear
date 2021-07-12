@@ -3,36 +3,65 @@
 '''
 :::::::::::: Driver For Tests ::::::::::::
 
-    ► Stuff & things 
+    ► Exposes components of the fuzzer down
+      to a class level to simplify testing
+      of trivial operations without hooking
+      up the component to the rest of the
+      architecture 
 
 '''
 
-# import outter path to expose core
+import csv
 from pathlib import Path
 import sys
-# sys.path.append('../')
+from colorama import Fore, Style
 
 from fuzzybear import Harness
 import argparse
 from pathlib import Path
 
+## CSV TESTS ##
+from fuzzybear.strategies import CSV
+
+## ELF Test ##
+from fuzzybear.strategies import ELF
+
+## JPEG Test ##
+from fuzzybear.strategies import JPEG
+
+## JSON Test ##
+from fuzzybear.strategies import JSON 
+
+## PDF Test ##
+from fuzzybear.strategies import PDF
+
+## TXT Test ##
+from fuzzybear.strategies import TXT
+
+## XML Test ##
+from fuzzybear.strategies import XML
+
+## ADD TEST IMPORT ## ^
+
 
 
 def print_banner():
-    print('''
-          ____    _____ _____ ____ _____   _____ _   _ ____________   __
-          \ \ \  |_   _| ____/ ___|_   _| |  ___| | | |__  /__  /\ \ / /
-           \ \ \   | | |  _| \___ \ | |   | |_  | | | | / /  / /  \ V / 
-           / / /   | | | |___ ___) || |   |  _| | |_| |/ /_ / /_   | |  
-          /_/_/    |_| |_____|____/ |_|   |_|    \___//____/____|  |_|  
-                                                              
-          ____  _____    _    ____  
-         | __ )| ____|  / \  |  _ \ 
-         |  _ \|  _|   / _ \ | |_) |
-         | |_) | |___ / ___ \|  _ < 
-         |____/|_____/_/   \_\_| \_\
+    print(Fore.RED + '''
+
+          ____    _____ _____ ____ _____   _____ _   _ ____________   __   
+          \ \ \  |_   _| ____/ ___|_   _| |  ___| | | |__  /__  /\ \ / /   
+           \ \ \   | | |  _| \___ \ | |   | |_  | | | | / /  / /  \ V /   
+           / / /   | | | |___ ___) || |   |  _| | |_| |/ /_ / /_   | |     
+          /_/_/    |_| |_____|____/ |_|   |_|    \___//____/____|  |_|     
+                                                                      
+          ____  _____    _    ____        
+         | __ )| ____|  / \  |  _ \      
+         |  _ \|  _|   / _ \ | |_) |          
+         | |_) | |___ / ___ \|  _ <             
+         |____/|_____/_/   \_\_| \_\          
                            
     ''')
+    print(Style.RESET_ALL)
 
 
 ########################## :: [DEFINE TESTS] :: ##########################
@@ -43,7 +72,7 @@ def test_harness():
     TEST_DIR = './tests/components/harness/'
 
     print(f'''
-        [>>] Runnings tests from {TEST_DIR}
+        [>>] Running tests from {TEST_DIR}
     ''')
 
     for file in Path(f'{TEST_DIR}/ins').glob('*'):
@@ -53,12 +82,37 @@ def test_harness():
                 ► Trying {file.name} against {binary.name}
             ''')
 
-            harness = Harness(binary)
+            harness = Harness.Harness(binary)
             res = harness.open_pipe(input)
 
             print(f'''
                     [+] Response from {binary.name} was {res}
             ''')
+
+# test csv1
+def test_csv():
+    TEST_DIR = './tests/complete'
+    TEST_BINARY = f'{TEST_DIR}/csv1'
+    TEST_SAMPLE = f'{TEST_DIR}/codecs/csv1.txt'
+
+    print(f"""
+        [>>] Running CSV test against {TEST_BINARY.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
+    """)
+
+    harness = Harness.Harness(TEST_BINARY)
+
+    csv_worker = CSV.CSV(TEST_SAMPLE)
+    
+    # buf = ''
+    # csv_writer = csv.writer(buf)
+    for x in range(5):
+        for x in csv_worker.run():
+            
+            # @ here would mark the place the 
+            # aggregator feeds harness
+            # print(x)
+            print(f"\nPiping to harness, res was {harness.open_pipe(x)}\n")
+    
 
 
 ###########################################################################
@@ -83,6 +137,23 @@ parser.add_argument('-H', '--harness',
                     )
 
 
+parser.add_argument('-CSV', '--CSV-codec',
+                    dest = 'CSV',
+                    action='store_true',
+                    help = 'test the csv codec binaries'
+                    )
+
+
+
+parser.add_argument('-JSON', '--JSON-codec',
+                    dest = 'JSON',
+                    action='store_true',
+                    help = 'test the json codec binaries'
+                    )
+
+
+## Add command line args for your test ^
+
 args = parser.parse_args()
 
 if (len(sys.argv) == 1): parser.print_help()
@@ -95,4 +166,6 @@ if (len(sys.argv) == 1): parser.print_help()
 
 if (args.harness): test_harness()
 
+if (args.CSV): test_csv()
 
+if (args.JSON): test_json()
