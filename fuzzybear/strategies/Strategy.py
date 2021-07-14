@@ -37,13 +37,20 @@ class Strategy():
 	  yield 'len'  
 	  
 
+	def negate(self, data):
+		try:
+			yield ~data + 1   # if (~data < 0) else ~data - 1
+		except TypeError:
+			yield '-' + data if ('-' not in data) else data.strip('-') 
+
+
 	def string(self, arg='all'):
 		strings = String().genStrings(arg)
 		for x in strings:
 			#print(f'x = {x}')
 			yield x
 
-	
+
 
 '''
 STRING CLASS
