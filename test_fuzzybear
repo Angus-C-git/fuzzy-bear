@@ -135,6 +135,34 @@ def test_json():
             print(f"\nPiping to harness, res was {harness.open_pipe(x)}\n")
 
 
+
+def test_negate():
+
+    from fuzzybear.strategies import Strategy
+
+    tests = [
+        '5',
+        5,
+        '-5',
+        -5,
+        '5.0',
+        5.0,
+        '-5.0',
+        -5.0
+    ]
+
+    print(f"""
+        [>>] Running negate tests
+    """)
+
+    strategy_driver = Strategy.Strategy()
+    for test in tests:
+        for s in strategy_driver.negate(test):
+            print(f'Flipped {test} :: {s}')
+
+
+
+
 ###########################################################################
 
 print_banner()
@@ -172,6 +200,13 @@ parser.add_argument('-JSON', '--JSON-codec',
                     )
 
 
+parser.add_argument('-NEGATE', '--negate-test',
+                    dest = 'NEGATE',
+                    action='store_true',
+                    help = 'test the negation strategy'
+                    )
+
+
 ## Add command line args for your test ^
 
 args = parser.parse_args()
@@ -189,3 +224,5 @@ if (args.harness): test_harness()
 if (args.CSV): test_csv()
 
 if (args.JSON): test_json()
+
+if (args.NEGATE): test_negate()
