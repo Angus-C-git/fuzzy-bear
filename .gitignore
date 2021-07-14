@@ -4,3 +4,13 @@
 docs/
 
 __pycache__/
+
+*/__pycache__/
+
+*/*/__pycache__/
+
+# Crash, testing, debug
+
+.gdb_history
+
+bad.txt
