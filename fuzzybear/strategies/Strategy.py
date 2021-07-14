@@ -24,3 +24,13 @@ class Strategy():
 	def chonk(self):
 		yield 'A' * 50
 		yield 'A' * 500
+		yield 'A' * 600
+		yield 'A' * 700
+		yield 'A' * 1000
+		yield 'A' * 10000
+
+	def keywords(self):
+		yield 'input'		# no this isn't a hardcoded value whattt
+		yield 'data'
+		yield 'len'
+

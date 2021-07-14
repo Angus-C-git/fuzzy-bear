@@ -3,6 +3,7 @@ from .. import Strategy
 import json
 import random
 from random import randint
+import copy
 
 
 def insert(key,value,json_obj):
@@ -61,12 +62,31 @@ class JSON(Strategy.Strategy):
 
         return mutation
     """
+    # def replace_random_key(self):
+    #     # Replace random key with chonky value
+    #     mutation = copy.deepcopy(self.candidate_input)
+    #     rand_key = random_entry(mutation)
+    #     print(f'[DEBUG] RANDOM ENTRY :: {rand_key[0]}')
+    #     for chonk in super().chonk():
+    #         if (type(rand_key[1]) is list): 
+    #             rand_key[1][0] = chonk
+    #         else:
+    #             mutation[rand_key[0]] = chonk
+            
+    #         return mutation
+            
+            # print(f'[DEBUG] MUTATION :: {mutation}')
+            # return json.dumps(mutation)
+
+
+
     # run strategies
     def run(self):
         print(f"\n[DEBUG] mutating {self.candidate_input} \n")        
         
         mutation = self.candidate_input
         rand_entry = random_entry(mutation)
+        
 
         for emoji in super().emoji():
             if (type(rand_entry[1]) is list): 
@@ -76,8 +96,27 @@ class JSON(Strategy.Strategy):
 
             yield json.dumps(mutation)
 
-        rand_entry_count = randint(1,100)
+        rand_entry_count = randint(1, 100)
         mutation = thicc_file(rand_entry_count)
         yield json.dumps(mutation)
+        
+        # Replace random key with chonky value
+        mutation = copy.deepcopy(self.candidate_input)
+        rand_key = random_entry(mutation)
+        # print(f'[DEBUG] RANDOM ENTRY :: {rand_key[0]}')
+        for chonk in super().chonk():
+            if (type(rand_key[1]) is list): 
+                rand_key[1][0] = chonk
+            else:
+                mutation[rand_key[0]] = chonk
 
-    
+            yield json.dumps(mutation)
+
+
+
+'''devnotes
+
+-> The json1 binary drops inputs if the length of the JSON is greater than 7200
+-> Supplying a negative length field to the json1 binary segfaults it
+
+'''
