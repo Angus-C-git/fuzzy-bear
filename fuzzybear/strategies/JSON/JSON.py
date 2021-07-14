@@ -21,20 +21,16 @@ def random_entry(json_obj):
     entry = random.choice(itt)
     return entry
 
+def thicc_file(num_entries):
+    thiccboi = {}
+    for i in range(0,num_entries):
+        thiccboi[i] = []
 
+        for l in range(1,50):
+            thiccboi[i].append(l)
 
-"""
-with open('json1.txt') as f:
-    json_data = json.load(f)
-    print(json_data)
-    print(len(json_data))
-    replace_val(12,3,json_data)
-    #print(json_data[1])
-    print("a random entry")
-    r = random_entry(json_data)
-    print(r)
-    print(json_data)
-"""
+    return thiccboi
+
 
 class JSON(Strategy.Strategy):
     
@@ -80,5 +76,8 @@ class JSON(Strategy.Strategy):
 
             yield json.dumps(mutation)
 
-        #seperate strat!!!!
-        #yield pack_csv(self.add_entries())
+        rand_entry_count = randint(1,100)
+        mutation = thicc_file(rand_entry_count)
+        yield json.dumps(mutation)
+
+    
