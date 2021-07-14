@@ -21,20 +21,16 @@ def random_entry(json_obj):
     entry = random.choice(itt)
     return entry
 
+def thicc_file(num_entries):
+    thiccboi = {}
+    for i in range(0,num_entries):
+        thiccboi[i] = []
 
+        for l in range(1,50):
+            thiccboi[i].append(l)
 
-"""
-with open('json1.txt') as f:
-    json_data = json.load(f)
-    print(json_data)
-    print(len(json_data))
-    replace_val(12,3,json_data)
-    #print(json_data[1])
-    print("a random entry")
-    r = random_entry(json_data)
-    print(r)
-    print(json_data)
-"""
+    return thiccboi
+
 
 class JSON(Strategy.Strategy):
     
@@ -42,8 +38,11 @@ class JSON(Strategy.Strategy):
     def __init__(self, sample_input):
         super()
         self.sample_input = sample_input
-        self.json.loads(sample_input)
-        self.size = len(sample_input)
+        print(sample_input)
+        with open(sample_input) as jsonfile:
+            self.candidate_input = json.load(jsonfile)
+        
+        self.size = len(self.candidate_input)
 
     """
     def add_entries(self):
@@ -66,12 +65,19 @@ class JSON(Strategy.Strategy):
     def run(self):
         print(f"\n[DEBUG] mutating {self.candidate_input} \n")        
         
-        mutation = json.loads(self.candidate_input)
+        mutation = self.candidate_input
         rand_entry = random_entry(mutation)
-        
+
         for emoji in super().emoji():
-            mutation[rand_entry[1]] = emoji   
+            if (type(rand_entry[1]) is list): 
+                rand_entry[1][0] = emoji
+            else:
+                mutation[rand_entry[1]] = emoji 
+
             yield json.dumps(mutation)
 
-        #seperate strat!!!!
-        #yield pack_csv(self.add_entries())
+        rand_entry_count = randint(1,100)
+        mutation = thicc_file(rand_entry_count)
+        yield json.dumps(mutation)
+
+    

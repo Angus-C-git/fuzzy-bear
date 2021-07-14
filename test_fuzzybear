@@ -98,7 +98,7 @@ def test_csv():
     print(f"""
         [>>] Running CSV test against {TEST_BINARY.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
     """)
-
+  
     harness = Harness.Harness(TEST_BINARY)
 
     csv_worker = CSV.CSV(TEST_SAMPLE)
@@ -112,8 +112,21 @@ def test_csv():
             # aggregator feeds harness
             # print(x)
             print(f"\nPiping to harness, res was {harness.open_pipe(x)}\n")
-    
 
+# test json1
+def test_json():
+    TEST_DIR = './tests/complete'
+    TEST_FILE = f'{TEST_DIR}/target-bins/json1'
+    TEST_SAMPLE = f'{TEST_DIR}/target-ins/json1.txt'
+
+    print(f"""
+        [>>] Running JSON test against {TEST_FILE.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
+    """)
+
+    json_worker = JSON.JSON(TEST_SAMPLE)
+    for x in json_worker.run():
+        print(x)   
+    
 
 ###########################################################################
 
