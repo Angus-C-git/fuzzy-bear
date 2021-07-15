@@ -1,0 +1,17 @@
+{
+    "complex1": {
+        "key1": [12, 11],
+        "key2": {
+            "dearlord": ["a", "bb"]
+        }
+    },
+    "len": 12,
+    "input": "AAAABBBBCCCC",
+    "more_data": ["a", "bb"],
+    "complex2": {
+        "key1": [12, 11],
+        "key2": {
+            "dearlord": ["a", "bb"]
+        }
+    }
+}

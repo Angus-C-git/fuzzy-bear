@@ -39,15 +39,17 @@ class Strategy():
 
 	def negate(self, data):
 		try:
-			yield ~data + 1   # if (~data < 0) else ~data - 1
+			yield data * -1
 		except TypeError:
-			yield '-' + data if ('-' not in data) else data.strip('-') 
+			try:
+				yield '-' + data if ('-' not in data) else data.strip('-')
+			except TypeError:
+				yield data
 
 
 	def string(self, arg='all'):
 		strings = String().genStrings(arg)
 		for x in strings:
-			#print(f'x = {x}')
 			yield x
 
 
@@ -113,3 +115,13 @@ class String():
 		for x in stuff:
 			arr.append(x)
 		return arr
+
+
+'''devnotes
+
+TODO
+
+	- [ ] May need to port the strings class methods into the
+	      strategies body since they cannot be used individually
+		  at the moment by sub strategies
+'''
