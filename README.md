@@ -14,7 +14,7 @@
 ![fuzzybear_usage](https://user-images.githubusercontent.com/44337835/124685226-2ea77b00-df14-11eb-81db-94254b33e30c.png)
 
 
-`./fuzzbear <input> <binary>`
+`./fuzzer <input> <binary>`
 
 ## Components/Modules
 
