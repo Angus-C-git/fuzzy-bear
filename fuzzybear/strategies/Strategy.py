@@ -1,4 +1,4 @@
-from random import randint
+from random import randint, randrange
 from pwn import cyclic
 
 '''
@@ -115,6 +115,80 @@ class String():
 		for x in stuff:
 			arr.append(x)
 		return arr
+
+
+class Integers():
+	#MAGIC NUMBERS :) (UNSIGNED)
+	CHAR_MAX = 255
+	INT_MAX  = 4294967295
+	INT_MAX_SIGNED = 2147483648
+	BYTE_8_MAX = 18446744073709551615
+	#number of ints gen:
+	def __init__(self, gen_max):
+		self.gen_max = gen_max
+
+	#Returns a list ofrandom integers for a particular range
+	def range(self, lower, upper):
+		int_list = []
+		for i in range(0, self.gen_max):
+			num = randrange(lower, upper)
+			if(num in int_list):
+				i -= 1
+			else:
+				int_list.append(num)
+		return int_list
+
+	def rand_positive(self):
+		int_list = []
+		for i in range(0, self.gen_max):
+			num = randint(0 , Integers.INT_MAX_SIGNED)
+			int_list.append(num)
+		#SOMETHING SHOULD BREAK IF THESE NUMBER ARE ENTERED :)
+		int_list.append(Integers.INT_MAX)
+		int_list.append(Integers.BYTE_8_MAX)
+		return int_list
+
+	def rand_negative(self):
+		int_list = []
+		for i in range(0, self.gen_max):
+			num = randint(-Integers.INT_MAX_SIGNED, 0)
+			int_list.append(num)
+		int_list.append(0)
+		int_list.append(Integers.INT_MAX)
+		int_list.append(Integers.BYTE_8_MAX)
+		return int_list
+
+	def rand(self):
+		int_list = []
+		for i in range(0, self.gen_max):
+			num = randint(-Integers.INT_MAX_SIGNED, Integers.INT_MAX_SIGNED)
+			int_list.append(num)
+		int_list.append(Integers.INT_MAX)
+		int_list.append(Integers.BYTE_8_MAX)
+		return int_list
+
+	def break(self):
+		pass
+
+
+	class Floats():
+		def __init__(self):
+			pass
+
+		def rand_float(self):
+			pass
+
+		def rand_large(self):
+			pass
+
+		def decimal(self):
+			pass
+
+		def rand(self):
+			pass
+
+
+
 
 
 '''devnotes
