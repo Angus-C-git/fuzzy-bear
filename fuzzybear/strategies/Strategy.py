@@ -167,8 +167,8 @@ class Integers():
 		int_list.append(Integers.BYTE_8_MAX)
 		return int_list
 
-	def break(self):
-		pass
+	# def break(self):
+	# 	pass
 
 
 	class Floats():

@@ -27,10 +27,10 @@ def write_crash(crashing_input):
 
 class Aggregator():
 	def __init__(self, binary, input_file):
-		print(f"   [DEBUG] Aggregator received <{binary.split('/')[-1]}> <{input_file.split('/')[-1]}>")
+		print(f"   [>>] Running fuzzer against <{binary.split('/')[-1]}> mutating <{input_file.split('/')[-1]}>")
 		self.harness = Harness(binary)
 		self.codec = codec.detect(input_file)
-		print(f'   [DEBUG] {self.codec}')
+		# print(f'   [DEBUG] {self.codec}')
 		self.base_file = input_file
 
 	# TODO :: Should internals be exported
@@ -44,6 +44,8 @@ class Aggregator():
 		if (Generator is None): 
 			print(f'\n   [>>] The format of {self.base_file} is not supported')
 			return None
+		
+		print('   [>>] Running fuzzer ...')
 
 		## TMP RUNNER >> ##
 		while True:
@@ -53,7 +55,7 @@ class Aggregator():
 			for input in inputs:
 				# print(f"	 [DEBUG] mutation was {input}")
 				response_code = self.harness.open_pipe(input)
-				print(f"\n   [DEBUG] Aggregator received {response_codes.lookup(response_code)} from binary")
+				# print(f"\n   [DEBUG] Aggregator received {response_codes.lookup(response_code)} from binary")
 				if (response_code): 
 					write_crash(input)
 					exit(0)				# exit on crash ? 
