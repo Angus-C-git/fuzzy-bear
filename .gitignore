@@ -9,6 +9,10 @@ __pycache__/
 
 */*/__pycache__/
 
+# releases
+
+releases/
+
 # Crash, testing, debug
 
 .gdb_history
