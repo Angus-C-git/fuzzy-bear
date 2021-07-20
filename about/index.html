@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>About</title>
+        <link rel="canonical" href="/fuzzy-bear/about/">
+        <style>
+
+    html body {
+        font-family: 'Mina', sans-serif;
+        background-color: #f5f5f5;
+    }
+
+    :root {
+        --accent: #386890;
+        --border-width:  0 ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mina">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=VT323">
+
+
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/lakeside-light.min.css"> 
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.0/css/all.css" integrity="sha384-Mmxa0mLqhmOeaE8vgOSbKacftZcsNYDjQzuCOm6D02luYSzBG8vpaOykv9lFQ51Y" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="/fuzzy-bear/css/main.css">
+
+
+
+
+ 
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/bash.min.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/go.min.js"></script>
+    
+
+    <script>hljs.initHighlightingOnLoad();</script>
+
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+<script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+
+
+<script>
+$(document).ready(function(){
+    
+  var input = $('#night-mode-toggle');
+  var container = $('#bigbody');
+  var stat = $('#button-status');
+  
+  container.toggleClass(localStorage.toggled);
+  stat.bootstrapToggle(localStorage.button).change();
+  
+  input.on('click', function() {
+      if (localStorage.toggled != "-nightmode" ) {
+          container.toggleClass("-nightmode", true );
+          localStorage.toggled = "-nightmode";
+          localStorage.button = "on";
+       } else {
+          container.toggleClass("-nightmode", false );
+          localStorage.toggled = "";
+          localStorage.button = "off"
+       }
+  })
+});
+</script>
+ <meta name="generator" content="Hugo 0.85.0" />
+        <link href="" rel="alternate" type="application/rss+xml" title="Fuzzy Bear" />
+        <link href="" rel="feed" type="application/rss+xml" title="Fuzzy Bear" />
+        
+
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="/fuzzy-bear/img/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/fuzzy-bear/img/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/fuzzy-bear/img/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/fuzzy-bear/img/favicon/site.webmanifest">
+    <link rel="mask-icon" href="/fuzzy-bear/img/favicon/safari-pinned-tab.svg" color="#000000">
+    <link rel="shortcut icon" href="/fuzzy-bear/img/favicon/favicon.ico">
+    <meta name="msapplication-TileColor" content="#2b5797">
+    <meta name="msapplication-config" content="/fuzzy-bear/img/favicon/browserconfig.xml">
+    <meta name="theme-color" content="#ffffff">
+    
+    
+    
+    <meta property="og:title" content="About">
+    <meta property="og:type" content="article">
+      
+      <meta name="twitter:card" content="summary">
+      <meta name="twitter:image" content="/fuzzy-bear/tmp_logo.png" >
+      
+    <meta property="description" content="">
+    <meta property="og:description" content="">
+    
+    <meta name="twitter:creator" content="">
+    <meta name="twitter:site" content="">
+    
+    </head>
+
+    
+    
+    <script type="text/javascript" async
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
+    
+
+    <body id = "bigbody">
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">About</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                        <ul class="nav navbar-nav">
+                            
+                                <li><a href="/fuzzy-bear/">Home</a></li>
+                            
+                                <li><a href="/fuzzy-bear/about/">About</a></li>
+                            
+                                <li><a href="/fuzzy-bear/team/">Cubs</a></li>
+                            
+                        </ul>
+                    
+                    
+                        <ul class="nav navbar-nav navbar-right">
+                            
+                                <li class="navbar-icon"><a href="https://github.com/Angus-C-git/fuzzy-bear"><i class="fab fa-github"></i></a></li>
+                            
+                                <li class="navbar-icon"><a href="#"><i class="fab fa-twitter"></i></a></li>
+                            
+                            <li id="night-mode-toggle">
+    <input type="checkbox" id = "button-status"
+        data-toggle="toggle"
+        data-width = "10"
+        data-height = "1"
+        data-on="<i class='far fa-moon fa-lg'></i>"
+        data-off= "<i class='far fa-sun fa-lg'></i>"
+        data-style="ios"
+        data-onstyle = "default">
+</li>
+                        </ul>
+                    
+                </div>
+            </div>
+        </nav>
+
+
+
+
+    
+    <div class="page">
+        <br> <div class="text-justify"><h1 id="fuzzy-bear">Fuzzy Bear</h1>
+<hr>
+<blockquote>
+<p>Fuzzy Bear is a blackbox fuzzer written in python.</p>
+</blockquote>
+<h2 id="design-overview">Design Overview</h2>
+<p>The fuzzer is designed with three primary components which work together to provide the desired functionality.</p>
+<ul>
+<li>Harness</li>
+<li>Strategies</li>
+<li>Aggregator</li>
+</ul>
+<p>Each component and indeed the fuzzer as a whole is designed with a strong focus on modular design. For strategies to be particularly useful they need to be able to be applied with great flexibility.</p>
+<pre><code>fuzzer [Entry point]
+|  
+|  Harness --&gt; Binary
+|   ^   |
+V   |   V
+Aggregator --&gt; Strategies ---
+    ^                       |
+    |_______________________|
+
+</code></pre><h2 id="harness">Harness</h2>
+<p>Second only to the generators themselves is the harness. The harness is the component of the fuzzer which really makes it useful. It is responsible for feeding input to the binary through <code>stdin</code> and collecting the response from the binary to return to the aggregator. The harness also implements a <strong>health check</strong> function which aims to detect hangs and infinite loops in the binary.</p>
+<h2 id="strategies">Strategies</h2>
+<h3 id="common">Common</h3>
+<p>There exist a number of mutations which are agnostic to the file format being utilized for mutation or which can and should be used within format specific mutations. For this reason we implement a base class <code>Strategies</code> which is extended by all other strategies the fuzzer currently supports. This has several major benefits:</p>
+<pre><code>+ It reduces code reuse 
++ Makes extending the functionality of the fuzzer `trivial`
+  + Add new broad strategies with class methods to the base class
+  + Or add support for more file formats without losing the ability to utilise existing code
++ It makes it easy to focus on writing format specific generators
+</code></pre>
+<h3 id="csv">CSV</h3>
+<p>CSV strategies focus on generating oddball data to place into <em>sensible</em> places within a CSV file. Currently this mainly revolves around loading the input file into memory and then mutating that data structures fields using tactics implemented in the base class. The CSV strategy also implements <code>add_entries</code> which focuses on creating a large valid csv structure with many rows/columns.</p>
+<h3 id="json">JSON</h3>
+<p>Similarly to the CSV based strategies the JSON generator attempts to create sane json structures with unnatural and unexpected fields which may cause a parser to break and  memory corruption to occur. A key strategy that the
+JSON mutator implements is the ability to select a random field to alter with another tactics data. The JSON generator also implements a function to add a large number of extra fields in the hopes of causing overflow based crashes to occur.</p>
+<h2 id="aggregator">Aggregator</h2>
+<p>The aggregator is the component of the fuzzer responsible for bridging the gap between the generators (strategies) and the harness. It functions as the manager for the fuzzing campaign taking in user supplied parameters and orchestrating the calling of generators whose output it then feeds to the harness. It then monitors the response from the harness to deicide if a crash file should be written and the campaign halted, or if the program is hanging / stuck in an infinite loop in which case the strategy should be evolved.</p>
+</div>
+
+        
+        
+    
+        
+    
+        
+    </div>
+
+
+
+
+        <footer id = "bigfooter">
+            <div style = "padding:15px;">
+                <p>
+                    Built for <a href='#'>COMP6447</a> by  | 
+                    <a href='https://cybernetic.coffee' target='_blank'>Angus</a> | 
+                    <a href='#'>Krispy</a> | 
+                    <a href='#'>Brandon</a> | 
+                    <a href='#'>Calvin</a> |
+                </p>
+                
+                
+                
+                
+            </div>
+        </footer>
+    
+    </body>
+
+</html>
+
