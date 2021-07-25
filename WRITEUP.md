@@ -15,9 +15,9 @@ Each component and indeed the fuzzer as a whole is designed with a strong focus 
 ```
 fuzzer [Entry point]
 |  
-|  Harness --> Binary
-|   ^
-V   |
+|  Harness <--> Binary
+|   ^  |
+V   |  V
 Aggregator --> Strategies ---
     ^                       |
     |_______________________|

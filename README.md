@@ -18,7 +18,17 @@
 
 ## Components/Modules
 
-![Diagram]()
+```
+fuzzer [Entry point]
+|  
+|  Harness <--> Binary
+|   ^  |
+V   |  V
+Aggregator --> Strategies ---
+    ^                       |
+    |_______________________|
+
+```
 
 ### Harness
 
