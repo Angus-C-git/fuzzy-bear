@@ -7,7 +7,7 @@
 
 ## Overview
 
-+  A blackbox fuzzer written in 🐍
++  A pythonic blackbox fuzzer for ELF binaries. 
 
 ## Usage
 
@@ -22,21 +22,25 @@
 
 ### Harness
 
-+ Stuff and things
+Responsible for feeding input to the binary through `stdin` and collecting the response from the binary to return to the aggregator. The harness also implements a **health check** function which is used by the aggregator to attempt to detect hangs and infinite loops in the binary. 
+### Strategies
 
-+ Stuff and things
+The set of broad tactics and techniques used in attempts to produce crashing inputs for the target binary as well as format specific techniques. Supported formats are:
 
-### Mutator
++ TXT
++ CSV
++ JSON
++ XML
++ PDF
++ JPEG
+## Aggregator
 
-+ Stuff and things
-
-### Generator
-
-+ Stuff and things
+The aggregator is the component of the fuzzer responsible for bridging the gap between the generators (strategies) and the harness. It functions as the manager for the fuzzing campaign taking in user supplied parameters and orchestrating the calling of generators whose output it then feeds to the harness. It then monitors the response from the harness to deicide if a crash file should be written and the campaign halted, or if the program is hanging / stuck in an infinite loop in which case the strategy should be evolved.
 
 ## Libraries
 
-+ [enlighten](https://pypi.org/project/enlighten/)
++ [rich](https://github.com/willmcgugan/rich) for GUI
++ [python-magic](#) for input file detection
 
 
 ## Structure
@@ -46,69 +50,73 @@
 
 ```
 .
-├── fuzzbear
+|
+├── fuzzer
 ├── fuzzybear
 │   ├── Aggregator.py
 │   ├── Harness.py
 │   ├── __init__.py
 │   ├── __main__.py
-│   ├── __pycache__
-│   │   ├── Aggregator.cpython-39.pyc
-│   │   ├── Harness.cpython-39.pyc
-│   │   └── __init__.cpython-39.pyc
-│   └── strategies
-│       ├── CSV
-│       │   └── CSV.py
-│       ├── ELF
-│       │   └── ELF.py
-│       ├── __init__.py
-│       ├── JPEG
-│       │   └── JPEG.py
-│       ├── JSON
-│       │   └── JSON.py
-│       ├── PDF
-│       │   └── PDF.py
-│       ├── README.md
-│       ├── Strategy.py
-│       ├── TXT
-│       │   └── TXT.py
-│       └── XML
-│           └── XML.py
+│   ├── strategies
+│   │   ├── CSV
+│   │   │   └── CSV.py
+│   │   ├── ELF
+│   │   │   └── ELF.py
+│   │   ├── __init__.py
+│   │   ├── JPEG
+│   │   │   └── JPEG.py
+│   │   ├── JSON
+│   │   │   └── JSON.py
+│   │   ├── PDF
+│   │   │   └── PDF.py
+│   │   ├── README.md
+│   │   ├── Strategy.py
+│   │   ├── TXT
+│   │   │   └── TXT.py
+│   │   └── XML
+│   │       └── XML.py
+│   └── utility
+│       ├── codec.py
+│       └── response_codes.py
 ├── install.sh
+├── mk_release.sh
 ├── README.md
 ├── requirements.txt
 ├── test_fuzzybear
-└── tests
-    ├── complete
-    │   ├── target-bins
-    │   │   ├── csv1
-    │   │   ├── csv2
-    │   │   ├── jpg1
-    │   │   ├── json1
-    │   │   ├── json2
-    │   │   ├── plaintext1
-    │   │   ├── plaintext2
-    │   │   ├── plaintext3
-    │   │   ├── xml1
-    │   │   ├── xml2
-    │   │   └── xml3
-    │   └── target-ins
-    │       ├── csv1.txt
-    │       ├── csv2.txt
-    │       ├── jpg1.txt
-    │       ├── json1.txt
-    │       ├── json2.txt
-    │       ├── plaintext1.txt
-    │       ├── plaintext2.txt
-    │       ├── plaintext3.txt
-    │       ├── xml1.txt
-    │       ├── xml2.txt
-    │       └── xml3.txt
-    └── components
-        ├── harness
-        │   ├── bins
-        │   │   └── harness_mvp
-        │   └── ins
-        │       └── big.txt
-        └── strategies
+├── TESTING.md
+├── tests
+│   ├── complete
+│   │   ├── codecs
+│   │   │   ├── csv1.txt
+│   │   │   ├── csv2.txt
+│   │   │   ├── jpg1.txt
+│   │   │   ├── json1.txt
+│   │   │   ├── json2.txt
+│   │   │   ├── plaintext1.txt
+│   │   │   ├── plaintext2.txt
+│   │   │   ├── plaintext3.txt
+│   │   │   ├── xml1.txt
+│   │   │   ├── xml2.txt
+│   │   │   └── xml3.txt
+│   │   ├── csv1
+│   │   ├── csv2
+│   │   ├── jpg1
+│   │   ├── json1
+│   │   ├── json2
+│   │   ├── plaintext1
+│   │   ├── plaintext2
+│   │   ├── plaintext3
+│   │   ├── xml1
+│   │   ├── xml2
+│   │   └── xml3
+│   └── components
+│       ├── aggregator
+│       │   └── badIn.png
+│       ├── harness
+│       │   ├── bins
+│       │   └── ins
+│       └── strategies
+│           ├── CSV
+│           └── JSON
+└── WRITEUP.md
 ```
