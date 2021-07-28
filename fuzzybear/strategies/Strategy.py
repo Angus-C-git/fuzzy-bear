@@ -9,6 +9,7 @@ BASE CLASS
 	  specific operations 
 	► Inherit this class to build other strategies 
 
+	► TODO :: Should be a factory model
 '''
 
 class Strategy():
