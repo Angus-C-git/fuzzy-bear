@@ -111,7 +111,7 @@ class Header:
             ),
             # Display inspirational 'quotes'
             Panel(
-                f"'Have you tried AFL?'{'':10}", 
+                f"'Have you tried AFL?'{'':15}", 
                 title="[b]Quotes", 
                 border_style="magenta",
                 padding=(4, 3),

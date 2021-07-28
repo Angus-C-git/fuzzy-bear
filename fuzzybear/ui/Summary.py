@@ -11,3 +11,16 @@ from rich.live import Live
 from time import sleep
 
 console = Console()
+
+""" Log Summary Of Fuzzing Campagin To Console """
+
+
+
+"""devnotes
+
++ Rough plan:
+    + Display table with results from stats after writing
+      bad.txt
+    + Note the crashing strategy
+
+"""
