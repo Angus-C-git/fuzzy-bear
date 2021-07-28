@@ -1,6 +1,8 @@
 from pwn import *
 from pwnlib.gdb import corefile
 
+from capstone import *
+
 # import gdb
 # proc = process('../../tests/components/coverage/complex')
 
@@ -55,9 +57,24 @@ def dump_symbols():
 
     # gdb_pipe = gdb.debug([test_binary], gdbscript="""break main""", api=True)
     
-    
 
-dump_symbols()
+
+def gen_code_paths():
+    """ Dump binaries code paths """
+    elf = ELF(test_binary)
+    
+    # TODO :: Dynamic arch detection
+    target_bin_conf = Cs(CS_ARCH_X86, CS_MODE_32)
+    
+    # executable code lives in .text section
+    opcodes = elf.section('.text')
+
+    for op in target_bin_conf.disasm(opcodes, 0x1000):
+        print("0x%x:\t%s\t%s" %(op.address, op.mnemonic, op.op_str))
+
+
+# dump_symbols()
+gen_code_paths()
 
 
 """devnotes
@@ -68,5 +85,11 @@ dump_symbols()
   can be called inline while the binary runs
 + There is overhead associated with this method of course
 + The method can be quite unreliable
+
++ UPDATE :: capstone is very much faster than gdb and 
+            more effective since we dont need to mess
+            with pipes
++ TODO :: Detect code blocks and function names
+    + Convert into data structure to use for tree and coverage
 
 """
