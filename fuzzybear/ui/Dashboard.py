@@ -8,6 +8,7 @@ from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn
 from rich.syntax import Syntax
 from rich.table import Table
 from rich.text import Text
+from rich.tree import Tree
 from rich.measure import Measurement
 from rich.live import Live
 from time import sleep
@@ -18,7 +19,7 @@ console = Console()
 
 
 """
-    TMP DUMMY VARIABLES TO SIMULATE STRATEGIES
+    TMP DUMMY VARIABLES TO SIMULATE ELEMENTS
 
     TODO :: fill out function stubs
 """
@@ -35,6 +36,47 @@ strategy_progress.add_task("[cyan]Large fields", total=400)
 total = sum(task.total for task in strategy_progress.tasks)
 overall_progress = Progress()
 overall_task = overall_progress.add_task("Progress", total=int(total))
+
+"""
+Structure:
+- root = main
+    |
+    - anchor (function): [sub_function, thing]
+    |
+    - anchor (function): 
+        |
+        - [sub_function, thing]
+
+"""
+
+# Coverage Tree Colors
+EXPLORED = "bright_green"
+UNEXPLORED = "bright_red"
+
+dummy_code_paths = {
+    "main": [
+        "get_input", 
+        ["validate_input", "send_input"],
+        "vuln"
+    ]
+}
+
+def build_coverage_tree(code_paths=dummy_code_paths):
+    """ Build coverage tree """
+    root = Text("main", EXPLORED)
+    # root node
+    paths_tree = Tree(root, guide_style="white")
+    
+    # code paths
+    branch = paths_tree.add(Text("get_input", EXPLORED))
+    
+    branch.add(Text("send_input", UNEXPLORED))
+    branch.add(Text("validate_input", UNEXPLORED))
+
+    paths_tree.add(Text("vuln", UNEXPLORED))
+    return paths_tree
+       
+coverage_tree = build_coverage_tree()
 
 # ======================================= #
 
@@ -141,21 +183,22 @@ class Footer:
                 strategy_progress,
                 title="[b]Strategies",
                 border_style="green",
-                padding=(3, 2),
+                padding=(3, 10),
             ),
             # Display logging data
             Panel(
                 f"[{self.time_stamp}]{'':3}{self.log_msg}{'':10}", 
                 title="[b]Logs", 
                 border_style="cyan",
-                padding=(4, 3),
+                padding=(4, 10),
             ),
             # Display current coverage data
             Panel(
-                strategy_progress, 
+                # strategy_progress, 
+                coverage_tree,
                 title="[b]Coverage", 
                 border_style="red", 
-                padding=(3, 2),
+                padding=(3, 10),
                 expand=True
             ),
         )
@@ -175,7 +218,7 @@ def make_layout() -> Layout:
     layout.split_column(
         Layout(name="banner", size=5),
         Layout(name="header", size=12),
-        Layout(name="footer", size=12),
+        Layout(name="footer", size=14),
     )
     return layout
 
@@ -191,6 +234,7 @@ layout["footer"].update(Footer())
 # ======================================= #
 
 # TODO :: Move to method and tie in event handlers
+# probably an update method
 with Live(layout, refresh_per_second=10, screen=True):
     while not overall_progress.finished:
         sleep(0.1)
@@ -226,4 +270,7 @@ with Live(layout, refresh_per_second=10, screen=True):
     + Overall Strategy Exhaustion: How many strategies have been exhausted
         + Does not indicate a halt in fuzzing just that all strategies have been
           exhausted in there basic forms
+
++ Rendering the code paths will be a intrresting and should be done
+    recursively 
 '''
