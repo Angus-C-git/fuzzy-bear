@@ -1,6 +1,8 @@
 from pwn import *
 from pwnlib.gdb import corefile
 
+
+
 from capstone import *
 
 # import gdb
@@ -19,47 +21,85 @@ _default_symbols = [
 
 def dump_symbols():
     
-    elf = ELF(test_binary)
+    elf = ELF(simple_binary)
     print(elf.symbols, "\n\n")
     print("Functions: \n", elf.functions.keys(), "\n\n")
     
     
     # process.corefile(test_binary)
-    proc = process(test_binary)
+    proc = process(simple_binary)
     #gdb.corefile(proc)
-    prog_state = proc.corefile
-    print(f"EIP @: {hex(prog_state.eip)}")
-    proc.recvuntil('function1\n')
-    proc.sendline('test')
-    # proc.sendline('0')    
-    # proc.recvuntil('function2\n')
+    # prog_state = proc.corefile
+    # print(f"EIP @: {hex(prog_state.eip)}")
+    # proc.sendline('A' * 300)
+    # # proc.recvuntil('function1\n')
+    # # proc.sendline('test')
+    # # proc.sendline('0')    
+    # # proc.recvuntil('function2\n')
 
-    # dump a corefile at the current point
-    # core is written to disk @ cwd so will
-    # need cleanup
-    prog_state = proc.corefile
-    print(f"EIP @: {hex(prog_state.eip)}")
+    # # dump a corefile at the current point
+    # # core is written to disk @ cwd so will
+    # # need cleanup
+    # prog_state = proc.corefile
+    # print(f"EIP @: {hex(prog_state.eip)}")
 
-    print(f"STACK :: {prog_state.stack}")
-    print(f"Registers :: {prog_state.registers}")
+    # print(f"STACK :: {prog_state.stack}")
+    # print(f"Registers :: {prog_state.registers}")
 
     # pid = gdb.attach(
     #     proc, 
     #     gdbscript='''
     #             disassemble main 
                  
+    #             break main
+    #             detach
     #             quit
     #             ''',
     #     api=True
     # )
     # print(pid)
 
-    # print(proc.recvline())
+    #print(proc.recvline())
     # gdb_instance = gdb.
 
-    # gdb_pipe = gdb.debug([test_binary], gdbscript="""break main""", api=True)
+    gdb_pipe = gdb.attach(
+        proc, 
+        gdbscript="""
+                break main
+                """, 
+        api=True
+    )
+    print("[>>] Opened PIPE :: ", gdb_pipe)
+
+    pid, gdb_inst = gdb_pipe
+    print("[>>] Opened GDB instance ::", gdb_inst)
+    # option dead on this arch?
+    # gdb_inst.start_recording()
+
+    proc.sendline('a' * 500)
+    # record = gdb_inst.current_recording()
+    
+    # print(dir(record))
+    # # print(record.begin)
+    # gdb_inst.stop_recording()
+    # print(record.method)
+
+    
+    # # proc.recvuntil('\n')
+    # # print("EVENTS :: ", gdb_inst.events)
+    # print(gdb_inst.breakpoints())
+    # for bp in gdb_inst.breakpoints():
+    #     # print(dir(bp))
+    #     print(f'{bp.number} hit {bp.hit_count} times') 
+
+   
+
+    # for bp in gdb_inst.breakpoints():
+    #     # print(dir(bp))
+    #     print(f'{bp.number} hit {bp.hit_count} times')    
     
 
+# ================================================================= #
 blocks = [
     {
         '_start': [],    # opcodes for start
@@ -105,10 +145,111 @@ def gen_code_paths():
     print(blocks)
 
 
+# ================================================================= #
+
+
+def stop_event_handler(event):
+    print("[>>] ", event)
+
+
+def test_gdb():
+    proc = process(simple_binary)
+
+    gdb_pipe = gdb.attach(
+        proc, 
+        gdbscript="""
+                break main
+                c
+                """, 
+        api=True
+    )
+    print("[>>] Opened PIPE :: ", gdb_pipe)
+
+    pid, gdb_inst = gdb_pipe
+    print("[>>] Opened GDB instance ::", gdb_inst)
+
+    gdb_inst.events.stop.connect(stop_event_handler)
+    
+    print("[>>] event hander connected")
+    proc.sendline('a' * 5)
+    # proc.interactive()
+    gdb_inst.events.stop.disconnect(stop_event_handler)
+    print("[>>] Event handler disconnect")
+
+
+def gdb_debugger_test():
+    # proc = process(simple_binary)
+
+    gdb_pipe = gdb.debug(
+        simple_binary, 
+        gdbscript="""
+                break main
+                c
+                """, 
+        api=True
+    )
+    print("[>>] Opened PIPE :: ", gdb_pipe)
+
+    gdb_inst = gdb_pipe
+    print("[>>] Opened GDB instance ::", gdb_inst)
+
+    gdb_inst.events.stop.connect(stop_event_handler)
+    
+    print("[>>] event hander connected")
+    #proc.sendline('a' * 5)
+    # proc.interactive()
+    gdb_inst.events.stop.disconnect(stop_event_handler)
+    print("[>>] Event handler disconnect")    
+
+
+
+# ================================================================= #
+
+"""notes
+
++ ptrace is very handy
++ was assumed that this would only work
+  through a C wrapper / binding
++ looks like it may be possible to do it 
+  directly through python, ish making it a 
+  very compelling approach 
++ also libs like:
+    + ptracer
+    + python-ptrace
+
+
+"""
+import ctypes
+import sys
+import os
+
+PTRACE_PEEKTEXT   = 1
+PTRACE_PEEKDATA   = 2
+PTRACE_POKETEXT   = 4
+PTRACE_POKEDATA   = 5
+PTRACE_CONT       = 7
+PTRACE_SINGLESTEP = 9
+PTRACE_GETREGS    = 12
+PTRACE_SETREGS    = 13
+PTRACE_ATTACH     = 16
+PTRACE_DETACH     = 17
+
+
+def ptrace_tests():
+    """ interface to ptrace syscall """
+    pass
+
+
+# ================================================================= #
+
+
+# ================================================================= #
+# test_gdb()
+# gdb_debugger_test()
 # dump_symbols()
-gen_code_paths()
+# gen_code_paths()
 
-
+# ================================================================= #
 """devnotes
 
 + We can dump corefiles for the running binary to detect the state
