@@ -3,6 +3,11 @@
 void
 function1()
 {
+    char buf[10];
+    gets(&buf);
+
+    // printf("%s\n", buf);
+
     int hex_cmp;
 
     if (0x9 == 9)
@@ -17,7 +22,8 @@ main(int argc, char const *argv[])
 {
     /* code */
     int answer;
-
+    printf("grabage data");
+    
     // just call another function
     function1();
 
