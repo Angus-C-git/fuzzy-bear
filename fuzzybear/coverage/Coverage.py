@@ -7,6 +7,8 @@ from capstone import *
 # proc = process('../../tests/components/coverage/complex')
 
 test_binary = "../../tests/components/coverage/complex"
+simple_binary = "../../tests/components/coverage/simple"
+
 
 _default_symbols = [
     '_start',
@@ -58,19 +60,49 @@ def dump_symbols():
     # gdb_pipe = gdb.debug([test_binary], gdbscript="""break main""", api=True)
     
 
+blocks = [
+    {
+        '_start': [],    # opcodes for start
+        'block_num': 0   # block number
+    }, 
+    {
+        'main' : [],     # opcodes for main
+        'block_num': 0   # block number
+    }
+]
 
 def gen_code_paths():
     """ Dump binaries code paths """
-    elf = ELF(test_binary)
+    # elf = ELF(test_binary)
+    elf = ELF(simple_binary)
     
     # TODO :: Dynamic arch detection
     target_bin_conf = Cs(CS_ARCH_X86, CS_MODE_32)
+    target_bin_conf.detail = True
     
     # executable code lives in .text section
     opcodes = elf.section('.text')
 
+    current_block = 0
+    last_block = 0
     for op in target_bin_conf.disasm(opcodes, 0x1000):
         print("0x%x:\t%s\t%s" %(op.address, op.mnemonic, op.op_str))
+        if len(op.groups) > 0:
+            print(f"Block{'':5}{op.groups}")
+            # if (op.groups[0] != last_block):
+            #     current_block += 1
+            #     last_block = op.groups[0]
+            
+            
+            # if (current_block == 0):
+            #     blocks[current_block]['block_num'] = op.groups[0]
+            #     blocks[current_block]['_start'].append(op.op_str)
+            # else:
+            #     blocks[current_block] = {
+            #         'block_num': op.groups[0],
+            #     }
+                
+    print(blocks)
 
 
 # dump_symbols()
@@ -92,4 +124,5 @@ gen_code_paths()
 + TODO :: Detect code blocks and function names
     + Convert into data structure to use for tree and coverage
 
++ Can proably use groups to work out the blocks
 """
