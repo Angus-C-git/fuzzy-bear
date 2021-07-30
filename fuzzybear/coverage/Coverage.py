@@ -217,8 +217,10 @@ def gdb_debugger_test():
     + ptracer
     + python-ptrace
 
-
++ Example C interface
+    + github.com/pinterest/ptracer/blob/master/ptracer/ptrace/_ptrace.c
 """
+
 import ctypes
 import sys
 import os
@@ -261,9 +263,25 @@ def ptrace_tests():
 
 + UPDATE :: capstone is very much faster than gdb and 
             more effective since we dont need to mess
-            with pipes
+            with pipes for static analysis
 + TODO :: Detect code blocks and function names
     + Convert into data structure to use for tree and coverage
 
 + Can proably use groups to work out the blocks
+
+
+=== Approach === 
+
++ Use capstone & symbols table (via pwntools) to perform
+  static analysis on the binary dumping blocks and function
+  names
++ Create a tree of the function blocks 
+
++ Use ptrace to set breakpoints on the previously collected
+  function names and addresses
++ Log breakpoints that are hit to track coverage
+    + Need to explore how ptrace interacts with breakpoints
+     and when events need to occur / the responsibility of the
+     harness and aggregator 
+
 """
