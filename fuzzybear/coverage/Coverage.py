@@ -11,6 +11,36 @@ from capstone import *
 test_binary = "../../tests/components/coverage/complex"
 simple_binary = "../../tests/components/coverage/simple"
 
+# ================================================================= #
+
+from . import ptrace
+
+class Coverage:
+    """ handler class for coverage ops """
+    def __init__(self, coverage_target):
+        self.coverage_target = coverage_target
+
+
+    def gen_code_paths(self):
+        """ establish all paths through target """
+        pass
+
+
+    def start(self):
+        """ begin coverage ops"""
+        ptrace.attach_tracer()
+
+
+'''todos
+
++ resolve target architecture
+
+'''
+
+# ================================================================= #
+
+
+
 
 _default_symbols = [
     '_start',
