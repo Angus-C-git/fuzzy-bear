@@ -1,5 +1,5 @@
 from .. import Strategy
-
+from xml.dom import minidom
 
 class XML(Strategy.Strategy):
     
