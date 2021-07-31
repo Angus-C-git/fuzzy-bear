@@ -13,7 +13,7 @@ simple_binary = "../../tests/components/coverage/simple"
 
 # ================================================================= #
 
-from . import ptrace
+import ptrace
 
 class Coverage:
     """ handler class for coverage ops """
@@ -26,9 +26,10 @@ class Coverage:
         pass
 
 
-    def start(self):
+    def start(self, tracee_pid):
         """ begin coverage ops"""
-        ptrace.attach_tracer()
+    
+        ptrace.attach_tracer(tracee_pid)
 
 
 '''todos
