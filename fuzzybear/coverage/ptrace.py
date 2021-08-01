@@ -46,17 +46,19 @@ def dump_register_state():
 
 	# TMP patchwork 
 	_registers = Registers_x86_64()
+	_data = Registers_x86_64()
 
 	LIBC.ptrace(PTRACE_GETREGS, PID, 0, ctypes.byref(_registers))
 	print(_registers)
 	print_register_state(_registers)
-
+	# _data = LIBC.ptrace(PTRACE_PEEKDATA, PID, ctypes.c_void_p(_registers.rip), 0)
+	# print(_data)
 
 
 
 """ TMP TEST PROCESS  """
 from pwn import *
-test_tracee = process('../../tests/components/coverage/simple64') 
+test_tracee = process('../../tests/components/coverage/complex64') 
 
 
 def attach_tracer(pid):
@@ -70,10 +72,16 @@ def attach_tracer(pid):
 				if WSTOPSIG(stat[1]) == 19:
 						print(f"[>>] attached {PID}")
 						# test intreact
-						test_tracee.sendline('aa')
+						test_tracee.sendlineafter('function1\n', 'aaa')
+						test_tracee.recvuntil('enter a ')
+						test_tracee.sendlineafter('number\n', '10')
+						test_tracee.sendlineafter('hack me\n', 'A' * 200)
 				else:
-						print("[>>] stopped for some other signal, bad ...", WSTOPSIG(stat[1]))
-						return -1
+					print(
+						"[>>] stopped for some other signal, bad ...", 
+						WSTOPSIG(stat[1])
+					)
+					return -1
 
 
 """ TMP TESTS """
@@ -84,10 +92,51 @@ print(f"[>>] Detached from {PID}")
 
 
 
+'''
+::::::::::::::::::::::::::::: [PTRACE] :::::::::::::::::::::::::::::
+ _________
+|		  |
+| process | --- pid --> attach_tracer(pdi) --> set_traps(blocks) --
+|_________|												 	      | 	
+																  |
+					 detach_tracer(pid) <--- handle_trap() <------
+											  |	   ^  |
+											  |___/   |
+											          |
+													  V
+										   update_coverage()
+
+_ attach_tracer(pid) _
+
+	+ Handels attaching to tracee
+
+_ set_traps(blocks) _
+
+	+ Sets breakpoints at the start of 
+	  each block in a program
+
+_ handle_trap() _
+
+	+ Primary utility method for fuzzing
+	+ Recives trap signals from the process
+	+ Updates coverage information
+	+ Restores register states modified to 
+	  set the blocks breakpoints
+	+ The coverage handler higher up
+	 takes care of saving the progressing
+	 input to a corpus 
+
+_ detach_tracer(pid) _
+
+	+ Handels detaching from tracee
+	+ Cleanup, may be unnecessary since 
+	  the process terminating kills the ptrace
+'''
 
 
 
 '''devnotes
+
 
 + ptrace requires pid of process so will need
 	to be hooked in from harness
@@ -101,6 +150,7 @@ print(f"[>>] Detached from {PID}")
 + Set breakpoints by inserting sigtraps in the binary at single
 	instruction locations
 + can tap into /proc/mappings to defeat PIE/ASLR
++ Might need to be stopped to properly observe register changes
 
 @ man ptrace
 + When the tracer is finished tracing, it can cause the tracee to continue executing in a normal,

@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-void
+int
 function1()
 {
     char buf[10];
@@ -14,6 +14,8 @@ function1()
         hex_cmp = 1;
     else
         hex_cmp = 0;
+
+    return 10;
 }
 
 
@@ -22,7 +24,7 @@ main(int argc, char const *argv[])
 {
     /* code */
     int answer;
-    printf("grabage data");
+    printf("grabage data\n");
     
     // just call another function
     function1();

@@ -9,6 +9,7 @@ untouchable_code_path(void)
 void
 vulnerable(){
     char hack[10];
+    printf("hack me\n");
     gets(&hack);
     
     printf("The password is: but what is coverage?\n");
@@ -41,6 +42,7 @@ function1()
 
     printf("function1\n");
     fgets(safe_buffer, 200, stdin);
+    printf("enter a number\n");
     scanf("%d", &sth_foolish);
 
     function2(sth_foolish);
