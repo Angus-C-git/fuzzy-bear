@@ -9,16 +9,27 @@ from os import waitpid, WIFSTOPPED, WSTOPSIG
 """ 
 >-> pythonic interface to ptrace <-<
 
-		► Exposed via libc and utilizing ctypes
-		► Work in progress
+	► Exposed via libc and utilizing ctypes
+	► Work in progress
 
 """
 
+""" NOTE :: these need to be ported to constants """
+# ===============================================
 
 PID = None
 
+# int $3
+TRAP_CODE = 0xCC
+
+ADDRESS_MASK_x86 = 0xFFFFFF00
+ADDRESS_MASK_x86_64 = 0xFFFFFFFFFFFFFF00
+
+# ===============================================
+
+
 """ debugging methods  """
-def print_register_state(registers):
+def print_register_state_x86_64(registers):
 	""" Print register state """
 	print(f"RIP: {hex(registers.rip)}")
 	print(f"RBP: {hex(registers.rbp)}")
@@ -31,13 +42,67 @@ def print_register_state(registers):
 	print(f"RAX: {hex(registers.rax)}")
 
 
+def print_register_state_x86(registers):
+	""" Print register state """
+	print(f"EIP: {hex(registers.eip)}")
 
-def save_register_state():
-	pass
+	print(f"EBX: {hex(registers.ebx)}")
+	print(f"ECX: {hex(registers.ecx)}")
+	print(f"EDX: {hex(registers.edx)}")
+	print(f"ESI: {hex(registers.esi)}")
+	print(f"EDI: {hex(registers.edi)}")
+	print(f"EBP: {hex(registers.ebp)}")
+	print(f"EAX: {hex(registers.eax)}")
+	print(f"DS: {hex(registers.eax)}")
+	print(f"origi_rax: {hex(registers.orig_eax)}")
+	print(f"EFLAGS: {hex(registers.eflags)}")
+	
+	# dropped other registers
+
+def print_symbols(proc):
+	""" Print symbols """
+	elf = ELF(proc)
+	print(elf.symbols, "\n\n")
+	print("Functions: \n", elf.functions.keys(), "\n\n")
+	print('\n\n')
 
 
-def restore_register_state():
-	pass
+def update_coverage(address):
+	""" Update coverage data """
+	# TODO :: resolve function/blockname
+	print(f"Updating coverage, hit {hex(address)}")
+
+
+# ===============================================
+
+def breakpoints_state(tmp_function_name):
+	state = {
+		'_start': 0x80490cc,
+		'main': 0x80491cc,
+		'function1': 0x80491cc,
+		'_end': 0x804b2cc
+	}
+	return state[tmp_function_name]
+
+
+
+# NOTE :: TMP hardcodes for simple
+def save_register_state(tmp_function_name):
+	""" Save register state """
+	state = {
+		'_start': 0x80490a0,
+		'main': 0x80491e9,
+		'function1': 0x80491b6,
+		'_end': 0x804b2e8
+	}
+
+	return state[tmp_function_name]
+
+
+def restore_register_state(bp_addr, original_address):
+	""" Restore register state """
+	res = LIBC.ptrace(PTRACE_POKEDATA, PID, bp_addr, original_address)
+	print(f"[>>] Restore returned {res}")
 
 
 def dump_register_state():
@@ -45,21 +110,117 @@ def dump_register_state():
 	print(f"[>>] Dumping {PID} register state")
 
 	# TMP patchwork 
-	_registers = Registers_x86_64()
-	_data = Registers_x86_64()
+	_registers = Registers_x86()
+	_data = Registers_x86()
 
 	LIBC.ptrace(PTRACE_GETREGS, PID, 0, ctypes.byref(_registers))
 	print(_registers)
-	print_register_state(_registers)
+	# TODO :: make dynamic
+	print_register_state_x86(_registers)
 	# _data = LIBC.ptrace(PTRACE_PEEKDATA, PID, ctypes.c_void_p(_registers.rip), 0)
 	# print(_data)
 
 
 
+def continue_exc():
+	""" Continue execution after breaking """
+	print(f"[>>] Continuing execution of {PID} ...")
+	res = LIBC.ptrace(PTRACE_CONT, PID, 0, 0)
+	print(f"[>>] Continue returned {res}")
+	
+	# print(f"[>>] Rolling back instruction ptr ...")
+
+	if (res):
+		print(f"[>>] Continue failed with error code {res}")
+
+
+def breakpoint(addr, arch='x86'):
+	""" Swap out the last byte with trap"""
+	if (arch == 'x86'):
+		return ((addr & ADDRESS_MASK_x86) | TRAP_CODE)
+	else:
+		return ((addr & ADDRESS_MASK_x86_64) | TRAP_CODE)
+
+
+
+def poketext(pid, address, value):
+	""" Write to memory """
+	res = LIBC.ptrace(PTRACE_POKETEXT, pid, address, value)
+	print(f"[>>] POKETEXT returned {res}")
+	if (res):
+		print(
+			f"[>>] Setting {hex(address)} failed with error code {res}"
+		)
+
+
+
+def handel_traps():
+	""" Handle trap signals """
+	print(f"[>>] Resuming execution from _start ...")
+	continue_exc()
+	# res = LIBC.ptrace(PTRACE_SINGLESTEP, PID, 0, 0)
+
+	# restore_register_state(breakpoints_state('_start'), save_register_state('_start'))
+	# print(f"[>>] Single step returned {res}")
+
+	#TODO :: Work out why waitpid never triggers
+
+	print(f"[>>] Listening for trap signals")
+	stat = waitpid(PID, 0)
+
+	print(f"[>>] Waitpid returned {stat}")
+	# listen for trap singals while fuzzing
+	while True:
+		# stat = LIBC.wait()
+		
+		# hit bp
+		if WSTOPSIG(stat[1]):
+			print(f"[>>] Handling trap signal")
+			dump_register_state()
+			print(f"[>>] Not implemented")
+		else:
+			print(f"[>>] Something awful happened {WIFSTOPPED(stat[1])}")
+			exit(1)
+
+	restore_register_state()
+	update_coverage()
+
+
+# TODO :: deal with alignment 
+def set_traps(targets):
+	""" Set trap breakpoints """
+	for bp_addr in targets:
+		print(f"[>>] Setting trap at {hex(bp_addr)}")
+		poketext(PID, bp_addr, breakpoint(bp_addr))
+		
+
+
+
+
+def set_entry_exit(start_addr, end_addr):
+	""" Set entry and exit point breakpoints """
+	print(f"[>>] Setting start/end point at {hex(start_addr)}/{hex(end_addr)}")
+	start_bp = breakpoint(start_addr)
+	end_bp = breakpoint(end_addr)
+	print(f"[>>] Start breakpoint: {hex(start_bp)}")
+	print(f"[>>] End breakpoint: {hex(end_bp)}")
+
+	poketext(PID, start_addr, start_bp)
+	poketext(PID, end_addr, end_bp)
+
+
+
 """ TMP TEST PROCESS  """
 from pwn import *
-test_tracee = process('../../tests/components/coverage/complex64') 
+test_tracee_elf = '../../tests/components/coverage/linear'
+test_tracee = process(test_tracee_elf) 
 
+
+'''
++ Looks like the process is only setting and or stopping
+ at one breakpoint 
+
+'''
 
 def attach_tracer(pid):
 		""" Attach to tracee to trace """
@@ -68,26 +229,48 @@ def attach_tracer(pid):
 
 		LIBC.ptrace(PTRACE_ATTACH, PID, 0, 0)
 		stat = waitpid(pid, 0)
+		print(f"[>>] Attach stat returned {stat}")
 		if WIFSTOPPED(stat[1]):
 				if WSTOPSIG(stat[1]) == 19:
-						print(f"[>>] attached {PID}")
-						# test intreact
-						test_tracee.sendlineafter('function1\n', 'aaa')
-						test_tracee.recvuntil('enter a ')
-						test_tracee.sendlineafter('number\n', '10')
-						test_tracee.sendlineafter('hack me\n', 'A' * 200)
+						
+						print(f"[>>] Attached {PID}")
+						set_entry_exit(0x80490a0, 0x80491e5)
+						
+						# set_traps([0x80491e9, 0x80491b6])
+						dump_register_state()
+						# handel_traps()
+						# continue_exc()
+						# res = LIBC.ptrace(PTRACE_SINGLESTEP, PID, 0, 0)
+						dump_register_state()
+						# print(f"[>>] Single step returned {res}")
+						# print(f"[>>] WSTOPSIG :: {WSTOPSIG(stat[1])}")
+						# proc.sendline("ls")
+						stat = waitpid(pid, 0)
+						# stat = LIBC.wait(5)
+						print(f"[>>] Got stat {stat}")
 				else:
 					print(
-						"[>>] stopped for some other signal, bad ...", 
+						"[>>] stopped for some other signal ...", 
 						WSTOPSIG(stat[1])
 					)
 					return -1
 
 
 """ TMP TESTS """
+
+# simple:
+	# _start: 0x80490a0
+	# main: 0x80491e9
+	# function1: 0x80491b6
+	# _end: 0x804b2e8
+
+# linear:
+	# _start
+
 print("[>>] Starting kessel run")
+print_symbols(test_tracee_elf)
 attach_tracer(test_tracee.pid)
-dump_register_state()
+
 print(f"[>>] Detached from {PID}")
 
 

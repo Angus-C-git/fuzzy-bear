@@ -2,4 +2,4 @@
 
 import sys
 import os
-from ctypes import Structure, c_ulonglong, c_int32, c_int64, util, CDLL, c_void_p
+from ctypes import Structure, c_ulonglong, c_int32, c_int64, util, CDLL, c_void_p, c_ulong, c_ushort # ctypes_tools
