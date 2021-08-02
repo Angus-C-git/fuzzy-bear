@@ -318,8 +318,10 @@ def launch_tracee(pid_child):
 	if (WIFSTOPPED(status[1])):
 		# print(f"[>>] Stopped for some signal")
 		if (WSTOPSIG(status[1]) == 5):
-			print(f"[>>] Handling trap signal!")
-			# tmp_input = input("[>>] Continue? [y/n] ")
+			print(f"[>>] Hit breakpoint!")
+			print("[>>] Handling trap signal ...")
+			print("")
+			# input("[>>] Continue? [y/n] ")
 			# dump_register_state()
 			print(f"[>>] ;) Not implemented")
 		else:
