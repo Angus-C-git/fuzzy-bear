@@ -1,9 +1,10 @@
 import ctypes
+# from pty import fork
 from ptrace._ptconstants import *
 from ptrace._libc import *
 from ptrace._registers import *
 
-from os import waitpid, WIFSTOPPED, WSTOPSIG
+from os import execl, waitpid, WIFSTOPPED, WSTOPSIG, execv
 
 
 """ 
@@ -122,10 +123,10 @@ def dump_register_state():
 
 
 
-def continue_exc():
+def continue_exc(pid):
 	""" Continue execution after breaking """
-	print(f"[>>] Continuing execution of {PID} ...")
-	res = LIBC.ptrace(PTRACE_CONT, PID, 0, 0)
+	print(f"[>>] Continuing execution of {pid} ...")
+	res = LIBC.ptrace(PTRACE_CONT, pid, 0, 0)
 	print(f"[>>] Continue returned {res}")
 	
 	# print(f"[>>] Rolling back instruction ptr ...")
@@ -197,7 +198,7 @@ def set_traps(targets):
 
 
 
-def set_entry_exit(start_addr, end_addr):
+def set_entry_exit(start_addr, end_addr, pid):
 	""" Set entry and exit point breakpoints """
 	print(f"[>>] Setting start/end point at {hex(start_addr)}/{hex(end_addr)}")
 	start_bp = breakpoint(start_addr)
@@ -205,15 +206,15 @@ def set_entry_exit(start_addr, end_addr):
 	print(f"[>>] Start breakpoint: {hex(start_bp)}")
 	print(f"[>>] End breakpoint: {hex(end_bp)}")
 
-	poketext(PID, start_addr, start_bp)
-	poketext(PID, end_addr, end_bp)
+	poketext(pid, start_addr, start_bp)
+	poketext(pid, end_addr, end_bp)
 
 
 
 """ TMP TEST PROCESS  """
 from pwn import *
-test_tracee_elf = '../../tests/components/coverage/linear'
-test_tracee = process(test_tracee_elf) 
+test_tracee_elf = 'tmp_tests/linear'
+# test_tracee = process(test_tracee_elf) 
 
 
 '''
@@ -256,6 +257,89 @@ def attach_tracer(pid):
 					return -1
 
 
+
+
+
+# =================================== ALT IMPLEMENTATION ===================================
+
+
+
+tmp_proc_bs = {
+	'_start': 0x80490a0,
+	'_end': 0x804b2e8
+}
+
+def run_tracee():
+	pass
+
+
+def launch_trace_target(proc_name):
+	""" Launch the process to be traced """
+	trace_me_res = LIBC.ptrace(PTRACE_TRACEME, 0, 0, 0)
+	if (trace_me_res < 0):
+		print(f"[>>] Traceme failed with error code {trace_me_res}")
+
+	print(f"[>>] Allowed tracing {proc_name}")
+	proc_path = os.path.abspath(proc_name)
+	print(f"[>>] Path to proc {proc_path}")
+
+	# TODO :: Disable ASLR ?
+
+	# replace the forked clone of main process
+	# with this process
+	execl_res = execl('./tmp_tests/linear', '/tmp_tests/linear')
+	if (execl_res < 0):
+		print(f"[>>] Execl failed with error code {execl_res}")
+
+
+
+def launch_tracee(pid_child):
+	""" Launch the tracee to track coverage """
+	print(f"[>>] Starting trace of {pid_child}")
+
+	# trap?
+	status = os.waitpid(pid_child, 0)
+	print(f"[>>] Waitpid returned {status}")
+
+	start_addr = tmp_proc_bs['_start']
+	end_addr = tmp_proc_bs['_end']
+
+	set_entry_exit(start_addr, end_addr, pid_child)
+
+	print(f'[>>] child pid is {pid_child}')
+
+	# cnt
+	continue_exc(pid_child)
+
+	status = os.waitpid(pid_child, 0)
+	print(f"[>>] Waitpid returned {status}")
+	
+
+	if (WIFSTOPPED(status[1])):
+		# print(f"[>>] Stopped for some signal")
+		if (WSTOPSIG(status[1]) == 5):
+			print(f"[>>] Handling trap signal!")
+			# tmp_input = input("[>>] Continue? [y/n] ")
+			# dump_register_state()
+			print(f"[>>] ;) Not implemented")
+		else:
+			print(f"[>>] Something else stopped the process")
+	else:
+		print(f"[>>] Something horrible occurred, {status[1]}")
+
+def alt_attach_tracer(tracee):
+	# if (LIBC.ptrace(PTRACE_ATTACH, pid, 0, 0) < 0):
+	# 	print(f"[>>] Attach failed for {pid}")
+	print(f"[>>] Attempting trace of {tracee}")
+
+	# make child
+	child_pid  = os.fork()
+	if (child_pid == 0):
+		# we are the child
+		launch_trace_target(tracee)
+	else:
+		launch_tracee(child_pid)
+
 """ TMP TESTS """
 
 # simple:
@@ -269,11 +353,12 @@ def attach_tracer(pid):
 
 print("[>>] Starting kessel run")
 print_symbols(test_tracee_elf)
-attach_tracer(test_tracee.pid)
+# attach_tracer(test_tracee.pid)
+alt_attach_tracer(test_tracee_elf)
+print("[>>] Finished kessel run somehow")
+# print(f"[>>] Detached from {PID}")
 
-print(f"[>>] Detached from {PID}")
-
-
+# ===========================================================================
 
 '''
 ::::::::::::::::::::::::::::: [PTRACE] :::::::::::::::::::::::::::::
@@ -320,6 +405,10 @@ _ detach_tracer(pid) _
 
 '''devnotes
 
+
++ NOTE :: pwntools process can disable aslr
+
+`process(process_name,aslr=False)`
 
 + ptrace requires pid of process so will need
 	to be hooked in from harness

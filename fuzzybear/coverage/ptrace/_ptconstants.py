@@ -1,6 +1,6 @@
 
 """ constants for ptrace """
-
+PTRACE_TRACEME   = 0
 PTRACE_PEEKTEXT   = 1
 PTRACE_PEEKDATA   = 2
 PTRACE_POKETEXT   = 4
