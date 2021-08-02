@@ -1,5 +1,10 @@
 from .. import Strategy
 from xml.dom import minidom
+import random
+#from xml.dom import minidom
+import xml.etree.ElementTree as ET
+from xml.etree.ElementTree import Element, SubElement, Comment, tostring
+import xml.dom.minidom as md
 
 class XML(Strategy.Strategy):
     
@@ -7,11 +12,7 @@ class XML(Strategy.Strategy):
     def __init__(self, sample_input):
         pass
 
-import random
-#from xml.dom import minidom
-import xml.etree.ElementTree as ET
-from xml.etree.ElementTree import Element, SubElement, Comment, tostring
-import xml.dom.minidom as md
+
 
 def prettify(elem):
     """Return a pretty-printed XML string for the Element.
@@ -20,20 +21,14 @@ def prettify(elem):
     reparsed = md.parseString(rough_string)
     return reparsed.toprettyxml(indent="  ")
 
-#dev random (big file)
-
-def nest_em(elem_obj, count=0):
-    if(count == 10):
+def nest_em(elem_obj,insert_text, count=0):
+    if(count == 500):
         return elem_obj
-    #new = Element('p')
-    #new.text = 'that\'s deep man'
-    #sub_elm = SubElement(new,'inner')
     for child in elem_obj:
         #child.append(new)
         sub_elm = SubElement(child,'inner')
-        #to be arg later
-        sub_elm.text = 'hecc'
-        nest_em(child,count+1)
+        sub_elm.text = insert_text
+        nest_em(child,insert_text,count+1)
 
 
 def change_id(elem_obj, new_ID):
@@ -43,9 +38,45 @@ def change_id(elem_obj, new_ID):
             child.attrib["id"] = new_ID
 #spicy files
 
-tree = ET.parse('og.xml')
-root = tree.getroot()
+def spicy_file():
+    
+    spicy_string = '''
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE root [
+ <!ENTITY spooky SYSTEM "file:///dev/random">
+  ]>
+  <root>&spooky;</root>
+    '''
+    return spicy_string
 
-#nest_em(root)
-change_id(root, 1000)
-print(prettify(root))
+class XML(Strategy.Strategy):
+    
+    # parse xml input data
+    def __init__(self, sample_input):
+        super()
+        self.sample_input = sample_input
+        with open(sample_input) as xmlfile:
+            self.candidate_input = ET.parse(xmlfile)
+        
+        self.size = len(self.candidate_input)
+
+    # run strategies
+    def run(self):
+        # print(f"\n   [DEBUG] mutating {self.candidate_input} \n")        
+
+        row, col = random_row_col(self.size)
+        mutation = self.candidate_input
+        for emoji in super().emoji():
+            nest_em(mutation,emoji)   
+            # print(mutation) 
+            yield mutation
+        
+        
+        for chonk in super().chonk():
+            change_id(mutation,chonk)
+            yield mutation
+
+        mutation = spicy_file()
+        yield mutation
+
+        yield pack_csv(self.add_entries())
