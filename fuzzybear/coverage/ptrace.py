@@ -4,7 +4,7 @@ from ptrace._ptconstants import *
 from ptrace._libc import *
 from ptrace._registers import *
 
-from os import execl, waitpid, WIFSTOPPED, WSTOPSIG, execv
+from os import execl, waitpid, WIFSTOPPED, WSTOPSIG
 
 
 """ 
@@ -15,9 +15,10 @@ from os import execl, waitpid, WIFSTOPPED, WSTOPSIG, execv
 
 """
 
-""" NOTE :: these need to be ported to constants """
+""" TODO :: these need to be ported to constants """
 # ===============================================
 
+# TODO :: refactor
 PID = None
 
 # int $3
@@ -60,6 +61,8 @@ def print_register_state_x86(registers):
 	
 	# dropped other registers
 
+
+# TODO :: migrate 
 def print_symbols(proc):
 	""" Print symbols """
 	elf = ELF(proc)
@@ -68,6 +71,7 @@ def print_symbols(proc):
 	print('\n\n')
 
 
+# TODO :: migrate  
 def update_coverage(address):
 	""" Update coverage data """
 	# TODO :: resolve function/blockname
@@ -76,6 +80,8 @@ def update_coverage(address):
 
 # ===============================================
 
+
+# TODO :: Deprecate 
 def breakpoints_state(tmp_function_name):
 	state = {
 		'_start': 0x80490cc,
@@ -87,7 +93,7 @@ def breakpoints_state(tmp_function_name):
 
 
 
-# NOTE :: TMP hardcodes for simple
+# Deprecate 
 def save_register_state(tmp_function_name):
 	""" Save register state """
 	state = {
@@ -100,12 +106,14 @@ def save_register_state(tmp_function_name):
 	return state[tmp_function_name]
 
 
+# TODO :: refactor, modularise
 def restore_register_state(bp_addr, original_address):
 	""" Restore register state """
 	res = LIBC.ptrace(PTRACE_POKEDATA, PID, bp_addr, original_address)
 	print(f"[>>] Restore returned {res}")
 
 
+# TODO :: refactor, modularise
 def dump_register_state():
 	""" Dump register state """
 	print(f"[>>] Dumping {PID} register state")
@@ -122,7 +130,7 @@ def dump_register_state():
 	# print(_data)
 
 
-
+# TODO :: Modularise (utility)
 def continue_exc(pid):
 	""" Continue execution after breaking """
 	print(f"[>>] Continuing execution of {pid} ...")
@@ -135,6 +143,7 @@ def continue_exc(pid):
 		print(f"[>>] Continue failed with error code {res}")
 
 
+# TODO :: Modularise (utility)
 def breakpoint(addr, arch='x86'):
 	""" Swap out the last byte with trap"""
 	if (arch == 'x86'):
@@ -143,7 +152,7 @@ def breakpoint(addr, arch='x86'):
 		return ((addr & ADDRESS_MASK_x86_64) | TRAP_CODE)
 
 
-
+# TODO :: Modularise 
 def poketext(pid, address, value):
 	""" Write to memory """
 	res = LIBC.ptrace(PTRACE_POKETEXT, pid, address, value)
@@ -154,7 +163,7 @@ def poketext(pid, address, value):
 		)
 
 
-
+# TODO :: Refactor
 def handel_traps():
 	""" Handle trap signals """
 	print(f"[>>] Resuming execution from _start ...")
@@ -223,6 +232,7 @@ test_tracee_elf = 'tmp_tests/linear'
 
 '''
 
+# TODO :: Deprecate
 def attach_tracer(pid):
 		""" Attach to tracee to trace """
 		global PID
@@ -280,16 +290,12 @@ def launch_trace_target(proc_name):
 		print(f"[>>] Traceme failed with error code {trace_me_res}")
 
 	print(f"[>>] Allowed tracing {proc_name}")
-	proc_path = os.path.abspath(proc_name)
-	print(f"[>>] Path to proc {proc_path}")
 
 	# TODO :: Disable ASLR ?
 
 	# replace the forked clone of main process
-	# with this process
+	# with this process, does not return
 	execl_res = execl('./tmp_tests/linear', '/tmp_tests/linear')
-	if (execl_res < 0):
-		print(f"[>>] Execl failed with error code {execl_res}")
 
 
 
