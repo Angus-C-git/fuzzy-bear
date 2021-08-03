@@ -15,7 +15,7 @@ function1()
     else
         hex_cmp = 0;
 
-    return 10;
+    return 1;
 }
 
 
