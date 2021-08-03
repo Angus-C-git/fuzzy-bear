@@ -6,12 +6,7 @@ import xml.etree.ElementTree as ET
 from xml.etree.ElementTree import Element, SubElement, Comment, tostring
 import xml.dom.minidom as md
 
-class XML(Strategy.Strategy):
-    
-    # parse ___ input data
-    def __init__(self, sample_input):
-        pass
-
+MAX_DEPTH = 300
 
 
 def prettify(elem):
@@ -21,14 +16,15 @@ def prettify(elem):
     reparsed = md.parseString(rough_string)
     return reparsed.toprettyxml(indent="  ")
 
+
 def nest_em(elem_obj,insert_text, count=0):
-    if(count == 500):
+    if(count == MAX_DEPTH):
         return elem_obj
     for child in elem_obj:
         #child.append(new)
         sub_elm = SubElement(child,'inner')
         sub_elm.text = insert_text
-        nest_em(child,insert_text,count+1)
+        nest_em(child,insert_text, count+1)
 
 
 def change_id(elem_obj, new_ID):
@@ -49,6 +45,7 @@ def spicy_file():
     '''
     return spicy_string
 
+
 class XML(Strategy.Strategy):
     
     # parse xml input data
@@ -56,27 +53,24 @@ class XML(Strategy.Strategy):
         super()
         self.sample_input = sample_input
         with open(sample_input) as xmlfile:
-            self.candidate_input = ET.parse(xmlfile)
-        
-        self.size = len(self.candidate_input)
+            element_tree = ET.parse(xmlfile)
+            self.candidate_input = element_tree.getroot()
 
     # run strategies
     def run(self):
-        # print(f"\n   [DEBUG] mutating {self.candidate_input} \n")        
+        print(f"\n   [DEBUG] mutating {self.candidate_input} \n")        
 
-        row, col = random_row_col(self.size)
         mutation = self.candidate_input
         for emoji in super().emoji():
-            nest_em(mutation,emoji)   
-            # print(mutation) 
-            yield mutation
+            nest_em(mutation, emoji)   
+            yield prettify(mutation)
         
         
         for chonk in super().chonk():
-            change_id(mutation,chonk)
-            yield mutation
+            change_id(mutation, chonk)
+            yield prettify(mutation)
 
-        mutation = spicy_file()
+        mutation = spicy_file() 
+        print(f"[>>] mutation was {mutation}")
         yield mutation
 
-        yield pack_csv(self.add_entries())
