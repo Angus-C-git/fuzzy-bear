@@ -7,6 +7,7 @@ from xml.etree.ElementTree import Element, SubElement, Comment, tostring
 import xml.dom.minidom as md
 
 MAX_DEPTH = 300
+target_elements = ['href', 'id', 'style', 'class']
 
 
 def prettify(elem):
@@ -27,13 +28,13 @@ def nest_em(elem_obj,insert_text, count=0):
         nest_em(child,insert_text, count+1)
 
 
-def change_id(elem_obj, new_ID):
-    for child in elem_obj:
-        if 'id' in child.attrib.keys():
+def change_element(elem_obj, new_elm, elem_type):
+    for child in elem_obj.iter():
+        if elem_type in child.attrib.keys():
             print(child)
-            child.attrib["id"] = new_ID
-#spicy files
+            child.attrib[elem_type] = new_elm
 
+#spicy files
 def spicy_file():
     
     spicy_string = '''
@@ -67,7 +68,9 @@ class XML(Strategy.Strategy):
         
         
         for chonk in super().chonk():
-            change_id(mutation, chonk)
+            for e in target_elements:
+                print(f"doing {e}")
+                change_element(root,chonk,e)
             yield prettify(mutation)
 
         mutation = spicy_file() 
