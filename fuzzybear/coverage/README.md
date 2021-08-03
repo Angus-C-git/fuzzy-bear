@@ -12,18 +12,25 @@ Handles coverage related tasks for fuzzing including:
 .
 ├── Coverage.py
 ├── __init__.py
-├── ptrace
+├── ptfuzz
 │   ├── __init__.py
-│   ├── _libc.py
-│   ├── _ptconstants.py
-│   └── _registers.py
-└── ptrace.py
+│   ├── ptfuzz.py
+│   ├── ptrace
+│   │   ├── __init__.py
+│   │   ├── _libc.py
+│   │   ├── _ptconstants.py
+│   │   ├── ptrace.py
+│   │   ├── _registers.py
+│   │   └── utility
+│   │       ├── arch.py
+│   │       └── breakpoints.py
+│   └── README.md
+└── README.md
 ```
 
 ## Operation
 
-The coverage module implements a sub-module `ptrace` which acts as a pythonic wrapper wrapper for `ptrace`.
-
+The coverage module utilizes a homegrown sub-module `ptfuzz` which acts as a pythonic wrapper for the `ptrace` syscall. See [ptfuzz](./ptfuzz/README.md).
 
 ## Support
 
