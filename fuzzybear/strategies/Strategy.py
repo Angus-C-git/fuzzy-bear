@@ -17,12 +17,14 @@ class Strategy():
 	def __init__(self):
 		return
 
+
 	def emoji(self):
 		yield '🏴‍☠️'
 		yield '🔥'
 		yield '👌'
 		yield '😂'
-		
+
+
 	def chonk(self):
 		yield 'A' * 50		
 		yield 'A' * 500
