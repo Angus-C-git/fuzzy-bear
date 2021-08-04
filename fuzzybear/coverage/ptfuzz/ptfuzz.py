@@ -1,7 +1,5 @@
-from ptfuzz import *
-import os
-
-from ptrace.ptrace import *
+from os import execl, fork, waitpid, WIFSTOPPED, WSTOPSIG
+from ptrace.ptrace import trace_me, continue_exc, pokedata, gen_breakpoint
 
 """
  ____ _____ _____ _   _ __________
@@ -48,7 +46,7 @@ test_tracee = 'tmp_tests/linear'
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::: #
 
 
-class ptfuzz:
+class PtFuzz:
 	def __init__(self, target):
 		self.tracee = target
 		
@@ -64,7 +62,7 @@ class ptfuzz:
 		print(f"[>>] Attempting trace on {self.tracee}")
 
 		# make child
-		child_pid  = os.fork()
+		child_pid  = fork()
 		self.pid = child_pid
 		if (child_pid == 0):
 			# executing as the child
@@ -93,7 +91,7 @@ class ptfuzz:
 		print(f"[>>] Starting trace of {pid_child}")
 
 		# wait for trap
-		status = os.waitpid(pid_child, 0)
+		status = waitpid(pid_child, 0)
 		print(f"[>>] Waitpid returned {status}")
 
 		start_addr = tmp_proc_bs['_start']
@@ -106,7 +104,7 @@ class ptfuzz:
 		# push process forwards
 		continue_exc(pid_child)
 
-		status = os.waitpid(pid_child, 0)
+		status = waitpid(pid_child, 0)
 		print(f"[>>] Waitpid returned {status}")
 		
 		if (WIFSTOPPED(status[1])):
@@ -154,7 +152,7 @@ class ptfuzz:
 """ tmp testing """
 
 print("[>>] Starting kessel run")
-ptfuzz(test_tracee).begin_trace()
+PtFuzz(test_tracee).begin_trace()
 print("[>>] Finished kessel run")
 
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::: #

@@ -1,11 +1,9 @@
-import ctypes
-# from pty import fork
-from ptrace._ptconstants import *
-from ptrace._libc import ptrace
-from ptrace._registers import *
-from ptrace.utility.breakpoints import gen_breakpoint
+from ._ptconstants import *
+from ._libc import ptrace
+from ._registers import *
+from .utility.breakpoints import gen_breakpoint
 
-from os import execl, waitpid, WIFSTOPPED, WSTOPSIG
+
 
 
 """ 
@@ -100,6 +98,7 @@ def set_registers(target_pid, new_registers):
 
 
 def trace_me():
+	print(f"[>>] Attempting trace me")
 	trace_me_res = ptrace(PTRACE_TRACEME, 0, 0, 0)
 	if (trace_me_res < 0):
 		print(f"[>>] Traceme failed with error code {trace_me_res}")

@@ -1,7 +1,5 @@
 from pwn import *
-from pwnlib.gdb import corefile
 from capstone import *
-from ptfuzz import *
 
 # ================================================================= #
 
@@ -18,6 +16,7 @@ def update_coverage(address):
 	print("[>>] Not implemented")
 
 
+# TODO :: Finish implementing
 class Coverage:
 	""" handler class for coverage ops """
 	def __init__(self, coverage_target):
@@ -80,6 +79,6 @@ blocks = [
 ]
 
 
-print_symbols(simple_binary)
+# print_symbols(simple_binary)
 
 # ================================================================= #

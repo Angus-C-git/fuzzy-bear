@@ -1,4 +1,5 @@
 import subprocess
+from .coverage.ptfuzz.ptrace.ptrace import trace_me
 
 '''
 ::::::::::::::::: [Harness] :::::::::::::::::
@@ -20,7 +21,8 @@ class Harness():
           self.binary,
           stdin  = subprocess.PIPE,
           stdout = subprocess.PIPE,
-          stderr = subprocess.PIPE
+          stderr = subprocess.PIPE,
+          preexec_fn = trace_me()
     ) as pipe:
                     
       # send data as bytes to pipe
