@@ -54,7 +54,7 @@ class JPEG(Strategy.Strategy):
             current = int(current,2)
             data[x] = current
 
-        return data
+        return bin(data)
 
     def magic(self, data, index=None):
 
@@ -99,9 +99,9 @@ class JPEG(Strategy.Strategy):
             for i in range(0,selection[0]):
                 data[index + i] = selection[1]
         
-        return data
+        return bin(data)
 
 	# create new jpg with mutated data
     def run(self):
-        yield self.fuzz(self.data).decode()
-        yield self.magic(self.data).decode()
+        yield self.fuzz(self.data)
+        yield self.magic(self.data)
