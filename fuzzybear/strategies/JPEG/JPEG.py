@@ -54,7 +54,11 @@ class JPEG(Strategy.Strategy):
             current = int(current,2)
             data[x] = current
 
-        return bin(data)
+        output = ""
+        for x in data:
+            output += bin(x)
+            
+        return output
 
     def magic(self, data, index=None):
 
@@ -99,7 +103,11 @@ class JPEG(Strategy.Strategy):
             for i in range(0,selection[0]):
                 data[index + i] = selection[1]
         
-        return bin(data)
+        output = ""
+        for x in data:
+            output += bin(x)
+
+        return output
 
 	# create new jpg with mutated data
     def run(self):
