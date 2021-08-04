@@ -34,7 +34,7 @@ class JPEG(Strategy.Strategy):
             current = "0" * (8 - len(current)) + current
             indexes = range(0,8)
             target = random.choice(indexes)
-            new_number = []
+            new_number = ""
 
             # our new_number list now has all the digits, example: ['1', '0', '1', '0', '1', '0', '1', '0']
             new_number = current.copy()
@@ -55,7 +55,7 @@ class JPEG(Strategy.Strategy):
 
         return data
 
-    def magic(self, data):
+    def magic(self, data, index=None):
 
         magic_vals = [
 			(1, 255),
@@ -70,8 +70,10 @@ class JPEG(Strategy.Strategy):
 			(4, 64),
 			(4, 127)
 		]
-
-        selection = random.choice(magic_vals)
+        if (index == None):
+            selection = random.choice(magic_vals)
+        else:
+            selection = index
 
         length = len(data) - 8
         index = random.choice(range(0, length))
@@ -82,7 +84,7 @@ class JPEG(Strategy.Strategy):
                 data[index + 1] = 0
                 data[index + 2] = 0
                 data[index + 3] = 0
-            elif selection[1] == 64:# 0x40000000
+            elif selection[1] == 64:   # 0x40000000
                 data[index] = 64
                 data[index + 1] = 0
                 data[index + 2] = 0
@@ -99,11 +101,6 @@ class JPEG(Strategy.Strategy):
         return data
 
 	# create new jpg with mutated data
-    def create_new(self, data):
-        f = open("mutated.jpg", "wb+")
-        f.write(data)
-        f.close()
-
-
-if ___name___ == '___main___':
-	print('hi')
+    def run(self):
+        yield self.fuzz(self.data)
+        yield self.magic(self.data)

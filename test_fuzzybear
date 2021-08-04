@@ -135,6 +135,24 @@ def test_json():
             print(f"\nPiping to harness, res was {harness.open_pipe(x)}\n")
 
 
+def test_jpeg():
+    TEST_DIR = './tests/complete'
+    TEST_BINARY = f'{TEST_DIR}/jpg1'
+    TEST_SAMPLE = f'{TEST_DIR}/codecs/jpg1.txt'
+
+    print(f"""
+        [>>] Running JPEG test against {TEST_BINARY.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
+    """)
+
+    harness = Harness.Harness(TEST_BINARY)
+    jpeg_worker = JPEG.JPEG(TEST_SAMPLE)
+
+    for x in range(10):
+        for x in jpeg_worker.run():
+            # @ here would mark the place the 
+            # aggregator feeds harness
+            print(f'[DEBUG] test mutation was {x}')
+            print(f"\nPiping to harness, res was {harness.open_pipe(x)}\n")
 
 def test_negate():
 
@@ -200,6 +218,12 @@ parser.add_argument('-JSON', '--JSON-codec',
                     help = 'test the json codec binaries'
                     )
 
+parser.add_argument('-JPEG', '--JPEG-codec',
+                    dest = 'JPEG',
+                    action='store_true',
+                    help = 'test the jpeg codec binaries'
+                    )
+
 
 parser.add_argument('-NEGATE', '--negate-test',
                     dest = 'NEGATE',
@@ -227,3 +251,5 @@ if (args.CSV): test_csv()
 if (args.JSON): test_json()
 
 if (args.NEGATE): test_negate()
+
+if (args.JPEG): test_jpeg()
