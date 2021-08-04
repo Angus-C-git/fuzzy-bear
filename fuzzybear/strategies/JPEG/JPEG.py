@@ -34,10 +34,11 @@ class JPEG(Strategy.Strategy):
             current = "0" * (8 - len(current)) + current
             indexes = range(0,8)
             target = random.choice(indexes)
-            new_number = ""
+            new_number = []
 
             # our new_number list now has all the digits, example: ['1', '0', '1', '0', '1', '0', '1', '0']
-            new_number = current.copy()
+            for i in current:
+                new_number.append(i)
 
             # if the number at our randomly selected index is a 1, make it a 0, and vice versa
             if new_number[target] == "1":
