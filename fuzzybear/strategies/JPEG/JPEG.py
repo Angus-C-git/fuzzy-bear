@@ -103,5 +103,5 @@ class JPEG(Strategy.Strategy):
 
 	# create new jpg with mutated data
     def run(self):
-        yield self.fuzz(self.data)
-        yield self.magic(self.data)
+        yield self.fuzz(self.data).decode()
+        yield self.magic(self.data).decode()
