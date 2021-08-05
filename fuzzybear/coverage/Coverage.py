@@ -30,7 +30,6 @@ class JumpBlocks:
 	# Assuming addr is a pointer thats jumped to in the binary.
 	def isNewPath(self, addr):
 		return self.jumpBlocks[str(addr)] == 0
-'''
 
 class JumpBlock:
 	def __init__(self, start, end):
@@ -41,9 +40,9 @@ class JumpBlock:
 	def reached(self):
 		self.nReached += 1
 	
-	def getReached(self)
+	def getReached(self):
 		return self.nReached
-
+'''
 
 # A binary tree where the root is main, and each child is appended when a j**
 # instruction is seen in the binary.
@@ -120,6 +119,7 @@ class Coverage:
 		current_block = 0
 		last_block = 0
 		i = 0
+		startOfNextBlock = 0
 		# We start storing from after main() since I don't think jumps before main are
 		# relevant for code coverage? Although maybe we need to include GOT stuffs ?
 		for op in target.disasm(opcodes, startOfInstructions):
@@ -127,9 +127,11 @@ class Coverage:
 			if 'j' in op.mnemonic and op.address > addrMain:
 				print("0x%x:\t%s\t%s" %(op.address, op.mnemonic, op.op_str))
 				if i == 0:
-					jumpTree = JumpTree(addrMain, int(op.op_str,0x10), op.mnemonic)					
+					jumpTree = JumpTree(addrMain, op.address, op.mnemonic)					
+					startOfNextBlock = int(op.op_str,0x10) 
 				else:
-					jumpTree.add(JumpTree(op.address, int(op.op_str,0x10), op.mnemonic))
+					jumpTree.add(JumpTree(startOfNextBlock,  op.address ,op.mnemonic))
+					startOfNextBlock = int(op.op_str,0x10) 
 				i += 1
 		jumpTree.show(jumpTree)
 			#if len(op.groups) > 0:
