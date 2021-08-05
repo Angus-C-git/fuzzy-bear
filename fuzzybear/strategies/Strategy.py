@@ -47,13 +47,20 @@ class Strategy():
 			except TypeError:
 				yield data
 
-
-	def string(self, arg='all'):
-		strings = String().genStrings(arg)
+	# Feel like this might be a bad function name. Maybe strings?
+	def string(self, arg='all', num=100):
+		strings = String().genStrings(arg, num)
 		for x in strings:
 			yield x
 
-
+	# Will flip a random bit in a given string and return it
+	'''
+	def bitflip(self, s, num=1):
+		bits = bin(int(bytes(s, encoding='utf-8').hex()))	
+		randNum = randint(0, len(bits)-1)
+		for i in range(num):
+			bits[
+	'''
 
 '''
 STRING CLASS
@@ -68,11 +75,12 @@ class String():
 		self.printfstrs = "diouxXeEfFgGaAcspnm"
 		self.printlmod = ["", "hh", 'h', 'l', 'll', 'L', 'j', 'z', 't']
 
-	def genStrings(self, type='all'):
+	def genStrings(self, type='all', num=128):
 		strings = []
 
 		if (type == 'all'):
 			for i in range(0, 4):
+				# maybe change this to 1-5, since a**0 = 1 ?
 				strings.append(self.fuzz(0x10**i))
 		if (type == 'all' or type == 'badchars'):
 			strings.append(self.badchars())
@@ -82,6 +90,8 @@ class String():
 			strings = self.overflow(strings)
 		if (type == 'all' or type == 'shellstuff'):
 			strings = self.shellstuff(strings)
+		if (type == 'fuzz'):
+			strings = self.fuzz(num)
 
 		return strings
 
@@ -91,9 +101,9 @@ class String():
 			output += chr(randint(lowerasciibound,upperasciibound))
 		return output
 
-	def badchars(self):
+	def badchars(self, num=128):
 		string = ""
-		for i in range(0,128):
+		for i in range(0,num):
 			string += chr(i)
 		return string
 
@@ -116,7 +126,6 @@ class String():
 		for x in stuff:
 			arr.append(x)
 		return arr
-
 
 class Integers():
 	#MAGIC NUMBERS :) (UNSIGNED)
@@ -187,7 +196,6 @@ class Integers():
 
 		def rand(self):
 			pass
-
 
 
 
