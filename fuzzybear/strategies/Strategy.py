@@ -12,30 +12,53 @@ BASE CLASS
 	► TODO :: Should be a factory model
 '''
 
+GEN_MAX = 100
+
+tmp_cumulative = 0
+# def ui_event(event, boost=10):
+# 	global tmp_cumulative
+# 	tmp_cumulative += boost
+# 	""" handels triggering strategy progress for UI """
+# 	print(f'   [>>] Updating {event} progress %{tmp_cumulative} done')
+# 	if tmp_cumulative >= 100:
+# 		tmp_cumulative = 0
+
+
 class Strategy():
 	
 	def __init__(self):
 		return
+
+
+	def ui_event(self, event, boost=10):
+		global tmp_cumulative
+		tmp_cumulative += boost
+		""" handels triggering strategy progress for UI """
+		print(f'   [>>] Updating {event} progress %{tmp_cumulative} done')
+		if tmp_cumulative >= 100:
+			tmp_cumulative = 0
+
 
 	def emoji(self):
 		yield '🏴‍☠️'
 		yield '🔥'
 		yield '👌'
 		yield '😂'
-		
+
+
 	def chonk(self):
-		yield 'A' * 50		
+		yield 'A' * 100		
 		yield 'A' * 500
-		yield 'A' * 600
 		yield 'A' * 700
 		yield 'A' * 1000
 		yield 'A' * 10000
 
 
 	def keywords(self):
-	  yield 'input'		# no this isn't a hardcoded value whattt
-	  yield 'data'
-	  yield 'len'  
+		""" Use grammas to fuzz keywords """
+		yield 'input'	
+		yield 'data'
+		yield 'len'  
 	  
 
 	def negate(self, data):
@@ -48,11 +71,14 @@ class Strategy():
 				yield data
 
 
-	def string(self, arg='all'):
-		strings = String().genStrings(arg)
-		for x in strings:
-			yield x
+	def bad_string(self, types='all'):
+		for string_case in String().genStrings(types):
+			yield string_case
 
+
+	def bad_ints(self, GEN_MAX):
+		for int_case in Integers().genStrings(GEN_MAX):
+			yield int_case
 
 
 '''
@@ -68,6 +94,7 @@ class String():
 		self.printfstrs = "diouxXeEfFgGaAcspnm"
 		self.printlmod = ["", "hh", 'h', 'l', 'll', 'L', 'j', 'z', 't']
 
+
 	def genStrings(self, type='all'):
 		strings = []
 
@@ -80,10 +107,11 @@ class String():
 			strings = self.printf(strings)
 		if (type == 'all' or type == 'overflow'):
 			strings = self.overflow(strings)
-		if (type == 'all' or type == 'shellstuff'):
-			strings = self.shellstuff(strings)
+		if (type == 'all' or type == 'shells'):
+			strings = self.shells(strings)
 
 		return strings
+
 
 	def fuzz(self, num=100, lowerasciibound=0, upperasciibound=128, chars=[]):
 		output = ''
@@ -91,11 +119,13 @@ class String():
 			output += chr(randint(lowerasciibound,upperasciibound))
 		return output
 
+
 	def badchars(self):
 		string = ""
 		for i in range(0,128):
 			string += chr(i)
 		return string
+
 
 	def printf(self, arr):
 		for a in self.printfstrs:
@@ -104,27 +134,40 @@ class String():
 				arr.append(string)
 		return arr
 
+
 	def overflow(self, arr):
 		base = 0x10
 		while (base < 0xFFFFF):
 			arr.append(cyclic(base))
 			base *= 0x10
+		
 		return arr
 
-	def shellstuff(self, arr):
+
+	def shells(self, arr):
 		stuff = ['../', '/bin/sh', '&&', '>>', '|', 'fork', 'brk', 'execve']
 		for x in stuff:
 			arr.append(x)
 		return arr
 
 
+'''
+STRING CLASS
+
+	► Implemented in Base Class
+	► String related arguments taken:
+		'badchars', 'printf', 'overflow', 'shellstuff'
+
+'''
 class Integers():
-	#MAGIC NUMBERS :) (UNSIGNED)
+	""" Generates bad integer fuzzcases """
+	
+	# MAGIC NUMBERS :) (UNSIGNED)
 	CHAR_MAX = 255
 	INT_MAX  = 4294967295
 	INT_MAX_SIGNED = 2147483648
 	BYTE_8_MAX = 18446744073709551615
-	#number of ints gen:
+	
 	def __init__(self, gen_max):
 		self.gen_max = gen_max
 
@@ -172,21 +215,21 @@ class Integers():
 	# 	pass
 
 
-	class Floats():
-		def __init__(self):
-			pass
+class Floats():
+	def __init__(self):
+		pass
 
-		def rand_float(self):
-			pass
+	def rand_float(self):
+		pass
 
-		def rand_large(self):
-			pass
+	def rand_large(self):
+		pass
 
-		def decimal(self):
-			pass
+	def decimal(self):
+		pass
 
-		def rand(self):
-			pass
+	def rand(self):
+		pass
 
 
 
