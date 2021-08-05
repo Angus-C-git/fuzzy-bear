@@ -137,8 +137,8 @@ def test_json():
 # test plaintext
 def test_plaintext():
     TEST_DIR = './tests/complete'
-    TEST_BINARY = f'{TEST_DIR}/plaintext2'
-    TEST_SAMPLE = f'{TEST_DIR}/codecs/plaintext2.txt'
+    TEST_BINARY = f'{TEST_DIR}/plaintext3'
+    TEST_SAMPLE = f'{TEST_DIR}/codecs/plaintext3.txt'
 
     print(f"""
         [>>] Running TXT test against {TEST_BINARY.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
@@ -151,17 +151,16 @@ def test_plaintext():
         print(f'case {i}')
         for u in txt_worker.run():
             try:
-                #print(f'[DEBUG] test mutation was {u}')
+                print(f'[DEBUG] test mutation was {u}')
                 retCode = harness.open_pipe(u)
-                #print(f"\nPiping to harness, res was {retCode}\n")
+                # print(f"\n  Piping to harness, res was {retCode}\n")
                 if retCode != 0:
-                    print('BROKE IT!!!!')
-                    print(u)
+                    print(f' [>>] Crashed {TEST_BINARY} with: \n {u}')
                     return
             except:
                 print('Either the generators are empty, or I fucked up')
                 break
-    #print(f'Caused {len(breakingInputs)} crashes')
+
 
 def test_negate():
 

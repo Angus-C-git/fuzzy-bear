@@ -7,12 +7,8 @@
 '''
 import random
 from .. import Strategy
-'''
-class TextFileInputGenerator(Strategy.Strategy, Strategy.Integers):
-    def __init__(self):
-        Strategy.Strategy.__init__(self)
-        Strategy.Integers.__init__(self)
-'''
+import copy
+
 
 
 class TextFile():
@@ -87,44 +83,54 @@ class TextFile():
 class TXT(Strategy.Strategy):
 
     def __init__(self, sample_input):
-        Strategy.Strategy.__init__(self)
+        super()
         try:
             with open(sample_input) as f:
                 self.textfile = TextFile(f.readlines())
-        except e:
+        except FileNotFoundError as err:
             # propper error logic goes here.
-            print('errrooooooooor')
-            raise e
+            print(f' [>>] File not found, {err}')
+            exit(0)
+
 
     def run(self):
         randCounter = random.randrange(0, 10)
-        self.textfile.append(next(self.string('overflow')))
-        yield str(self.textfile)
+        mutation = copy.deepcopy(self.textfile)
+        mutation.append(next(self.string('overflow')))
+        yield str(mutation)
+
 
         randNum = random.randrange(0, len(self.textfile.lines))
-        self.textfile.mutateLine(randNum, next(self.string('badchars', 200)))
-        yield str(self.textfile)
-
+        mutation = copy.deepcopy(self.textfile)
+        mutation.mutateLine(randNum, next(self.string('badchars', 200)))
+        yield str(mutation)
+        
+        mutation = copy.deepcopy(self.textfile)
         if randCounter == 7:
             randNum = random.randrange(0, len(self.textfile.lines))
-            self.textfile.doubleLineLength(randNum)
-            yield str(self.textfile)
+            mutation.doubleLineLength(randNum)
+            yield str(mutation)
 
+        mutation = copy.deepcopy(self.textfile)
         for i in range(5):
             randNum = random.randrange(0, len(self.textfile.lines))
-            self.textfile.addControlCharacters(randNum, 10)
+            mutation.addControlCharacters(randNum, 10)
+        yield str(mutation)
+
+        mutation = copy.deepcopy(self.textfile)
+        mutation.append(next(self.string('fuzz', 1000)))
         yield str(self.textfile)
 
-        self.textfile.append(next(self.string('fuzz', 1000)))
-        yield str(self.textfile)
-
+        mutation = copy.deepcopy(self.textfile)
         if randCounter == 2:
-            self.textfile.injectWhiteSpace()
-            yield str(self.textfile)
+            mutation.injectWhiteSpace()
+            yield str(mutation)
 
         if randCounter == 9:
-            self.textfile.injectBlankLines()
-            yield str(self.textfile)
+            mutation.injectBlankLines()
+            yield str(mutation)
+
+
 
 '''devnotes
 - I basically just do random shit in the run method. Will definitely need to be more heuristic
