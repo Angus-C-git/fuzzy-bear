@@ -24,6 +24,7 @@ class Strategy():
 	INT_MAX_SIGNED = 2147483648
 	BYTE_8_MAX = 18446744073709551615
 
+
 	def __init__(self):
 		# self.ui_runner = 
 		return
@@ -37,6 +38,7 @@ class Strategy():
 		print(f'   [>>] Updating {event} progress %{tmp_cumulative} done')
 		if tmp_cumulative >= target:
 			tmp_cumulative = 0
+
 
 	def register_ui_events(self, events):
 		""" Register a list of UI events """
@@ -174,6 +176,7 @@ class Strategy():
 		int_list.append(self.BYTE_8_MAX)
 		yield int_list
 
+
 	def rand(self):
 		""" Gen random integers """
 		int_list = []
@@ -221,6 +224,4 @@ Needs work:
 	+ rand_negative
 	+ rand
 	+ rand_positive
-
-
 """
