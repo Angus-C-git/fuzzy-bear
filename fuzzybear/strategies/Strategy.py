@@ -126,7 +126,7 @@ class Strategy():
 		yield data + '../' * 25
 		yield data + '..%' * 25
 
-
+    
 	def polyglots(self, data=''):
 		""" Polyglot fuzzcases """
 		yield data + """javascript:/*--></title></style></textarea></script>
@@ -218,6 +218,7 @@ class Strategy():
 			return ''.join(str(~ord(char)) for char in data)
 
 
+    
 """devnotes
 
 Needs work:

@@ -136,6 +136,32 @@ def test_json():
             print(f'[DEBUG] test mutation was {x}')
             print(f"\nPiping to harness, res was {harness.open_pipe(x)}\n")
 
+# test plaintext
+def test_plaintext():
+    TEST_DIR = './tests/complete'
+    TEST_BINARY = f'{TEST_DIR}/plaintext3'
+    TEST_SAMPLE = f'{TEST_DIR}/codecs/plaintext3.txt'
+
+    print(f"""
+        [>>] Running TXT test against {TEST_BINARY.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
+    """)
+
+    harness = Harness.Harness(TEST_BINARY)
+    txt_worker = TXT.TXT(TEST_SAMPLE)
+    breakingInputs = []
+    for i in range(7000):
+        print(f'case {i}')
+        for u in txt_worker.run():
+            try:
+                print(f'[DEBUG] test mutation was {u}')
+                retCode = harness.open_pipe(u)
+                # print(f"\n  Piping to harness, res was {retCode}\n")
+                if retCode != 0:
+                    print(f' [>>] Crashed {TEST_BINARY} with: \n {u}')
+                    return
+            except:
+                print('Either the generators are empty, or I fucked up')
+                break
 
 def test_jpeg():
     TEST_DIR = './tests/complete'
@@ -310,6 +336,12 @@ parser.add_argument('-JPEG', '--JPEG-codec',
                     help = 'test the jpeg codec binaries'
                     )
 
+parser.add_argument('-TXT', '--TXT-test',
+                    dest = 'TXT',
+                    action='store_true',
+                    help = 'Test TXT generator'
+                    )
+
 
 ## Add command line args for your test ^
 
@@ -338,3 +370,6 @@ if (args.JSON): test_json()
 if (args.NEGATE): test_negate()
 
 if (args.JPEG): test_jpeg()
+
+if (args.TXT): test_plaintext()
+
