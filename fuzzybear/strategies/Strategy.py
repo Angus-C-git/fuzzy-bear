@@ -14,23 +14,22 @@ BASE CLASS
 
 GEN_MAX = 100
 
+# tmp UI manager
 tmp_cumulative = 0
-# def ui_event(event, boost=10):
-# 	global tmp_cumulative
-# 	tmp_cumulative += boost
-# 	""" handels triggering strategy progress for UI """
-# 	print(f'   [>>] Updating {event} progress %{tmp_cumulative} done')
-# 	if tmp_cumulative >= 100:
-# 		tmp_cumulative = 0
-
 
 class Strategy():
 	
+	CHAR_MAX = 255
+	INT_MAX  = 4294967295
+	INT_MAX_SIGNED = 2147483648
+	BYTE_8_MAX = 18446744073709551615
+
 	def __init__(self):
 		return
 
 
 	def ui_event(self, event, boost=10):
+		""" handels triggering strategy progress for UI """
 		global tmp_cumulative
 		tmp_cumulative += boost
 		""" handels triggering strategy progress for UI """
@@ -39,7 +38,9 @@ class Strategy():
 			tmp_cumulative = 0
 
 
+
 	def emoji(self):
+		""" Meme fuzzcases """
 		yield '🏴‍☠️'
 		yield '🔥'
 		yield '👌'
@@ -47,21 +48,28 @@ class Strategy():
 
 
 	def chonk(self):
-		yield 'A' * 100		
-		yield 'A' * 500
-		yield 'A' * 700
-		yield 'A' * 1000
-		yield 'A' * 10000
+		""" Overflow fuzzcases """
+		yield cyclic(100)	
+		yield cyclic(500)
+		yield cyclic(1000)
+		yield cyclic(4000)
+		yield cyclic(10000)
 
 
 	def keywords(self):
 		""" Use grammas to fuzz keywords """
 		yield 'input'	
 		yield 'data'
-		yield 'len'  
+		yield 'len'
+		yield 'trivial'
+		yield 'size'
+		yield 'length'
+		yield 'max'
+		yield 'min'  
 	  
 
 	def negate(self, data):
+		""" Negate the given data """
 		try:
 			yield data * -1
 		except TypeError:
@@ -71,108 +79,61 @@ class Strategy():
 				yield data
 
 
-	def bad_string(self, types='all'):
-		for string_case in String().genStrings(types):
-			yield string_case
-
-
-	def bad_ints(self, GEN_MAX):
-		for int_case in Integers().genStrings(GEN_MAX):
-			yield int_case
-
-
-'''
-STRING CLASS
-
-	► Implemented in Base Class
-	► String related arguments taken:
-		'badchars', 'printf', 'overflow', 'shellstuff'
-
-'''
-class String():
-	def __init__(self) -> None:
-		self.printfstrs = "diouxXeEfFgGaAcspnm"
-		self.printlmod = ["", "hh", 'h', 'l', 'll', 'L', 'j', 'z', 't']
-
-
-	def genStrings(self, type='all'):
-		strings = []
-
-		if (type == 'all'):
-			for i in range(0, 4):
-				strings.append(self.fuzz(0x10**i))
-		if (type == 'all' or type == 'badchars'):
-			strings.append(self.badchars())
-		if (type == 'all' or type == 'printf'):
-			strings = self.printf(strings)
-		if (type == 'all' or type == 'overflow'):
-			strings = self.overflow(strings)
-		if (type == 'all' or type == 'shells'):
-			strings = self.shells(strings)
-
-		return strings
-
-
-	def fuzz(self, num=100, lowerasciibound=0, upperasciibound=128, chars=[]):
-		output = ''
-		for i in range (0,num):
-			output += chr(randint(lowerasciibound,upperasciibound))
-		return output
-
-
-	def badchars(self):
-		string = ""
-		for i in range(0,128):
-			string += chr(i)
-		return string
-
-
-	def printf(self, arr):
-		for a in self.printfstrs:
-			for b in self.printlmod:
-				string = f'%{b}{a}'
-				arr.append(string)
-		return arr
-
-
-	def overflow(self, arr):
-		base = 0x10
-		while (base < 0xFFFFF):
-			arr.append(cyclic(base))
-			base *= 0x10
-		
-		return arr
-
-
-	def shells(self, arr):
-		stuff = ['../', '/bin/sh', '&&', '>>', '|', 'fork', 'brk', 'execve']
-		for x in stuff:
-			arr.append(x)
-		return arr
-
-
-'''
-STRING CLASS
-
-	► Implemented in Base Class
-	► String related arguments taken:
-		'badchars', 'printf', 'overflow', 'shellstuff'
-
-'''
-class Integers():
-	""" Generates bad integer fuzzcases """
+	def format_strings(self, data='', offset=1):
+		""" Format string fuzzcases """
+		yield data + '%p'
+		yield data + '%n'
+		yield data + '%d'
+		yield data + '%s'
+		yield data + '%x'
+		yield data + '%@'
+		yield data + '%hn'
+		yield data + '%hhn'
+		yield data + f'\x00\x00\x00\x01%{offset}$n'
+		yield data + f'%99999$hn'
 	
-	# MAGIC NUMBERS :) (UNSIGNED)
-	CHAR_MAX = 255
-	INT_MAX  = 4294967295
-	INT_MAX_SIGNED = 2147483648
-	BYTE_8_MAX = 18446744073709551615
-	
-	def __init__(self, gen_max):
-		self.gen_max = gen_max
 
-	#Returns a list ofrandom integers for a particular range
-	def range(self, lower, upper):
+	def system_words(self, data='', arg=''):
+		""" System keyword fuzzcases """
+		yield f'{data}/bin/sh{arg}'
+		yield f'{data}/bin/bash{arg}'
+		yield f'{data}/bin/zsh{arg}'
+		yield f'{data}fork{arg}'
+		yield f'{data}exec{arg}'
+		yield f'{data}brk{arg}'
+		yield f'{data}exit{arg}'
+		yield f'{data}>>{arg}'
+		yield f'{data}|{arg}'
+
+
+	def system_paths(self, data=''):
+		""" System path fuzzcases """
+		yield data + '/dev/null'
+		yield data + '/etc/passwd'
+		yield data + '/dev/random'
+		yield data + '/dev/urandom'
+		yield data + '\\..\\..\\'
+		yield data + '../' * 25
+		yield data + '..%' * 25
+
+
+	def polyglots(self, data=''):
+		""" Polyglot fuzzcases """
+		yield data + """javascript:/*--></title></style></textarea></script>
+		</xmp><svg/onload='+/"/+/onmouseover=1/+/[*/[]/+alert(1)//'>"""
+
+		yield data + """jaVasCript:/*-/*`/*\`/*'/*"/*%0D%0A%0d%0a*/(/* */oNcliCk=alert() )//
+		</stYle/</titLe/</teXtarEa/</scRipt/--!>\x3ciframe/<iframe/oNloAd=alert()//>\x3e""" 
+
+		yield data + """<script>/*<![CDATA[*/alert(1)///*]]>*/</script>"""
+
+		yield data + """${{<%[%'"}}%\""""
+
+		yield data + """'/**/"# -- """
+
+	
+	def rand_int_range(self, lower, upper):
+		""" Gen random integers in a range """
 		int_list = []
 		for i in range(0, self.gen_max):
 			num = randrange(lower, upper)
@@ -180,66 +141,70 @@ class Integers():
 				i -= 1
 			else:
 				int_list.append(num)
-		return int_list
+		yield int_list
+
 
 	def rand_positive(self):
+		""" Gen random positive integers """
 		int_list = []
 		for i in range(0, self.gen_max):
-			num = randint(0 , Integers.INT_MAX_SIGNED)
+			num = randint(0 , self.INT_MAX_SIGNED)
 			int_list.append(num)
 		#SOMETHING SHOULD BREAK IF THESE NUMBER ARE ENTERED :)
-		int_list.append(Integers.INT_MAX)
-		int_list.append(Integers.BYTE_8_MAX)
-		return int_list
+		int_list.append(self.INT_MAX)
+		int_list.append(self.BYTE_8_MAX)
+		yield  int_list
+
 
 	def rand_negative(self):
+		""" Gen random negative integers """
 		int_list = []
 		for i in range(0, self.gen_max):
-			num = randint(-Integers.INT_MAX_SIGNED, 0)
+			num = randint(-self.INT_MAX_SIGNED, 0)
 			int_list.append(num)
 		int_list.append(0)
-		int_list.append(Integers.INT_MAX)
-		int_list.append(Integers.BYTE_8_MAX)
-		return int_list
+		int_list.append(self.INT_MAX)
+		int_list.append(self.BYTE_8_MAX)
+		yield int_list
 
 	def rand(self):
+		""" Gen random integers """
 		int_list = []
 		for i in range(0, self.gen_max):
-			num = randint(-Integers.INT_MAX_SIGNED, Integers.INT_MAX_SIGNED)
+			num = randint(-self.INT_MAX_SIGNED, Integers.INT_MAX_SIGNED)
 			int_list.append(num)
-		int_list.append(Integers.INT_MAX)
-		int_list.append(Integers.BYTE_8_MAX)
-		return int_list
-
-	# def break(self):
-	# 	pass
+		int_list.append(self.INT_MAX)
+		int_list.append(self.BYTE_8_MAX)
+		yield  int_list
 
 
-class Floats():
-	def __init__(self):
-		pass
-
-	def rand_float(self):
-		pass
-
-	def rand_large(self):
-		pass
-
-	def decimal(self):
-		pass
-
-	def rand(self):
-		pass
+	def max_constants(self):
+		""" Maximal constant fuzzcases """
+		yield '255'
+		yield '4294967295'
+		yield '2147483648'
+		yield '18446744073709551615'
 
 
+	def xor_data(self, data):
+		""" XOR each char in a string """
+		return ''.join(chr(ord(char) ^ 0xFF) for char in data)
 
 
+	def bit_flip(self, data):
+		""" Bitflip fuzzcases, expects a integer value """
+		try:
+			return  ~int(data)
+		except:
+			print(f"{'':4}[DEBUG] {data} is not a number")
+			return data
 
-'''devnotes
 
-TODO
+	def byte_flip(self, data):
+		""" Byteflip fuzzcases """
+		try:
+			return ''.join(chr(~ord(char)) for char in data)
+		except:
+			return ''.join(str(~ord(char)) for char in data)
 
-	- [ ] May need to port the strings class methods into the
-	      strategies body since they cannot be used individually
-		  at the moment by sub strategies
-'''
+
