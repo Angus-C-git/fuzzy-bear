@@ -5,8 +5,10 @@ import random
 import xml.etree.ElementTree as ET
 from xml.etree.ElementTree import Element, SubElement, Comment, tostring
 import xml.dom.minidom as md
+import copy
 
-MAX_DEPTH = 300
+
+MAX_DEPTH = 850
 target_elements = ['href', 'id', 'style', 'class']
 
 
@@ -25,7 +27,7 @@ def nest_em(elem_obj,insert_text, count=0):
         #child.append(new)
         sub_elm = SubElement(child,'inner')
         sub_elm.text = insert_text
-        nest_em(child,insert_text, count+1)
+        nest_em(child, insert_text, count+1)
 
 
 def change_element(elem_obj, new_elm, elem_type):
@@ -59,21 +61,21 @@ class XML(Strategy.Strategy):
 
     # run strategies
     def run(self):
-        print(f"\n   [DEBUG] mutating {self.candidate_input} \n")        
+        # print(f"\n   [DEBUG] mutating {self.candidate_input} \n")        
 
-        mutation = self.candidate_input
-        for emoji in super().emoji():
-            nest_em(mutation, emoji)   
-            yield prettify(mutation)
+        mutation = copy.deepcopy(self.candidate_input)
+        emoji = next(super().emoji())
+        # removed loop here
+        nest_em(mutation, emoji)   
+        yield prettify(mutation)
         
-        
+        mutation = copy.deepcopy(self.candidate_input)
         for chonk in super().chonk():
             for e in target_elements:
-                print(f"doing {e}")
-                change_element(root,chonk,e)
+                change_element(mutation, chonk, e)
             yield prettify(mutation)
 
         mutation = spicy_file() 
-        print(f"[>>] mutation was {mutation}")
+        # print(f"[>>] mutation was {mutation}")
         yield mutation
 
