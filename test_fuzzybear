@@ -92,8 +92,8 @@ def test_harness():
 # test csv1
 def test_csv():
     TEST_DIR = './tests/complete'
-    TEST_BINARY = f'{TEST_DIR}/csv1'
-    TEST_SAMPLE = f'{TEST_DIR}/codecs/csv1.txt'
+    TEST_BINARY = f'{TEST_DIR}/csv2'
+    TEST_SAMPLE = f'{TEST_DIR}/codecs/csv2.txt'
 
     print(f"""
         [>>] Running CSV test against {TEST_BINARY.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
@@ -103,16 +103,18 @@ def test_csv():
 
     csv_worker = CSV.CSV(TEST_SAMPLE)
     
-    # buf = ''
-    # csv_writer = csv.writer(buf)
     # for x in range(5):
     for x in csv_worker.run():
         
         # @ here would mark the place the 
         # aggregator feeds harness
-        # print(x)
-        print(f"\nPiping to harness, res was {harness.open_pipe(x)}\n")
-    
+        # print(f'[DEBUG] test mutation was\n{x}')
+        res = harness.open_pipe(x)
+        print(f"\nPiping to harness, res was {res}\n")
+        if res != 0:
+            print(f'[+] CRASH? {res}')
+            return
+
 
 # test json1
 def test_json():

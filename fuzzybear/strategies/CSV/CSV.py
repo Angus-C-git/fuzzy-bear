@@ -14,8 +14,8 @@ Utility methods for CSV
 strategies
 '''
 
-MAX_ROWS = 100
-MAX_COLUMNS = 100
+MAX_ROWS = 1000
+MAX_COLUMNS = 1000
 ENTRIES_THRESHOLD = 10
 
 
@@ -27,7 +27,7 @@ ENTRIES_THRESHOLD = 10
 # within the size of csv
 def random_row_col(range):
 	a, b = range
-	return (randint(1, a), randint(1, b))
+	return (randint(0, a - 1), randint(0, b - 1))
 
 
 # TODO :: fails sometimes 
@@ -51,18 +51,17 @@ class CSV(Strategy.Strategy):
 		with open(self.sample_input) as csvfile:
 			self.candidate_input = list(reader(csvfile))
 
-		self.size = (len(self.candidate_input) - 1, 
-					len(self.candidate_input[0]) - 1)
+		self.size = (len(self.candidate_input), 
+					len(self.candidate_input[0]))
 
 
-	def add_entries(self):
+	def add_entries(self, preserve_header=False):
 		# Generate random number of rows
 		# between 0 - 1000
 		rows, cols = random_row_col((MAX_ROWS, MAX_COLUMNS))
 
 		candidate = copy.deepcopy(self.candidate_input)
-		# TODO :: Fix header preservation
-		mutation = [candidate[0]]
+		mutation = [candidate[0]] if preserve_header else candidate
 
 		for row in range(1, rows):
 			new_row = []
@@ -94,14 +93,46 @@ class CSV(Strategy.Strategy):
 		
 		for count in range(ENTRIES_THRESHOLD):
 			yield pack_csv(self.add_entries())
-
+			
+		for count in range(ENTRIES_THRESHOLD):
+			yield pack_csv(self.add_entries(True))
 
 		mutation = copy.deepcopy(self.candidate_input)
 		row, col = random_row_col(self.size)
-		for string in super().bad_string():
-			mutation[row][col] = string
+		for constant in super().max_constants():
+			mutation[row][col] = constant
 			yield pack_csv(mutation)
-			super().ui_event('bad strings', 10)
+			super().ui_event('constants', 25)
+	
+		mutation = copy.deepcopy(self.candidate_input)
+		row, col = self.size
+		for r in range(row):
+			for c in range(col):
+				mutation[r][c] = super().xor_data(self.candidate_input[r][c])
+				yield pack_csv(mutation)
+				super().ui_event('xor', 1, row)
+
+
+		mutation = copy.deepcopy(self.candidate_input)
+		row, col = self.size
+		for r in range(row):
+			for c in range(col):
+				mutation[r][c] = super().bit_flip(self.candidate_input[r][c])
+				print(f"[>>] mutation was {mutation}")
+				yield pack_csv(mutation)
+				super().ui_event('bit flip', 1, row)
+
+		mutation = copy.deepcopy(self.candidate_input)
+		print(f"[>>] mutation is {mutation}")
+		row, col = self.size
+		print(f"[>>] size rows: {row}, col: {col}")
+		for r in range(row):
+			for c in range(col):
+				print(f"[>>] Candidate input {self.candidate_input[r][c]}")
+				print(f"[>>] mutation was {mutation}")
+				mutation[r][c] = super().negate(self.candidate_input[r][c])
+				yield pack_csv(mutation)
+				super().ui_event('negate', 1, row)
 
 
 '''dev_notes
@@ -118,8 +149,5 @@ class CSV(Strategy.Strategy):
 
 + Currently designed to run in stages where diffrent fuzz cases are applied
  random entries each time 
-
-+ TODO :: Add UI hooks
-
 
 '''

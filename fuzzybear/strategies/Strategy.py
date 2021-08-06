@@ -25,18 +25,26 @@ class Strategy():
 	BYTE_8_MAX = 18446744073709551615
 
 	def __init__(self):
+		# self.ui_runner = 
 		return
 
 
-	def ui_event(self, event, boost=10):
+	def ui_event(self, event, boost=10, target=100):
 		""" handels triggering strategy progress for UI """
 		global tmp_cumulative
 		tmp_cumulative += boost
 		""" handels triggering strategy progress for UI """
 		print(f'   [>>] Updating {event} progress %{tmp_cumulative} done')
-		if tmp_cumulative >= 100:
+		if tmp_cumulative >= target:
 			tmp_cumulative = 0
 
+	def register_ui_events(self, events):
+		""" Register a list of UI events """
+		
+		# initialise UI manager with 
+		# used strategies
+		
+		# self.ui_runner.add_strategy_targets()
 
 
 	def emoji(self):
@@ -49,11 +57,11 @@ class Strategy():
 
 	def chonk(self):
 		""" Overflow fuzzcases """
-		yield cyclic(100)	
-		yield cyclic(500)
-		yield cyclic(1000)
-		yield cyclic(4000)
-		yield cyclic(10000)
+		yield str(cyclic(100))	
+		yield str(cyclic(500))
+		yield str(cyclic(1000))
+		yield str(cyclic(4000))
+		yield str(cyclic(10000))
 
 
 	def keywords(self):
@@ -71,12 +79,12 @@ class Strategy():
 	def negate(self, data):
 		""" Negate the given data """
 		try:
-			yield data * -1
+			return str(int(data) * -1)
 		except TypeError:
 			try:
-				yield '-' + data if ('-' not in data) else data.strip('-')
+				return '-' + data if ('-' not in data) else data.strip('-')
 			except TypeError:
-				yield data
+				return data
 
 
 	def format_strings(self, data='', offset=1):
@@ -150,7 +158,6 @@ class Strategy():
 		for i in range(0, self.gen_max):
 			num = randint(0 , self.INT_MAX_SIGNED)
 			int_list.append(num)
-		#SOMETHING SHOULD BREAK IF THESE NUMBER ARE ENTERED :)
 		int_list.append(self.INT_MAX)
 		int_list.append(self.BYTE_8_MAX)
 		yield  int_list
@@ -194,7 +201,7 @@ class Strategy():
 	def bit_flip(self, data):
 		""" Bitflip fuzzcases, expects a integer value """
 		try:
-			return  ~int(data)
+			return  str(~int(data))
 		except:
 			print(f"{'':4}[DEBUG] {data} is not a number")
 			return data
@@ -208,3 +215,12 @@ class Strategy():
 			return ''.join(str(~ord(char)) for char in data)
 
 
+"""devnotes
+
+Needs work:
+	+ rand_negative
+	+ rand
+	+ rand_positive
+
+
+"""
