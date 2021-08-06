@@ -25,8 +25,9 @@ class FunctionCalls:
 		# function object basically encapsulate some data about a function, incl its addr.
 		# Here we reverse the mapping so we can index it by address.
 		for fnName, fnObj in self.elf.functions.items():
-			addressNameMap[str(hex(fnObj.address+self.binaryBase))] = fnName
-
+			address = hex(fnObj.address + self.binaryBase) if self.pie else hex(fnObj.address)
+			addressNameMap[address] = fnName
+		pprint(addressNameMap)
 		for key, val in self.calls.items():
 			try:
 				# our functionCalls data structure is indexed by function address.

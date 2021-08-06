@@ -86,14 +86,13 @@ class Coverage:
 			# This excludes insturctions that jump to a register since its a trek to find out the address
 			# actually being jumped to.
 			if 'j' in op.mnemonic and not re.search('r..', op.op_str) and not re.search('e..', op.op_str):
-				#print("0x%x:\t%s\t%s" %(op.address, op.mnemonic, op.op_str))
+				# print("0x%x:\t%s\t%s" %(op.address+self.binaryBase, op.mnemonic, hex(int(op.op_str,0x10)+self.binaryBase)))
+				print("0x%x:\t%s\t%s" %(op.address, op.mnemonic, hex(int(op.op_str,0x10))))
 				if i == 0:
 					jumpBlocks = JumpBlocks(self.binaryBase, elf)
-					jumpBlocks.add(addrMain, op.address)
 					startOfNextBlock = int(op.op_str,0x10) 
-				else:
-					jumpBlocks.add(startOfNextBlock, op.address)
-					startOfNextBlock = int(op.op_str,0x10) 
+				jumpBlocks.add(startOfNextBlock, op.address)
+				startOfNextBlock = int(op.op_str,0x10) 
 				i += 1
 			# Can probably more efficiently write this conditional.
 			if 'call' in op.mnemonic and not re.search('r..', op.op_str) and not re.search('e..', op.op_str):
@@ -103,10 +102,11 @@ class Coverage:
 				functionCalls.add(hex(op.address), hex(int(op.op_str, 0x10)))
 				j += 1
 
-		functionCalls.resolveFunctionNames()
-		print('printing function calls')
-		print(functionCalls)
+		#functionCalls.resolveFunctionNames()
+		# print('printing function calls')
+		# print(functionCalls)
 
+		jumpBlocks.resolveFunctionContext()
 		print('printng jumpBlocks')
 		print(jumpBlocks)
 				
