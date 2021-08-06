@@ -112,7 +112,6 @@ class CSV(Strategy.Strategy):
 				yield pack_csv(mutation)
 				super().ui_event('xor', 1, row)
 
-
 		mutation = copy.deepcopy(self.candidate_input)
 		row, col = self.size
 		for r in range(row):
@@ -123,13 +122,9 @@ class CSV(Strategy.Strategy):
 				super().ui_event('bit flip', 1, row)
 
 		mutation = copy.deepcopy(self.candidate_input)
-		print(f"[>>] mutation is {mutation}")
 		row, col = self.size
-		print(f"[>>] size rows: {row}, col: {col}")
 		for r in range(row):
 			for c in range(col):
-				print(f"[>>] Candidate input {self.candidate_input[r][c]}")
-				print(f"[>>] mutation was {mutation}")
 				mutation[r][c] = super().negate(self.candidate_input[r][c])
 				yield pack_csv(mutation)
 				super().ui_event('negate', 1, row)
