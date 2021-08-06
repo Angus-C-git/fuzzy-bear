@@ -23,24 +23,20 @@ ENTRIES_THRESHOLD = 10
 #     Strategy.ui_event(event, boost)
 
 
-# random row & column number
-# within the size of csv
+
 def random_row_col(range):
+	""" selects a random row and column with respect to size """
 	a, b = range
 	return (randint(0, a - 1), randint(0, b - 1))
 
 
-# TODO :: fails sometimes 
 def pack_csv(data):
+	""" pack csv list into string """
 	return "\n".join((",".join(row_col) for row_col in data))
 
 
-# TODO :: Need a way to switch
-# up header preservation organically
-# see dev notes
 class CSV(Strategy.Strategy):
 	
-	# parse csv input data
 	def __init__(self, sample_input):
 		super()
 		self.sample_input = sample_input
@@ -48,6 +44,7 @@ class CSV(Strategy.Strategy):
 
 
 	def parse_csv(self):
+		""" parse csv candidate file """
 		with open(self.sample_input) as csvfile:
 			self.candidate_input = list(reader(csvfile))
 
@@ -56,8 +53,7 @@ class CSV(Strategy.Strategy):
 
 
 	def add_entries(self, preserve_header=False):
-		# Generate random number of rows
-		# between 0 - 1000
+		""" adds extra entries to csv file in a random range """
 		rows, cols = random_row_col((MAX_ROWS, MAX_COLUMNS))
 
 		candidate = copy.deepcopy(self.candidate_input)
@@ -66,7 +62,8 @@ class CSV(Strategy.Strategy):
 		for row in range(1, rows):
 			new_row = []
 			for col in range(1, cols):
-				new_row.append(str(col * row))     # could be anything really 
+				# add some value
+				new_row.append(str(col * row))     
 
 			mutation.append(new_row)
 
@@ -74,9 +71,8 @@ class CSV(Strategy.Strategy):
 		return mutation
 
 
-	# run strategies
 	def run(self):     
-
+		""" run the CSV generator """
 		row, col = random_row_col(self.size)
 		mutation = copy.deepcopy(self.candidate_input)
 		for emoji in super().emoji():
@@ -132,17 +128,6 @@ class CSV(Strategy.Strategy):
 
 '''dev_notes
 
- + Even tho it matters for some CSVs that the header 
- remains intact we can ignore this as it will eventually
- be resolved by the generator -> unless
-
-
- + Things like adding rows and columns could be considered
-   a sub strategy because the data that goes into the extra fields
-   could also be fuzzed 
-
-
-+ Currently designed to run in stages where diffrent fuzz cases are applied
- random entries each time 
-
++ Currently designed to use mostly random based mutations coupled with close input 
+  based mutations using field manipulation
 '''
