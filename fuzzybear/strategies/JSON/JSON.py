@@ -5,35 +5,41 @@ from random import randint
 import copy
 
 
+MAX_KEYS = 50
+
+
 def insert(key,value,json_obj):
+    """ insert a key value pair """
     json_obj[key] = value
 
 
-#given a value replace it
 def replace_val(find,replace,json_obj):
+    """ given a value replace it """
     for item in json_obj.items():
         if item[1] == find:
             #print(item)
             json_obj[item[0]] = replace
             
 
-# random entry within dictionary
 def random_entry(json_obj):
+    """ random entry within dictionary """
     itt = list(json_obj.items())
     entry = random.choice(itt)
     return entry
 
 
 def get_rand_field(json_obj):
+    """ select a random field in the JSON obj """
     return random.choice(list(json_obj.items()))
 
 
 def thicc_file(num_entries):
+    """ add extra JSON fields in a range """
     thiccboi = {}
-    for i in range(0,num_entries):
+    for i in range(num_entries):
         thiccboi[i] = []
 
-        for l in range(1,50):
+        for l in range(1, MAX_KEYS):
             thiccboi[i].append(l)
 
     return thiccboi
@@ -41,19 +47,17 @@ def thicc_file(num_entries):
 
 class JSON(Strategy.Strategy):
     
-    # parse csv input data
     def __init__(self, sample_input):
+        """ parse JSON input """
         super()
         self.sample_input = sample_input
         with open(sample_input) as jsonfile:
             self.candidate_input = json.load(jsonfile)
-        
         self.size = len(self.candidate_input)
 
 
-    # run strategies
     def run(self):
-
+        """ run the JSON generator """
         rand_entry_count = randint(1, 100)
         mutation = thicc_file(rand_entry_count)
         yield json.dumps(mutation)
@@ -74,25 +78,22 @@ class JSON(Strategy.Strategy):
         rand_field = get_rand_field(mutation)
 
         field_value = rand_field[1] if (type(rand_field) is not list) else rand_field[1][0]
-        # print(f'   [DEBUG] Selected random field {rand_field}')
-        for negated in super().negate(field_value):
-            if (type(rand_field[1]) is list): 
-                rand_field[1][0] = negated
-            else:
-                mutation[rand_field[0]] = negated
+        negated = super().negate(field_value)
 
-            yield json.dumps(mutation)
+        if (type(rand_field[1]) is list): 
+            mutation[rand_field[1][0]] = negated
+        else:
+            mutation[rand_field[0]] = negated
+
+        yield json.dumps(mutation)
 
 
 
 '''devnotes
 
--> The json1 binary drops inputs if the length of the JSON is greater than 7200
--> Supplying a negative length field to the json1 binary segfaults it
 -> Some of the code above is truly fucking magical
     -> like how does a tuple become mutable
     -> we got list magic its all happening
--> Owen says - "this is a crime against humanity" 
 
 TODO
 

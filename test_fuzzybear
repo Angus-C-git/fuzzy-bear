@@ -133,8 +133,12 @@ def test_json():
         for x in json_worker.run():
             # @ here would mark the place the 
             # aggregator feeds harness
-            print(f'[DEBUG] test mutation was {x}')
-            print(f"\nPiping to harness, res was {harness.open_pipe(x)}\n")
+            res = harness.open_pipe(x)
+            print(f"\nPiping to harness, res was {res}\n")
+            if res != 0:
+                print(f'[+] CRASH? {res}')
+                return
+
 
 # test plaintext
 def test_plaintext():
@@ -162,6 +166,7 @@ def test_plaintext():
             except:
                 print('Either the generators are empty, or I fucked up')
                 break
+
 
 def test_jpeg():
     TEST_DIR = './tests/complete'

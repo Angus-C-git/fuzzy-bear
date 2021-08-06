@@ -82,10 +82,10 @@ class Strategy():
 		""" Negate the given data """
 		try:
 			return str(int(data) * -1)
-		except TypeError:
+		except:
 			try:
 				return '-' + data if ('-' not in data) else data.strip('-')
-			except TypeError:
+			except:
 				return data
 
 
