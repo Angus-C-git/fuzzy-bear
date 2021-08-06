@@ -5,6 +5,8 @@ class JumpBlocks:
 		self.binaryBase = binaryBase
 		self.pie = 'PIE enabled' in elf.checksec()
 
+	# This would be used if we were to implement some sort of cycle detection
+	# that's manually triggered at some point during the fuzz.
 	def watch(self):
 		self.watching = True
 

@@ -83,9 +83,9 @@ class Coverage:
 		j = 0
 		startOfNextBlock = 0
 		for op in target.disasm(opcodes, addrStart):
-			# This finds all jump instructions in the binary.
-			#if 'j' in op.mnemonic and op.address >= addrMain and 'eax' not in op.op_str:
-			if 'j' in op.mnemonic and 'eax' not in op.op_str:
+			# This excludes insturctions that jump to a register since its a trek to find out the address
+			# actually being jumped to.
+			if 'j' in op.mnemonic and not re.search('r..', op.op_str) and not re.search('e..', op.op_str):
 				#print("0x%x:\t%s\t%s" %(op.address, op.mnemonic, op.op_str))
 				if i == 0:
 					jumpBlocks = JumpBlocks(self.binaryBase, elf)
@@ -99,16 +99,8 @@ class Coverage:
 			if 'call' in op.mnemonic and not re.search('r..', op.op_str) and not re.search('e..', op.op_str):
 				#print("0x%x:\t%s\t%s" %(op.address, op.mnemonic, op.op_str))
 				if j == 0:
-					#Will get binaryBase from /proc/{pid}/maps
 					functionCalls = FunctionCalls(self.binaryBase, elf)
-				#try:
 				functionCalls.add(hex(op.address), hex(int(op.op_str, 0x10)))
-					# print('added function call')
-				#except:
-					# if the code doesn't call an addr, then it won't be saved in functionCalls.
-					# For example `call eax` won't be stored as a function call. 
-					# This can be implemented but not sure how helpful it'll be.
-				#	pass
 				j += 1
 
 		functionCalls.resolveFunctionNames()
