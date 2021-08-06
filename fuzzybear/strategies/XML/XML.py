@@ -49,6 +49,32 @@ def spicy_file():
     return spicy_string
 
 
+
+def fmt_string_insert():
+    return (
+        """
+<html>
+    <head>
+        <link href="http://somewebsite.com" />
+    </head>
+    <body>
+        <h1>I'm not a web developer.</h1>
+    </body>
+
+    <div id="#lol">
+        <a href="http://google.com">Here is some link...</a>
+    </div>
+
+
+    <tail>
+        <a href="http://bing.comhttp://bing.comhttp://bing.comhttp://bing.comhttp://bing.comhttp://bing.comhttp://bing.comhttp://bing.comhttp://bing.com%p%p%400$n">Footer link</a>
+    </tail>
+</html>
+  
+        """
+    )
+
+
 class XML(Strategy.Strategy):
     
     # parse xml input data
@@ -79,3 +105,7 @@ class XML(Strategy.Strategy):
         # print(f"[>>] mutation was {mutation}")
         yield mutation
 
+        """ tmp example for fmt strings should come from super class instead 
+        waiting on issue #15
+        """
+        yield fmt_string_insert()
