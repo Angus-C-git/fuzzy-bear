@@ -2,8 +2,9 @@ from Coverage import Coverage
 from pwn import *
 
 # Make sure this path is right for you.
-elf = ELF('./test')
-#'/home/lucas/Comp/UNSW/2021/term2/6447/week3/wargame/bin/formatrix
+#elf = ELF('./test')
+path = '/home/lucas/Comp/UNSW/2021/term2/6447/week8/wargame/bin/notezpz2'
+p = process(path)
 
-c = Coverage(elf)
+c = Coverage(p)
 c.gen_code_paths()
