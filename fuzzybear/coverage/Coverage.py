@@ -76,13 +76,21 @@ class Coverage:
 				#print(f'ops.address: {ops[i].address} blockStart: {blockStart}')
 				if ops[i].address >= blockStart:
 					self.jumpBlocks.add(blockStart, ops[i].address)
-					#print(f'      added a new block: start{hex(blockStart)} end: {hex(ops[i].address)}')
 					blockStart = ops[i+1].address
-			#elif 'call'
+			try:
+				key = hex(int(ops[i].op_str, 0x10))
+				if 'call' in ops[i].mnemonic and key in self.addressNameMap and self.addressNameMap[key] == 'exit':
+					self.jumpBlocks.add(blockStart, ops[i].address)
+					# print('\n\n=====================\n')
+					# print(f'blockStart: {hex(blockStart)} currInstr: {hex(ops[i].address)}')
+					# print('\n\n=====================\n')
+			except:
+				pass
 		#	elif 'ret' in ops[i].mnemonic:
 		#	 	self.jumpBlocks.add(blockStart, ops[i].address)
 				#print(f'blockStart: {hex(blockStart)} current instruction address: {hex(ops[i].address)} == {ops[i].mnemonic}')
 
+	# Need to make sure this works with PIE / ASLR
 	def gen_code_paths(self):
 		# addrMain = elf.symbols['main']
 		#pprint(self.coverage_target.functions)
@@ -91,7 +99,12 @@ class Coverage:
 		elf = self.coverage_target
 		for fnName, fnObj in elf.functions.items():
 			addressNameMap[hex(fnObj.address)] = fnName
+		self.addressNameMap = addressNameMap # Need to make all of this code much nicer
+		for fnName, addr in elf.plt.items():
+			#print(fnName, addr)
+			addressNameMap[hex(addr)] = fnName
 
+		pprint(self.addressNameMap)
 		for fnName, fnObj in elf.functions.items():
 			functionAddrList.append(fnObj.address)
 		functionAddrList.sort()
