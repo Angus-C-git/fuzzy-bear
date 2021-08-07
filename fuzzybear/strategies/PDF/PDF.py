@@ -1,3 +1,4 @@
+from argparse import ONE_OR_MORE
 from .. import Strategy
 
 
@@ -5,16 +6,29 @@ from .. import Strategy
 def create_header():
     return '%PDF-1.4\n'
 
-#Creating the middle components of the pdf document
-def pdf_object():
-    pass
+def create_img_and_text_resouce(obj_num, img_num, font_num):
+    stream = str(obj_num) + ' 0 obj\n<<\n'
+    stream += '/XObject << /I1' + str(img_num) + ' 0 R >>\n'
+    stream += '/Font << /F1 ' + str(font_num) + ' 0 R >>\n'
+    stream += '/ProcSet [/PDF /Text /ImageB /ImageC /ImageI]'
+    stream += '>>\n'
+    stream += 'endobj\n'
+    return stream
+
+def create_img_resouce_obj(obj_num, img_num):
+    stream = str(obj_num) + ' 0 obj\n<<\n'
+    stream += '/XObject << ' + str(img_num) + ' 0 R >>\n'
+    stream += '/ProcSet [/PDF /ImageB /ImageC /ImageI]'
+    stream += '>>\n'
+    stream += 'endobj\n'
+    return stream
 
 def create_resource_obj(obj_num, font_num):
     stream = str(obj_num) + ' 0 obj\n<<\n'
     stream += '/Font << /F1 ' + str(font_num) + ' 0 R >>\n'
-    stream += '/ProcSet [/PDF / Text]\n'
+    stream += '/ProcSet [/PDF /Text]\n'
     stream += '>>\n'
-    stream += 'endobj'
+    stream += 'endobj\n'
     return stream
 
 def type_obj(obj_num):
@@ -22,7 +36,6 @@ def type_obj(obj_num):
     stream += '/Type /Font\n'
     stream += '/Subtype /Type1\n'
     stream += '/BaseFont /Helvetica\n'
-    stream += '/Encoding /WinAnsiEncoding\n'
     stream += '>>\n'
     stream += 'endobj\n'
     return stream
@@ -64,6 +77,22 @@ def create_info_obj(obj_num):
     stream += '>>\n'
     stream += 'endobj\n'
     return stream
+
+def create_img_stream(obj_num, data, type_encoding):
+    stream = str(obj_num) + ' 0 obj\n<<\n'
+    stream += '/Type /XObject\n'
+    stream += '/Subtype /Image\n'
+    stream += '/Width  3510\n'
+    stream += '/Height 2491\n'
+    stream += '/ColorSpace /DeviceRGB\n'
+    stream += 'BitsPerComponent 8\n'
+    stream += '/Filter ' + type_encoding + '\n'
+    stream += '/Length ' + str(len(data)) + '\n' 
+    stream += '>>\n'
+    stream += 'stream\n'
+    stream += data
+    stream += '\nendstream\n'
+    stream += 'endobj\n'
 
 #assuming data is a string
 def create_stream(obj_num ,data, encoding):
@@ -179,7 +208,7 @@ def create_large_page_document(num):
     page_obj_nums = []
     for i in range(num):
         obj_locations.append(len(pdf_document))
-        pdf_document += create_stream(obj_num ,"BT /F1 12 Tf 100 700 Td (Hello World)Tj ET", False)
+        pdf_document += create_stream(obj_num ,"BT /F1 12 Tf 100 700 Td (Hello Adam, I hope you enjoy a very large PDF Document... I have much pain form PDFs)Tj ET", False)
         obj_num += 1
         obj_locations.append(len(pdf_document))
         page_obj_nums.append(obj_num)
@@ -197,6 +226,72 @@ def create_large_page_document(num):
     pdf_document += create_trailer(obj_num-1, obj_num, 2, length_to_xref, None)
     return pdf_document
 
+def create_bee_movie_page(data):
+    obj_num = 1
+    obj_locations = []
+    pdf_document = create_header()
+    obj_locations.append(len(pdf_document))
+    pdf_document += create_info_obj(obj_num)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += type_obj(obj_num)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    resouce_obj = obj_num
+    pdf_document += create_resource_obj(obj_num, obj_num-1)
+    obj_num += 1
+    parent_obj = obj_num + (len(data)*2)
+    page_obj_nums = []
+    for i in data:
+        obj_locations.append(len(pdf_document))
+        pdf_document += create_stream(obj_num ,"BT /F1 35 Tf 100 700 Td 1 Tr 2 w ("+i+")Tj ET", False)
+        obj_num += 1
+        obj_locations.append(len(pdf_document))
+        page_obj_nums.append(obj_num)
+        pdf_document += page_leaf_obj(obj_num , parent_obj, resouce_obj, obj_num-1)
+        obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += page_node_obj(obj_num, page_obj_nums)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += doc_catalog(obj_num,obj_num-1)
+    obj_num += 1
+    length_to_xref = len(pdf_document)
+    pdf_document += create_xref(obj_locations)
+    pdf_document += create_trailer(obj_num-1, obj_num, 2, length_to_xref, None)
+    return pdf_document
+
+def create_document_image(data):
+    obj_num = 1
+    obj_locations = []
+    pdf_document = create_header()
+    obj_locations.append(len(pdf_document))
+    pdf_document += create_info_obj(obj_num)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += create_img_stream(obj_num, data,'/DCTDecode')
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += create_img_resouce_obj(obj_num, obj_num-1)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += create_stream(obj_num, 'q\n 1 0 0 1 100 200 cm\n 0 0 0 0 0 0 cm \n 150 0 0 80 0 0 cm\n /I1 Do\n Q', False)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += page_leaf_obj(obj_num, obj_num+1, obj_num-2, obj_num-1)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += page_node_obj(obj_num, [(obj_num-1)])
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += doc_catalog(obj_num,obj_num-1)
+    obj_num += 1
+    length_to_xref = len(pdf_document)
+    pdf_document += create_xref(obj_locations)
+    pdf_document += create_trailer(obj_num-1, obj_num, 2, length_to_xref, None)
+    return pdf_document
+
+
 class PDF(Strategy.Strategy):
     # parse ___ input data
     def __init__(self, sample_input):
@@ -209,7 +304,11 @@ class PDF(Strategy.Strategy):
 
     def run(self):
         yield(create_pdf_basic())
-        yield(create_large_page_document(1000))
+        yield(create_large_page_document(10))
+        with open('fuzzybear/strategies/PDF/bee_mov.txt') as f:
+            lines = f.readlines()
+            yield(create_bee_movie_page(lines))
+        
 
 
 
