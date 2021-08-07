@@ -8,6 +8,8 @@ import re
 from rich.tree import Tree
 from rich import print
 
+from symbols import defaults
+
 # ================================================================= #
 
 test_binary = "../../tests/components/coverage/complex"
@@ -40,8 +42,9 @@ def build_call_tree(branch, called_address):
 # TODO :: Finish implementing
 class Coverage:
 	""" handler class for coverage ops """
-	def __init__(self, coverage_target, target_pid):
+	def __init__(self, coverage_target, target_path, target_pid):
 		self.coverage_target = coverage_target.elf
+		self.target_elf = ELF(target_path, checksec=False)
 		self.pid = target_pid
 
 
@@ -83,9 +86,29 @@ class Coverage:
 
 
 	def get_function_calls(self):
-		""" Get the function calls for the binary"""
-		pass
-			
+		""" Get the function calls for the binary as a lookup table"""
+		self.rebase()
+		self.target_elf.address = self.binaryBase
+		functions = self.target_elf.functions
+
+		self.entry_point = self.target_elf.symbols['_start']
+		self.exit_point = self.target_elf.symbols['_end']
+
+		print(f"[>>] Entry/exit points: {hex(self.entry_point)}/{hex(self.exit_point)}")
+
+		function_table = {
+			# address : name
+		}
+
+		for key in functions.keys():
+			if key not in defaults:
+				function_table[functions[key].address] =  key
+				# print(f"{key}: {hex(functions[key].address)}")
+
+		print(function_table)
+		return function_table
+
+	# =================================================================
 
 
 	def gen_code_paths(self):
@@ -106,8 +129,8 @@ class Coverage:
 		print(f"[>>] addrMain: {hex(addrMain)}")
 
 		# rebase binary	
-		self.rebase()
-		print(f"[>>] Binary Base: {hex(self.binaryBase)}")
+		# self.rebase()
+		# print(f"[>>] Binary Base: {hex(self.binaryBase)}")
 		
 
 		# We start storing from after main() since I don't think jumps before main are

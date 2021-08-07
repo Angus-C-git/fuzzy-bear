@@ -9,8 +9,8 @@ TESTS_PATH = '../../tests/components/coverage/codepaths'
 
 # target_binary = f'{TESTS_PATH}/test'
 # target_binary = f'{TESTS_PATH}/simple'
-# target_binary = f'{TESTS_PATH}/complex'
-target_binary = f'{TESTS_PATH}/regular'
+target_binary = f'{TESTS_PATH}/complex'
+# target_binary = f'{TESTS_PATH}/regular'
 
 
 proc = process(target_binary)
@@ -19,5 +19,7 @@ proc = process(target_binary)
 # gdb.attach(proc.pid)
 
 
-coverage_runner = Coverage(proc, proc.pid)
-coverage_runner.gen_code_paths()
+coverage_runner = Coverage(proc, target_binary, proc.pid)
+coverage_runner.get_function_calls()
+# coverage_runner.gen_code_paths()
+
