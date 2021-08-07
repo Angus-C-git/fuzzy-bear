@@ -200,6 +200,11 @@ class Strategy():
 		""" XOR each char in a string """
 		return ''.join(chr(ord(char) ^ 0xFF) for char in data)
 
+	
+	def xor_char(self, char):
+		""" XOR a single char """
+		return chr(ord(char) ^ 0xFF)
+
 
 	def bit_flip(self, data):
 		""" Bitflip fuzzcases, expects a integer value """

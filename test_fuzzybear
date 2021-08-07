@@ -144,8 +144,8 @@ def test_json():
 # test plaintext
 def test_plaintext():
     TEST_DIR = './tests/complete'
-    TEST_BINARY = f'{TEST_DIR}/plaintext1'
-    TEST_SAMPLE = f'{TEST_DIR}/codecs/plaintext1.txt'
+    TEST_BINARY = f'{TEST_DIR}/plaintext3'
+    TEST_SAMPLE = f'{TEST_DIR}/codecs/plaintext3.txt'
 
     print(f"""
         [>>] Running TXT test against {TEST_BINARY.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
@@ -153,16 +153,13 @@ def test_plaintext():
 
     harness = Harness.Harness(TEST_BINARY)
     txt_worker = TXT.TXT(TEST_SAMPLE)
-    breakingInputs = []
-    # for i in range(100):
-        # print(f'case {i}')
     for u in txt_worker.run():
         try:
             print(f'[DEBUG] test mutation was:\n{u}')
             retCode = harness.open_pipe(u)
             print(f"\n  Piping to harness, res was {retCode}\n")
-            if retCode != 0:
-                print(f' [>>] Crashed {TEST_BINARY} with: \n {u}')
+            if retCode == -11:
+                print(f'[+] CRASH? {retCode}')
                 return
         except:
             print('Either the generators are empty, or I fucked up')
