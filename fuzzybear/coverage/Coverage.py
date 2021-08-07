@@ -1,5 +1,9 @@
 from pwn import *
 from capstone import *
+from pprint import pprint
+from FunctionCall import FunctionCalls, FunctionCall
+from JumpBlock import JumpBlocks, JumpBlock
+import re
 
 # ================================================================= #
 
@@ -15,13 +19,47 @@ def update_coverage(address):
 	print(f"[>>] Updating coverage, hit {hex(address)}")
 	print("[>>] Not implemented")
 
+'''Ideas:
+	- Once you have code blocks working properly
+	- You should be able to detect if you some sort of cyclic behaviour	
+'''
 
 # TODO :: Finish implementing
 class Coverage:
 	""" handler class for coverage ops """
 	def __init__(self, coverage_target):
-		self.coverage_target = coverage_target
+		self.coverage_target = coverage_target.elf
+		self.pid = coverage_target.pid
+		# Trying this since /proc/pid is being created but all the files are empty
 
+	def getVmmap(self, pid):
+		f = open(f'/proc/{pid}/maps', 'r')
+		vmmap = f.readlines()
+		# for l in vmmap:
+		# 	print(l)
+		return vmmap
+
+	# First line of vmmap gives address for the start of binary.
+	def getBinaryBase(self, vmmap):
+		line = vmmap[0]
+		
+		self.binaryBase = int(line[:line.index('-')],0x10)
+
+	# Search for first line that references libc. 
+	# Need to make sure this is is reliable
+	def getLibcBase(self, vmmap):
+		for i in range(len(vmmap)):
+			if 'libc' in vmmap[i]:
+				line = vmmap[i]
+				self.libcBase = int(line[:line.index('-')],0x10)
+				return
+
+	
+	def dubstep(self):
+		vmmap = self.getVmmap(self.pid)
+		self.getBinaryBase(vmmap)
+		self.getLibcBase(vmmap)
+		# self.getHeapBase(vmmap)
 
 	def gen_code_paths(self):
 		""" establish all paths through target """
@@ -33,22 +71,49 @@ class Coverage:
 		# executable code lives in .text section
 		opcodes = elf.section('.text')
 
-		current_block = 0
-		last_block = 0
-		for op in target.disasm(opcodes, 0x1000):
-			print("0x%x:\t%s\t%s" %(op.address, op.mnemonic, op.op_str))
-			if len(op.groups) > 0:
-				print(f"Block{'':5}{op.groups}")
+		addrMain = elf.symbols['main']
+		addrStart = elf.symbols['_start'] #  <-- make sure this is what we want
 
-		print("[>>] Not implemented")
+		# Find binaryBase and libcBase (unnecesary atm)
+		self.dubstep()
 
+		# We start storing from after main() since I don't think jumps before main are
+		# relevant for code coverage? Although maybe we need to include GOT stuffs ?
+		i = 0
+		j = 0
+		startOfNextBlock = 0
+		for op in target.disasm(opcodes, addrStart):
+			# This excludes insturctions that jump to a register since its a trek to find out the address
+			# actually being jumped to.
+			if 'j' in op.mnemonic and not re.search('r..', op.op_str) and not re.search('e..', op.op_str):
+				# print("0x%x:\t%s\t%s" %(op.address+self.binaryBase, op.mnemonic, hex(int(op.op_str,0x10)+self.binaryBase)))
+				print("0x%x:\t%s\t%s" %(op.address, op.mnemonic, hex(int(op.op_str,0x10))))
+				if i == 0:
+					jumpBlocks = JumpBlocks(self.binaryBase, elf)
+					startOfNextBlock = int(op.op_str,0x10) 
+				jumpBlocks.add(startOfNextBlock, op.address)
+				startOfNextBlock = int(op.op_str,0x10) 
+				i += 1
+			# Can probably more efficiently write this conditional.
+			if 'call' in op.mnemonic and not re.search('r..', op.op_str) and not re.search('e..', op.op_str):
+				#print("0x%x:\t%s\t%s" %(op.address, op.mnemonic, op.op_str))
+				if j == 0:
+					functionCalls = FunctionCalls(self.binaryBase, elf)
+				functionCalls.add(hex(op.address), hex(int(op.op_str, 0x10)))
+				j += 1
+
+		#functionCalls.resolveFunctionNames()
+		# print('printing function calls')
+		# print(functionCalls)
+
+		jumpBlocks.resolveFunctionContext()
+		print('printng jumpBlocks')
+		print(jumpBlocks)
+				
 
 	def start(self, tracee_pid):
 		""" begin coverage ops"""
 		pass
-
-# ================================================================= #
-
 
 # ================================================================= #
 """ debugging/tmp """
