@@ -192,8 +192,8 @@ def test_jpeg():
 def test_xml():
 
     TEST_DIR = './tests/complete'
-    TEST_BINARY = f'{TEST_DIR}/xml1'
-    TEST_SAMPLE = f'{TEST_DIR}/codecs/xml1.txt'
+    TEST_BINARY = f'{TEST_DIR}/xml2'
+    TEST_SAMPLE = f'{TEST_DIR}/codecs/xml2.txt'
 
     print(f"""
         [>>] Running XML test against {TEST_BINARY.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}

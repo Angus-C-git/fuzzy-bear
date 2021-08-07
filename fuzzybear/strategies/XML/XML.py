@@ -10,6 +10,7 @@ import copy
 
 MAX_DEPTH = 100
 target_elements = ['href', 'id', 'style', 'class']
+target_tags = ['div', 'tail', 'head']
 
 
 def prettify(elem):
@@ -37,6 +38,17 @@ def change_element(elem_obj, new_elm, elem_type):
             base_str = child.attrib[elem_type]
             child.attrib[elem_type] = base_str + base_str + base_str + base_str + base_str + base_str + base_str + new_elm
 
+def append_elem(elem_obj, elem_type):
+    append_list = []
+    for child in elem_obj.iter():
+        if child.tag == elem_type:
+            new = child
+            append_list.append(new)
+    
+    if append_list:
+        for elem in append_list:
+            for i in range(90):
+                elem_obj.append(elem)
 
 #spicy files
 def spicy_file():
@@ -77,6 +89,12 @@ class XML(Strategy.Strategy):
                 change_element(mutation, chonk, e)
             yield prettify(mutation)
 
+        
+        for e in target_tags:
+            mutation = copy.deepcopy(self.candidate_input)
+            append_elem(mutation,e)
+            yield prettify(mutation)
+
         mutation = spicy_file() 
         # print(f"[>>] mutation was {mutation}")
         yield mutation
@@ -92,3 +110,4 @@ class XML(Strategy.Strategy):
             except:
                 print("[>>] failed to yield")
                 pass
+
