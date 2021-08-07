@@ -59,11 +59,11 @@ class Strategy():
 
 	def chonk(self):
 		""" Overflow fuzzcases """
-		yield str(cyclic(100))	
-		yield str(cyclic(500))
-		yield str(cyclic(1000))
-		yield str(cyclic(4000))
-		yield str(cyclic(10000))
+		yield cyclic(100).decode()	
+		yield cyclic(500).decode()
+		yield cyclic(1000).decode()
+		yield cyclic(4000).decode()
+		yield cyclic(10000).decode()
 
 
 	def keywords(self):
