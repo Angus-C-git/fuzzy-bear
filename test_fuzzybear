@@ -269,6 +269,10 @@ def test_byte_flips():
         res = strategy_driver.byte_flip(x)
         print(f'Byte flipped {x} to {res}')
 
+def test_pdf():
+    pdf = PDF.PDF('yeet')
+    for i in pdf.run():
+        print(i)
 
 ###########################################################################
 
@@ -345,6 +349,12 @@ parser.add_argument('-TXT', '--TXT-test',
                     help = 'Test TXT generator'
                     )
 
+parser.add_argument('-PDF', '--PDF-test',
+                    dest = 'PDF',
+                    action='store_true',
+                    help = 'Test PDF generator'
+                    )
+
 
 ## Add command line args for your test ^
 
@@ -375,4 +385,6 @@ if (args.NEGATE): test_negate()
 if (args.JPEG): test_jpeg()
 
 if (args.TXT): test_plaintext()
+
+if (args.PDF): test_pdf()
 

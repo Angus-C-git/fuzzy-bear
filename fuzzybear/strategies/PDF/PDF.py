@@ -28,7 +28,7 @@ def page_node_obj(obj_num,page_leaf):
     stream += ']\n'
     stream += '/Count '+ str(len(page_leaf)) + '\n'
     stream += '>>\nendobj\n'
-    return page_leaf_obj
+    return stream
 
 def page_leaf_obj(obj_num ,parent_node_num, resource_obj_num, contents_obj_num):
     stream = str(obj_num) + ' 0 obj\n<<\n'
@@ -46,8 +46,8 @@ def doc_catalog(obj_num, page_tree_obj_num):
     stream += '/Type /Catalog\n'
     stream += '/Pages '+str(page_tree_obj_num) + ' 0 R\n'
     stream += '>>\n'
-    stream += 'endobj'
-    return doc_catalog
+    stream += 'endobj\n'
+    return stream
 
 def create_info_obj(obj_num):
     stream = str(obj_num) + ' 0 obj\n<<\n'
@@ -55,6 +55,7 @@ def create_info_obj(obj_num):
     stream += '/Producer (FuzzyBear fuzzer 11.1.1.1.1.11)\n'
     stream += '>>\n'
     stream += 'endobj\n'
+    return stream
 
 #assuming data is a string
 def create_stream(obj_num ,data, encoding):
@@ -65,8 +66,8 @@ def create_stream(obj_num ,data, encoding):
     stream += '>>\n'
     stream += 'stream\n'
     stream += str(data)
-    stream += 'endstream\n'
-    stream += 'endobj'
+    stream += '\nendstream\n'
+    stream += 'endobj\n'
     return stream
 
 ##Creating the ending of the pdf document uses create_xref and create_trailer
@@ -93,10 +94,10 @@ def create_trailer(root_obj_id, num_objects, info_obj_id, lenth_to_xref, prev_xr
     trailer += '/Root '+ str(root_obj_id) + ' 0 R\n'
     trailer += '/Info '+ str(info_obj_id) + ' 0 R\n'
     if(prev_xref != None):
-        trailer += '/Prev '+ prev_xref
+        trailer += '/Prev '+ str(prev_xref)
     trailer += '>>\n'
-    trailer += 'startxref'
-    trailer += lenth_to_xref
+    trailer += 'startxref\n'
+    trailer += str(lenth_to_xref) + '\n'
     trailer += '%%EOF'
     return trailer
 
