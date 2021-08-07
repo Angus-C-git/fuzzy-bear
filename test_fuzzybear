@@ -129,15 +129,16 @@ def test_json():
     harness = Harness.Harness(TEST_BINARY)
     json_worker = JSON.JSON(TEST_SAMPLE)
 
-    for x in range(10):
-        for x in json_worker.run():
-            # @ here would mark the place the 
-            # aggregator feeds harness
-            res = harness.open_pipe(x)
-            print(f"\nPiping to harness, res was {res}\n")
-            if res != 0:
-                print(f'[+] CRASH? {res}')
-                return
+    # for x in range(10):
+    for x in json_worker.run():
+        # print(f'[DEBUG] test mutation was {x}')
+        # @ here would mark the place the 
+        # aggregator feeds harness
+        res = harness.open_pipe(x)
+        print(f"\nPiping to harness, res was {res}\n")
+        if res != 0:
+            print(f'[+] CRASH? {res}')
+            return
 
 
 # test plaintext

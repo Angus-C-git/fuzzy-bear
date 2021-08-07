@@ -91,14 +91,14 @@ class Strategy():
 
 	def format_strings(self, data='', offset=1):
 		""" Format string fuzzcases """
-		yield data + '%p'
-		yield data + '%n'
-		yield data + '%d'
-		yield data + '%s'
-		yield data + '%x'
-		yield data + '%@'
-		yield data + '%hn'
-		yield data + '%hhn'
+		yield data + f'%{offset}$p'
+		yield data + f'%{offset}$n'
+		yield data + f'%{offset}$d'
+		yield data + f'%{offset}$s'
+		yield data + f'%{offset}$x'
+		yield data + f'%{offset}$@'
+		yield data + f'%{offset}$hn'
+		yield data + f'%{offset}hhn'
 		yield data + f'\x00\x00\x00\x01%{offset}$n'
 		yield data + f'%99999$hn'
 	

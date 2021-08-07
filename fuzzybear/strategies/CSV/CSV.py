@@ -1,19 +1,16 @@
-'''
+""""
 CSV strategy driver Class
 
 	► Generates strategies for csv based 
 	  inputs
-'''
+"""
 from .. import Strategy
 from  csv import reader
 from random import randint
 import copy
 
-'''
-Utility methods for CSV 
-strategies
-'''
 
+# config
 MAX_ROWS = 1000
 MAX_COLUMNS = 1000
 ENTRIES_THRESHOLD = 10
@@ -126,8 +123,8 @@ class CSV(Strategy.Strategy):
 				super().ui_event('negate', 1, row)
 
 
-'''dev_notes
+"""dev_notes
 
 + Currently designed to use mostly random based mutations coupled with close input 
   based mutations using field manipulation
-'''
+"""
