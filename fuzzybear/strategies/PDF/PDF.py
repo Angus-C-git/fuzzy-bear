@@ -9,11 +9,18 @@ def create_header():
 def pdf_object():
     pass
 
+def create_resource_obj(obj_num, font_num):
+    stream = str(obj_num) + ' 0 obj\n<<\n'
+    stream += '/Font << /F8 ' + str(font_num) + ' 0 R >>\n'
+    stream += '/ProcSet [/PDF / Text]\n'
+    stream += '>>\n'
+    stream += 'endobj'
+
 def type_obj(obj_num):
     stream = str(obj_num) + ' 0 obj\n<<\n'
     stream += '/Type /Font\n'
     stream += '/Subtype /Type1\n'
-    stream += 'BaseFont /Helvetica-Bold\n'
+    stream += '/BaseFont /Helvetica-Bold\n'
     stream += '/Encoding /WinAnsiEncoding\n'
     stream += '>>\n'
     stream += 'endobj\n'
@@ -107,6 +114,7 @@ def create_trailer(root_obj_id, num_objects, info_obj_id, lenth_to_xref, prev_xr
 #page_leaf 4 5
 #stream location 6 7
 #resouce_obj 8, 9
+#font_obj 10, 11
 def create_pdf_basic():
     obj_num = 1
     obj_locations = []
@@ -134,10 +142,17 @@ def create_pdf_basic():
     pdf_document += create_stream(obj_num ,"BT /F1 24 Tf 100 700 Td (Nice to meet you)Tj ET", False)
     obj_num += 1
     obj_locations.append(len(pdf_document))
+    pdf_document += create_resource_obj(obj_num, 10)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += create_resource_obj(obj_num, 11)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
     pdf_document += type_obj(obj_num)
     obj_num += 1
     obj_locations.append(len(pdf_document))
     pdf_document += type_obj(obj_num)
+
     length_to_xref = len(pdf_document)
     pdf_document += create_xref(obj_locations)
     pdf_document += create_trailer(1, obj_num, 2, length_to_xref, None)
