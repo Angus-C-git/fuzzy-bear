@@ -1,7 +1,7 @@
 from random import randint, randrange
 from pwn import cyclic
 
-'''
+"""
 BASE CLASS
 
 	► Other strategy classes inherit from this base class to build new strats
@@ -10,7 +10,7 @@ BASE CLASS
 	► Inherit this class to build other strategies 
 
 	► TODO :: Should be a factory model
-'''
+"""
 
 GEN_MAX = 100
 
@@ -18,7 +18,7 @@ GEN_MAX = 100
 tmp_cumulative = 0
 
 class Strategy():
-	
+	# max constants
 	CHAR_MAX = 255
 	INT_MAX  = 4294967295
 	INT_MAX_SIGNED = 2147483648
