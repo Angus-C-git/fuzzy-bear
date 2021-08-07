@@ -47,11 +47,12 @@ test_tracee = 'tmp_tests/linear'
 
 
 class PtFuzz:
-	def __init__(self, target=None, pid=None, entry=None, exit=None):
+	def __init__(self, target=None, pid=None, entry=None, exit=None, dynamic_bps=None):
 		self.tracee = target
 		self.pid = pid
 		self.entry = entry
 		self.exit = exit
+		self.dynamic_breakpoints = dynamic_bps
 
 		
 	def begin_trace(self):
@@ -102,6 +103,8 @@ class PtFuzz:
 		end_addr = self.exit  #tmp_proc_bs['_end']
 
 		self.set_anchors(start_addr, end_addr)
+		
+		self.set_checkpoints()
 
 		print(f'[>>] child pid is {pid_child}')
 
@@ -140,9 +143,15 @@ class PtFuzz:
 		pokedata(pid_child, _end, end_bp)
 
 
-	def set_checkpoints(self, blocks):
+	def set_checkpoints(self):
 		""" Set dynamic breakpoints """
-		print("[>>] Not implemented")
+		pid_child = self.pid
+		print(f"[>>] Setting dynamic breakpoints")
+		for bp in self.dynamic_breakpoints.keys():
+			print(f"[>>] Setting dynamic bp {hex(bp)}")
+			bp_addr = gen_breakpoint(bp)
+			pokedata(pid_child, bp, bp_addr)
+
 
 
 	def handle_trap():

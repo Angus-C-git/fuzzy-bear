@@ -4,7 +4,7 @@ from ._registers import *
 from .signals import *
 from .utility.breakpoints import gen_breakpoint
 
-
+from os import getpid
 
 
 """ 
@@ -67,7 +67,6 @@ def print_register_state_x86(registers):
 
 def attach(target_pid):
 	res = ptrace(PTRACE_ATTACH, target_pid, 0, 0)
-	print(f"Attach: {res}")
 	if (res < 0):
 		print(f"[>>] Attach failed, error code {res}")
 
@@ -113,11 +112,11 @@ def set_registers(target_pid, new_registers):
 
 
 def trace_me():
+	""" Trace current process """
 	print(f"[>>] Attempting trace me")
+	# should be child here
 	trace_me_res = ptrace(PTRACE_TRACEME, 0, 0, 0)
-	print(f"[>>] Trace me returned {trace_me_res}")
-	
-
+	print("[>>] PID chid is:", getpid()) 
 	if (trace_me_res < 0):
 		print(f"[>>] Traceme failed with error code {trace_me_res}")
 
@@ -135,7 +134,6 @@ def continue_exc(pid):
 
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 
 
 
