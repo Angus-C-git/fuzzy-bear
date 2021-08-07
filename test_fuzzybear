@@ -14,7 +14,7 @@
 import csv
 from pathlib import Path
 import sys
-from colorama import Fore, Style
+# from colorama import Fore, Style
 
 from fuzzybear import Harness
 import argparse
@@ -44,9 +44,9 @@ from fuzzybear.strategies import XML
 ## ADD TEST IMPORT ## ^
 
 
-
+# Fore.RED +
 def print_banner():
-    print(Fore.RED + '''
+    print('''
 
           ____    _____ _____ ____ _____   _____ _   _ ____________   __   
           \ \ \  |_   _| ____/ ___|_   _| |  ___| | | |__  /__  /\ \ / /   
@@ -61,7 +61,7 @@ def print_banner():
          |____/|_____/_/   \_\_| \_\          
                            
     ''')
-    print(Style.RESET_ALL)
+    # print(Style.RESET_ALL)
 
 
 ########################## :: [DEFINE TESTS] :: ##########################
@@ -92,8 +92,8 @@ def test_harness():
 # test csv1
 def test_csv():
     TEST_DIR = './tests/complete'
-    TEST_BINARY = f'{TEST_DIR}/csv1'
-    TEST_SAMPLE = f'{TEST_DIR}/codecs/csv1.txt'
+    TEST_BINARY = f'{TEST_DIR}/csv2'
+    TEST_SAMPLE = f'{TEST_DIR}/codecs/csv2.txt'
 
     print(f"""
         [>>] Running CSV test against {TEST_BINARY.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
@@ -103,16 +103,18 @@ def test_csv():
 
     csv_worker = CSV.CSV(TEST_SAMPLE)
     
-    # buf = ''
-    # csv_writer = csv.writer(buf)
-    for x in range(5):
-        for x in csv_worker.run():
-            
-            # @ here would mark the place the 
-            # aggregator feeds harness
-            # print(x)
-            print(f"\nPiping to harness, res was {harness.open_pipe(x)}\n")
-    
+    # for x in range(5):
+    for x in csv_worker.run():
+        
+        # @ here would mark the place the 
+        # aggregator feeds harness
+        # print(f'[DEBUG] test mutation was\n{x}')
+        res = harness.open_pipe(x)
+        print(f"\nPiping to harness, res was {res}\n")
+        if res != 0:
+            print(f'[+] CRASH? {res}')
+            return
+
 
 # test json1
 def test_json():
@@ -127,8 +129,60 @@ def test_json():
     harness = Harness.Harness(TEST_BINARY)
     json_worker = JSON.JSON(TEST_SAMPLE)
 
+    # for x in range(10):
+    for x in json_worker.run():
+        # print(f'[DEBUG] test mutation was {x}')
+        # @ here would mark the place the 
+        # aggregator feeds harness
+        res = harness.open_pipe(x)
+        print(f"\nPiping to harness, res was {res}\n")
+        if res != 0:
+            print(f'[+] CRASH? {res}')
+            return
+
+
+# test plaintext
+def test_plaintext():
+    TEST_DIR = './tests/complete'
+    TEST_BINARY = f'{TEST_DIR}/plaintext3'
+    TEST_SAMPLE = f'{TEST_DIR}/codecs/plaintext3.txt'
+
+    print(f"""
+        [>>] Running TXT test against {TEST_BINARY.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
+    """)
+
+    harness = Harness.Harness(TEST_BINARY)
+    txt_worker = TXT.TXT(TEST_SAMPLE)
+    breakingInputs = []
+    for i in range(7000):
+        print(f'case {i}')
+        for u in txt_worker.run():
+            try:
+                print(f'[DEBUG] test mutation was {u}')
+                retCode = harness.open_pipe(u)
+                # print(f"\n  Piping to harness, res was {retCode}\n")
+                if retCode != 0:
+                    print(f' [>>] Crashed {TEST_BINARY} with: \n {u}')
+                    return
+            except:
+                print('Either the generators are empty, or I fucked up')
+                break
+
+
+def test_jpeg():
+    TEST_DIR = './tests/complete'
+    TEST_BINARY = f'{TEST_DIR}/jpg1'
+    TEST_SAMPLE = f'{TEST_DIR}/codecs/jpg1.txt'
+
+    print(f"""
+        [>>] Running JPEG test against {TEST_BINARY.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
+    """)
+
+    harness = Harness.Harness(TEST_BINARY)
+    jpeg_worker = JPEG.JPEG(TEST_SAMPLE)
+
     for x in range(10):
-        for x in json_worker.run():
+        for x in jpeg_worker.run():
             # @ here would mark the place the 
             # aggregator feeds harness
             print(f'[DEBUG] test mutation was {x}')
@@ -188,6 +242,62 @@ def test_negate():
 
 
 
+def test_bit_flips():
+    from fuzzybear.strategies import Strategy
+
+    print(f"""
+        [>>] Running bit flip tests
+    """
+    )
+
+    strategy_driver = Strategy.Strategy()
+    for x in range(100):
+        res = strategy_driver.bit_flip(x)
+        print(f'Flipped {x} to {res}')
+
+
+
+def test_xor_data():
+    from fuzzybear.strategies import Strategy
+
+    print(f"""
+        [>>] Running xor tests
+    """
+    )
+
+    strategy_driver = Strategy.Strategy()
+
+    candidate_strings = [
+        "-1", "2", "2000", "lol", 
+        "fizz", "buzz", "adam", "trivial"
+    ]
+
+    for x in candidate_strings:
+        res = strategy_driver.xor_data(x)
+        print(f'XOR\'d {x} to {res}')
+
+
+
+def test_byte_flips():
+    from fuzzybear.strategies import Strategy
+
+    print(f"""
+        [>>] Running byte flip tests
+    """
+    )
+
+    strategy_driver = Strategy.Strategy()
+
+    candidate_strings = [
+        "-1", "2", "2000", "lol", 
+        "fizz", "buzz", "adam", "trivial",
+        "c", "d", "$", "-", "y"
+    ]
+
+    for x in candidate_strings:
+        res = strategy_driver.byte_flip(x)
+        print(f'Byte flipped {x} to {res}')
+
 
 ###########################################################################
 
@@ -211,12 +321,39 @@ parser.add_argument('-H', '--harness',
                     )
 
 
+parser.add_argument('-BF', '--bit-flips',
+                    dest = 'bitflips',
+                    action='store_true',
+                    help = 'test bit flips strategy'
+                    )
+
+
+parser.add_argument('-NEGATE', '--negate-test',
+                    dest = 'NEGATE',
+                    action='store_true',
+                    help = 'test the negation strategy'
+                    )
+
+
+parser.add_argument('-BYTEFLIP', '--byte-flips',
+                    dest = 'byteflips',
+                    action='store_true',
+                    help = 'test bit flips strategy'
+                    )
+
+
+parser.add_argument('-XOR', '--xor-chars',
+                    dest = 'xor',
+                    action='store_true',
+                    help = 'what is your test'
+                    )
+
+
 parser.add_argument('-CSV', '--CSV-codec',
                     dest = 'CSV',
                     action='store_true',
                     help = 'test the csv codec binaries'
                     )
-
 
 
 parser.add_argument('-JSON', '--JSON-codec',
@@ -225,6 +362,11 @@ parser.add_argument('-JSON', '--JSON-codec',
                     help = 'test the json codec binaries'
                     )
 
+parser.add_argument('-JPEG', '--JPEG-codec',
+                    dest = 'JPEG',
+                    action='store_true',
+                    help = 'test the jpeg codec binaries'
+                    )
 
 parser.add_argument('-XML', '--XML-codec',
                     dest = 'XML',
@@ -236,7 +378,7 @@ parser.add_argument('-XML', '--XML-codec',
 parser.add_argument('-NEGATE', '--negate-test',
                     dest = 'NEGATE',
                     action='store_true',
-                    help = 'test the negation strategy'
+                    help = 'Test TXT generator'
                     )
 
 
@@ -254,6 +396,12 @@ if (len(sys.argv) == 1): parser.print_help()
 
 if (args.harness): test_harness()
 
+if (args.bitflips): test_bit_flips()
+
+if (args.byteflips): test_byte_flips()
+
+if (args.xor): test_xor_data()
+
 if (args.CSV): test_csv()
 
 if (args.JSON): test_json()
@@ -262,3 +410,8 @@ if (args.XML): test_xml()
 
 
 if (args.NEGATE): test_negate()
+
+if (args.JPEG): test_jpeg()
+
+if (args.TXT): test_plaintext()
+
