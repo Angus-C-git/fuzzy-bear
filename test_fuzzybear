@@ -375,12 +375,6 @@ parser.add_argument('-XML', '--XML-codec',
                     )
 
 
-parser.add_argument('-NEGATE', '--negate-test',
-                    dest = 'NEGATE',
-                    action='store_true',
-                    help = 'Test TXT generator'
-                    )
-
 
 ## Add command line args for your test ^
 
@@ -407,7 +401,6 @@ if (args.CSV): test_csv()
 if (args.JSON): test_json()
 
 if (args.XML): test_xml()
-
 
 if (args.NEGATE): test_negate()
 
