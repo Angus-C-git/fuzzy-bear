@@ -11,16 +11,17 @@ def pdf_object():
 
 def create_resource_obj(obj_num, font_num):
     stream = str(obj_num) + ' 0 obj\n<<\n'
-    stream += '/Font << /F8 ' + str(font_num) + ' 0 R >>\n'
+    stream += '/Font << /F1 ' + str(font_num) + ' 0 R >>\n'
     stream += '/ProcSet [/PDF / Text]\n'
     stream += '>>\n'
     stream += 'endobj'
+    return stream
 
 def type_obj(obj_num):
     stream = str(obj_num) + ' 0 obj\n<<\n'
     stream += '/Type /Font\n'
     stream += '/Subtype /Type1\n'
-    stream += '/BaseFont /Helvetica-Bold\n'
+    stream += '/BaseFont /Helvetica\n'
     stream += '/Encoding /WinAnsiEncoding\n'
     stream += '>>\n'
     stream += 'endobj\n'
@@ -136,10 +137,10 @@ def create_pdf_basic():
     pdf_document += page_leaf_obj(obj_num , 3, 9, 7)
     obj_num += 1
     obj_locations.append(len(pdf_document))
-    pdf_document += create_stream(obj_num ,"BT /F1 24 Tf 100 700 Td (Hello World)Tj ET", False)
+    pdf_document += create_stream(obj_num ,"BT /F1 12 Tf 100 700 Td (Hello World)Tj ET", False)
     obj_num += 1
     obj_locations.append(len(pdf_document))
-    pdf_document += create_stream(obj_num ,"BT /F1 24 Tf 100 700 Td (Nice to meet you)Tj ET", False)
+    pdf_document += create_stream(obj_num ,"BT /F1 24 Tf 200 700 Td (Nice to meet you)Tj ET", False)
     obj_num += 1
     obj_locations.append(len(pdf_document))
     pdf_document += create_resource_obj(obj_num, 10)
@@ -159,6 +160,43 @@ def create_pdf_basic():
     return pdf_document
 
 
+def create_large_page_document(num):
+    obj_num = 1
+    obj_locations = []
+    pdf_document = create_header()
+    obj_locations.append(len(pdf_document))
+    pdf_document += create_info_obj(obj_num)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += type_obj(obj_num)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    resouce_obj = obj_num
+    pdf_document += create_resource_obj(obj_num, obj_num-1)
+    obj_num += 1
+    
+    parent_obj = obj_num + (num*2)
+    page_obj_nums = []
+    for i in range(num):
+        obj_locations.append(len(pdf_document))
+        pdf_document += create_stream(obj_num ,"BT /F1 12 Tf 100 700 Td (Hello World)Tj ET", False)
+        obj_num += 1
+        obj_locations.append(len(pdf_document))
+        page_obj_nums.append(obj_num)
+        pdf_document += page_leaf_obj(obj_num , parent_obj, resouce_obj, obj_num-1)
+        obj_num += 1
+
+    obj_locations.append(len(pdf_document))
+    pdf_document += page_node_obj(obj_num, page_obj_nums)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += doc_catalog(obj_num,obj_num-1)
+    obj_num += 1
+    length_to_xref = len(pdf_document)
+    pdf_document += create_xref(obj_locations)
+    pdf_document += create_trailer(obj_num-1, obj_num, 2, length_to_xref, None)
+    return pdf_document
+
 class PDF(Strategy.Strategy):
     # parse ___ input data
     def __init__(self, sample_input):
@@ -171,6 +209,7 @@ class PDF(Strategy.Strategy):
 
     def run(self):
         yield(create_pdf_basic())
+        yield(create_large_page_document(1000))
 
 
 
