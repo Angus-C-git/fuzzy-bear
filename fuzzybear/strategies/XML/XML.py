@@ -36,6 +36,17 @@ def change_element(elem_obj, new_elm, elem_type):
             print(child)
             child.attrib[elem_type] = new_elm
 
+def chonkify_element(elem_obj, elem_type, append_str):
+
+    for child in elem_obj.iter():
+        print(f"got kid {child}")
+        if elem_type in child.attrib.keys():
+            base_str = child.attrib[elem_type]
+            for count in range(3):
+                base_str = base_str+base_str+append_str
+                print(f"string is now {base_str}")
+            child.attrib[elem_type] = base_str
+
 #spicy files
 def spicy_file():
     
@@ -108,4 +119,9 @@ class XML(Strategy.Strategy):
         """ tmp example for fmt strings should come from super class instead 
         waiting on issue #15
         """
+        for fstring in super().format_strings():
+            for e in target_elements:
+                chonkify_element(mutation,e,fstring)
+            yield prettify(mutation)
+
         yield fmt_string_insert()
