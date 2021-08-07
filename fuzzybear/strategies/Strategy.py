@@ -181,7 +181,7 @@ class Strategy():
 		""" Gen random integers """
 		int_list = []
 		for i in range(0, self.gen_max):
-			num = randint(-self.INT_MAX_SIGNED, Integers.INT_MAX_SIGNED)
+			num = randint(-self.INT_MAX_SIGNED, self.INT_MAX_SIGNED)
 			int_list.append(num)
 		int_list.append(self.INT_MAX)
 		int_list.append(self.BYTE_8_MAX)
