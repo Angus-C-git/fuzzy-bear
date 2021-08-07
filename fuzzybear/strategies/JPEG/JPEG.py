@@ -53,12 +53,9 @@ class JPEG(Strategy.Strategy):
 
             current = int(current,2)
             data[x] = current
-
-        output = ""
-        for x in data:
-            output += bin(x)
             
-        return output
+        with open('new.txt', 'wb') as f:
+            f.write(data)
 
     def magic(self, data, index=None):
 
@@ -103,11 +100,9 @@ class JPEG(Strategy.Strategy):
             for i in range(0,selection[0]):
                 data[index + i] = selection[1]
         
-        output = ""
-        for x in data:
-            output += bin(x)
-
-        return output
+        with open('new.jpeg', 'wb') as f:
+            f.write(data)
+        
 
 	# create new jpg with mutated data
     def run(self):
