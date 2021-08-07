@@ -153,20 +153,17 @@ def test_plaintext():
 
     harness = Harness.Harness(TEST_BINARY)
     txt_worker = TXT.TXT(TEST_SAMPLE)
-    breakingInputs = []
-    for i in range(7000):
-        print(f'case {i}')
-        for u in txt_worker.run():
-            try:
-                print(f'[DEBUG] test mutation was {u}')
-                retCode = harness.open_pipe(u)
-                # print(f"\n  Piping to harness, res was {retCode}\n")
-                if retCode != 0:
-                    print(f' [>>] Crashed {TEST_BINARY} with: \n {u}')
-                    return
-            except:
-                print('Either the generators are empty, or I fucked up')
-                break
+    for u in txt_worker.run():
+        try:
+            print(f'[DEBUG] test mutation was:\n{u}')
+            retCode = harness.open_pipe(u)
+            print(f"\n  Piping to harness, res was {retCode}\n")
+            if retCode == -11:
+                print(f'[+] CRASH? {retCode}')
+                return
+        except:
+            print('Either the generators are empty, or I fucked up')
+            break
 
 
 def test_jpeg():
