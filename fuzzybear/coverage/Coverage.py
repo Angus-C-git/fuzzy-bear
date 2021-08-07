@@ -5,6 +5,9 @@ from FunctionCall import FunctionCalls, FunctionCall
 from JumpBlock import JumpBlocks, JumpBlock
 import re
 
+from rich.tree import Tree
+from rich import print
+
 # ================================================================= #
 
 test_binary = "../../tests/components/coverage/complex"
@@ -19,35 +22,51 @@ def update_coverage(address):
 	print(f"[>>] Updating coverage, hit {hex(address)}")
 	print("[>>] Not implemented")
 
+
+tree = {
+	'0': 'main'
+}
+
+def build_call_tree(branch, called_address):
+	""" builds a tree of function calls """
+	pass
+
+
 '''Ideas:
 	- Once you have code blocks working properly
-	- You should be able to detect if you some sort of cyclic behaviour	
+	- You should be able to detect if you some sort of cyclic behavior	
 '''
 
 # TODO :: Finish implementing
 class Coverage:
 	""" handler class for coverage ops """
-	def __init__(self, coverage_target):
+	def __init__(self, coverage_target, target_pid):
 		self.coverage_target = coverage_target.elf
-		self.pid = coverage_target.pid
-		# Trying this since /proc/pid is being created but all the files are empty
+		self.pid = target_pid
+
 
 	def getVmmap(self, pid):
-		f = open(f'/proc/{pid}/maps', 'r')
-		vmmap = f.readlines()
-		# for l in vmmap:
-		# 	print(l)
-		return vmmap
-
-	# First line of vmmap gives address for the start of binary.
-	def getBinaryBase(self, vmmap):
-		line = vmmap[0]
+		""" pulls the vmmap for target pid """
+		with open(f'/proc/{pid}/maps', 'r') as mmap:
+			vmmap = mmap.readlines()
 		
+		if len(vmmap):
+			return vmmap
+		else:
+			print("[>>] vmmap lookup failed, is the process halted?")
+			exit(1)
+
+
+	def getBinaryBase(self, vmmap):
+		""" obtains the binaries base from vmmap """
+		# First line of vmmap gives address for the start of binary.
+		line = vmmap[0]
 		self.binaryBase = int(line[:line.index('-')],0x10)
 
-	# Search for first line that references libc. 
-	# Need to make sure this is is reliable
+
+	# TODO :: Need to make sure this is is reliable
 	def getLibcBase(self, vmmap):
+		""" Search for first line that references libc. """
 		for i in range(len(vmmap)):
 			if 'libc' in vmmap[i]:
 				line = vmmap[i]
@@ -55,27 +74,41 @@ class Coverage:
 				return
 
 	
-	def dubstep(self):
+	def rebase(self):
+		""" rebase binary for given pid """
 		vmmap = self.getVmmap(self.pid)
 		self.getBinaryBase(vmmap)
 		self.getLibcBase(vmmap)
 		# self.getHeapBase(vmmap)
 
+
+	def get_function_calls(self):
+		""" Get the function calls for the binary"""
+		pass
+			
+
+
 	def gen_code_paths(self):
 		""" establish all paths through target """
+		
+		# config
 		target = Cs(CS_ARCH_X86, CS_MODE_32)
 		target.detail = True
-
 		elf = self.coverage_target
+
 		
 		# executable code lives in .text section
 		opcodes = elf.section('.text')
 
+		# get section entry/exits
 		addrMain = elf.symbols['main']
 		addrStart = elf.symbols['_start'] #  <-- make sure this is what we want
+		print(f"[>>] addrMain: {hex(addrMain)}")
 
-		# Find binaryBase and libcBase (unnecesary atm)
-		self.dubstep()
+		# rebase binary	
+		self.rebase()
+		print(f"[>>] Binary Base: {hex(self.binaryBase)}")
+		
 
 		# We start storing from after main() since I don't think jumps before main are
 		# relevant for code coverage? Although maybe we need to include GOT stuffs ?
@@ -83,7 +116,7 @@ class Coverage:
 		j = 0
 		startOfNextBlock = 0
 		for op in target.disasm(opcodes, addrStart):
-			# This excludes insturctions that jump to a register since its a trek to find out the address
+			# This excludes instructions that jump to a register since its a trek to find out the address
 			# actually being jumped to.
 			if 'j' in op.mnemonic and not re.search('r..', op.op_str) and not re.search('e..', op.op_str):
 				# print("0x%x:\t%s\t%s" %(op.address+self.binaryBase, op.mnemonic, hex(int(op.op_str,0x10)+self.binaryBase)))
@@ -102,18 +135,19 @@ class Coverage:
 				functionCalls.add(hex(op.address), hex(int(op.op_str, 0x10)))
 				j += 1
 
-		#functionCalls.resolveFunctionNames()
-		# print('printing function calls')
-		# print(functionCalls)
+		functionCalls.resolveFunctionNames()
+		print('printing function calls')
+		print(functionCalls)
 
 		jumpBlocks.resolveFunctionContext()
-		print('printng jumpBlocks')
-		print(jumpBlocks)
-				
+		# print('printing jumpBlocks')
+		# print(jumpBlocks)
+
 
 	def start(self, tracee_pid):
 		""" begin coverage ops"""
 		pass
+
 
 # ================================================================= #
 """ debugging/tmp """
@@ -128,8 +162,10 @@ def print_symbols(proc):
 _default_symbols = [
 	'_start',
 	'_init',
-	'stack_chk_fail'
-
+	'stack_chk_fail',
+	'__libc_csu_init',
+	'__libc_csu_fini',
+	'__stack_chk_fail_local'
 ]
 
 blocks = [

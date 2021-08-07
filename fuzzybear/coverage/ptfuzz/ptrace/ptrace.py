@@ -7,7 +7,18 @@ from .utility.breakpoints import gen_breakpoint
 
 
 """ 
->-> pythonic interface to ptrace for fuzzing <-<
+
+ ____ _____ ____      _    ____ _____ 
+|  _ \_   _|  _ \    / \  / ___| ____|
+| |_) || | | |_) |  / _ \| |   |  _|  
+|  __/ | | |  _ <  / ___ \ |___| |___ 
+|_|    |_| |_| \_\/_/   \_\____|_____|
+                                    
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+:::::::::::::::::: ptrace ::::::::::::::::::
+
+A pythonic interface to ptrace
 
 	► Exposed via libc and utilizing ctypes
 	► Not all methods supported 
@@ -122,7 +133,7 @@ def continue_exc(pid):
 
 
 '''
-::::::::::::::::::::::::::::: [PTRACE] :::::::::::::::::::::::::::::
+::::::::::::::::::::::::::::: [PTRACE: internals] :::::::::::::::::::::::::::::
 
 + TODO :: cleanup
 
