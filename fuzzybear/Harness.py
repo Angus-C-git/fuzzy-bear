@@ -12,22 +12,22 @@ import subprocess
 
 
 class Harness():
-  def __init__(self, binary):
-	self.binary = binary
+	def __init__(self, binary):
+		self.binary = binary
 
-  def open_pipe(self, data, codec=None):
-	with subprocess.Popen(
+	def open_pipe(self, data, codec=None):
+		with subprocess.Popen(
 		  self.binary,
 		  stdin  = subprocess.PIPE,
 		  stdout = subprocess.PIPE,
 		  stderr = subprocess.PIPE
-	) as pipe:
+		) as pipe:
 
-		if codec == 'jpeg':
-			# send raw bytes
-			pipe.communicate(data)
-		else:
-			# send data as bytes to pipe
-			pipe.communicate(data.encode())
+			if codec == 'jpeg':
+				# send raw bytes
+				pipe.communicate(data)
+			else:
+				# send data as bytes to pipe
+				pipe.communicate(data.encode())
 
-	  	return pipe.returncode
+			return pipe.returncode
