@@ -51,32 +51,6 @@ def spicy_file():
     return spicy_string
 
 
-
-def fmt_string_insert():
-    return (
-        """
-<html>
-    <head>
-        <link href="http://somewebsite.com" />
-    </head>
-    <body>
-        <h1>I'm not a web developer.</h1>
-    </body>
-
-    <div id="#lol">
-        <a href="http://google.com">Here is some link...</a>
-    </div>
-
-
-    <tail>
-        <a href="http://bing.comhttp://bing.comhttp://bing.comhttp://bing.comhttp://bing.comhttp://bing.comhttp://bing.comhttp://bing.comhttp://bing.com%p%p%400$n">Footer link</a>
-    </tail>
-</html>
-  
-        """
-    )
-
-
 class XML(Strategy.Strategy):
     
     # parse xml input data
@@ -107,14 +81,13 @@ class XML(Strategy.Strategy):
         # print(f"[>>] mutation was {mutation}")
         yield mutation
 
-    
+        # TODO :: make more reliable 
         for fstring in super().format_strings():
             mutation = copy.deepcopy(self.candidate_input)
             for e in target_elements:
                 change_element(mutation, fstring, e)
             
             try:
-                # print("[>>] mutation was ", prettify(mutation))
                 yield prettify(mutation)
             except:
                 print("[>>] failed to yield")
