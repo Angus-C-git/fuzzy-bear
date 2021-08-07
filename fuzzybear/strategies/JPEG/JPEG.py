@@ -38,7 +38,7 @@ class JPEG(Strategy.Strategy):
             bit_flipper = 0b1 << target
             data[x] = current ^ bit_flipper
             
-        return data
+        return bytes(data).decode()
 
     def magic(self, data, index=None):
 
@@ -67,7 +67,7 @@ class JPEG(Strategy.Strategy):
             data[index + count] = element
             count += 1
 
-        return data
+        return bytes(data).decode()
         
 
 	# create new jpg with mutated data
