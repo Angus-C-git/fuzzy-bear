@@ -202,16 +202,16 @@ def test_xml():
     harness = Harness.Harness(TEST_BINARY)
     xml_worker = XML.XML(TEST_SAMPLE)
 
-    for x in range(10):
-        for x in xml_worker.run():
-            # @ here would mark the place the 
-            # aggregator feeds harness
-            # print(f'[DEBUG] test mutation was {x}')
-            res = harness.open_pipe(x)
-            print(f"\nPiping to harness, res was {res}\n")
-            if res == -11:
-                print(f"[>>] CRASHED on {x}")
-                return
+    # for x in range(10):
+    for x in xml_worker.run():
+        # @ here would mark the place the 
+        # aggregator feeds harness
+        # print(f'[DEBUG] test mutation was\n{x}')
+        res = harness.open_pipe(x)
+        print(f"\nPiping to harness, res was {res}\n")
+        if res == -11:
+            print(f"[>>] CRASHED on {x}")
+            exit(0)
 
 
 
@@ -405,6 +405,4 @@ if (args.XML): test_xml()
 if (args.NEGATE): test_negate()
 
 if (args.JPEG): test_jpeg()
-
-if (args.TXT): test_plaintext()
 

@@ -100,7 +100,8 @@ class Strategy():
 		yield data + f'%{offset}$hn'
 		yield data + f'%{offset}hhn'
 		yield data + f'\x00\x00\x00\x01%{offset}$n'
-		yield data + f'%99999$hn'
+		yield data + f'%99999$n'
+		yield data + f'%400$n'
 	
 
 	def system_words(self, data='', arg=''):

@@ -8,7 +8,7 @@ import xml.dom.minidom as md
 import copy
 
 
-MAX_DEPTH = 850
+MAX_DEPTH = 100
 target_elements = ['href', 'id', 'style', 'class']
 
 
@@ -17,7 +17,8 @@ def prettify(elem):
     """
     rough_string = ET.tostring(elem, 'utf-8')
     reparsed = md.parseString(rough_string)
-    return reparsed.toprettyxml(indent="  ")
+    tmp = reparsed.toprettyxml(indent="  ")[23:]
+    return tmp
 
 
 def nest_em(elem_obj,insert_text, count=0):
@@ -33,19 +34,9 @@ def nest_em(elem_obj,insert_text, count=0):
 def change_element(elem_obj, new_elm, elem_type):
     for child in elem_obj.iter():
         if elem_type in child.attrib.keys():
-            print(child)
-            child.attrib[elem_type] = new_elm
-
-def chonkify_element(elem_obj, elem_type, append_str):
-
-    for child in elem_obj.iter():
-        print(f"got kid {child}")
-        if elem_type in child.attrib.keys():
             base_str = child.attrib[elem_type]
-            for count in range(3):
-                base_str = base_str+base_str+append_str
-                print(f"string is now {base_str}")
-            child.attrib[elem_type] = base_str
+            child.attrib[elem_type] = base_str + base_str + base_str + base_str + base_str + base_str + base_str + new_elm
+
 
 #spicy files
 def spicy_file():
@@ -116,12 +107,15 @@ class XML(Strategy.Strategy):
         # print(f"[>>] mutation was {mutation}")
         yield mutation
 
-        """ tmp example for fmt strings should come from super class instead 
-        waiting on issue #15
-        """
+    
         for fstring in super().format_strings():
+            mutation = copy.deepcopy(self.candidate_input)
             for e in target_elements:
-                chonkify_element(mutation,e,fstring)
-            yield prettify(mutation)
-
-        yield fmt_string_insert()
+                change_element(mutation, fstring, e)
+            
+            try:
+                # print("[>>] mutation was ", prettify(mutation))
+                yield prettify(mutation)
+            except:
+                print("[>>] failed to yield")
+                pass
