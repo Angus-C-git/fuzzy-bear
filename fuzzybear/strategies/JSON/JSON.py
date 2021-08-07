@@ -4,36 +4,44 @@ import random
 from random import randint
 import copy
 
+# config
+MAX_KEYS = 50
+MAX_ENTRIES = 100
+ITERATION_MAX = 100
+
 
 def insert(key,value,json_obj):
+    """ insert a key value pair """
     json_obj[key] = value
 
 
-#given a value replace it
 def replace_val(find,replace,json_obj):
+    """ given a value replace it """
     for item in json_obj.items():
         if item[1] == find:
             #print(item)
             json_obj[item[0]] = replace
             
 
-# random entry within dictionary
 def random_entry(json_obj):
+    """ random entry within dictionary """
     itt = list(json_obj.items())
     entry = random.choice(itt)
     return entry
 
 
 def get_rand_field(json_obj):
+    """ select a random field in the JSON obj """
     return random.choice(list(json_obj.items()))
 
 
 def thicc_file(num_entries):
+    """ add extra JSON fields in a range """
     thiccboi = {}
-    for i in range(0,num_entries):
+    for i in range(num_entries):
         thiccboi[i] = []
 
-        for l in range(1,50):
+        for l in range(1, MAX_KEYS):
             thiccboi[i].append(l)
 
     return thiccboi
@@ -41,20 +49,18 @@ def thicc_file(num_entries):
 
 class JSON(Strategy.Strategy):
     
-    # parse csv input data
     def __init__(self, sample_input):
+        """ parse JSON input """
         super()
         self.sample_input = sample_input
         with open(sample_input) as jsonfile:
             self.candidate_input = json.load(jsonfile)
-        
         self.size = len(self.candidate_input)
 
 
-    # run strategies
     def run(self):
-
-        rand_entry_count = randint(1, 100)
+        """ run the JSON generator """
+        rand_entry_count = randint(1, MAX_ENTRIES)
         mutation = thicc_file(rand_entry_count)
         yield json.dumps(mutation)
         
@@ -70,29 +76,71 @@ class JSON(Strategy.Strategy):
             yield json.dumps(mutation)
 
         # negate random fields
-        mutation = copy.deepcopy(self.candidate_input)
-        rand_field = get_rand_field(mutation)
+        for field in range(ITERATION_MAX):
+            mutation = copy.deepcopy(self.candidate_input)
+            rand_field = get_rand_field(mutation)
 
-        field_value = rand_field[1] if (type(rand_field) is not list) else rand_field[1][0]
-        # print(f'   [DEBUG] Selected random field {rand_field}')
-        for negated in super().negate(field_value):
+            field_value = rand_field[1] if (type(rand_field) is not list) else rand_field[1][0]
+            negated = super().negate(field_value)
+            
             if (type(rand_field[1]) is list): 
-                rand_field[1][0] = negated
+                mutation[rand_field[1][0]] = negated
             else:
                 mutation[rand_field[0]] = negated
 
             yield json.dumps(mutation)
 
+        # replace random fields with format strings
+        for field in range(ITERATION_MAX):
+            mutation = copy.deepcopy(self.candidate_input)
+            rand_field = get_rand_field(mutation)
+            for fmtstring in super().format_strings():
+                field_value = rand_field[0] if (type(rand_field) is not list) else rand_field[1][0]
+                mutation[field_value] = fmtstring
+                yield json.dumps(mutation)
+
+        # replace random fields with system paths
+        for field in range(ITERATION_MAX):
+            mutation = copy.deepcopy(self.candidate_input)
+            rand_field = get_rand_field(mutation)
+            for path in super().system_paths():
+                field_value = rand_field[0] if (type(rand_field) is not list) else rand_field[1][0]
+                mutation[field_value] = path
+
+                yield json.dumps(mutation)
+
+        # replace random fields with polyglots
+        for field in range(ITERATION_MAX):
+            mutation = copy.deepcopy(self.candidate_input)
+            rand_field = get_rand_field(mutation)
+            for polyglot in super().polyglots():
+                field_value = rand_field[0] if (type(rand_field) is not list) else rand_field[1][0]
+                mutation[field_value] = polyglot
+                yield json.dumps(mutation)
+
+        # replace random fields with max constants
+        for field in range(ITERATION_MAX):
+            mutation = copy.deepcopy(self.candidate_input)
+            rand_field = get_rand_field(mutation)
+            for constant in super().max_constants():
+                field_value = rand_field[0] if (type(rand_field) is not list) else rand_field[1][0]
+                mutation[field_value] = constant
+                yield json.dumps(mutation)
+
+        # replace random fields with byte flips
+        for field in range(ITERATION_MAX):
+            mutation = copy.deepcopy(self.candidate_input)
+            rand_field = get_rand_field(mutation)
+            field_value = rand_field[0] if (type(rand_field) is not list) else rand_field[1][0]
+            mutation[field_value] = super().byte_flip(field_value)
+            yield json.dumps(mutation)
 
 
-'''devnotes
+"""devnotes
 
--> The json1 binary drops inputs if the length of the JSON is greater than 7200
--> Supplying a negative length field to the json1 binary segfaults it
 -> Some of the code above is truly fucking magical
     -> like how does a tuple become mutable
     -> we got list magic its all happening
--> Owen says - "this is a crime against humanity" 
 
 TODO
 
@@ -116,4 +164,4 @@ TODO
         as a whole
 
     - [ ] Improve fuzzing of nested JSON bodies 
-'''
+"""

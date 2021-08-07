@@ -11,34 +11,51 @@ class JPEG(Strategy.Strategy):
     # parse ___ input data
     def __init__(self, sample_input):
         self.data = sample_input
+        self.original_input = self.data
         self.parse_input()
 
     # read bytes from our valid JPEG and return them in a mutable bytearray 
     def parse_input(self):
         
         f = open(self.data, "rb").read()
-        
-        self.data = bytearray(f)
+        self.data = f
+        #self.data = bytearray(f)
 
     def fuzz(self, data):
 
         num_of_flips = int((len(data) - 4) * 0.01)
 
-        indexes = range(4, (len(data) - 4))
+        indexes = range(32, (len(data) - 4))
 
-        chosen_indexes = []
+        #chosen_indexes = []
+        index_bits = {}
 
         # iterate selecting indexes until we've hit our num_of_flips number
         for i in range(0, num_of_flips):
-            chosen_indexes.append(random.choice(indexes))
+            #chosen_indexes.append(random.choice(indexes))
+            index_bits[str(random.choice(indexes))] = 0
 
-        for x in chosen_indexes:
+        # bytearray version
+        #for x in chosen_indexes:
+        for x in index_bits:
             current = data[x]
             target = random.choice(range(0,8))
             bit_flipper = 0b1 << target
-            data[x] = current ^ bit_flipper
+            #data[x] = current ^ bit_flipper
+            index_bits[x] = current ^ bit_flipper
+
+        first = 4
+        last = 4
+        output = data[:32]
+        for i in range(32, len(data) - 4):
+            last = i
+            if (str(i) in index_bits):
+                output += data[first:last] + index_bits[str(i)]
+                first = i
+        output += data[first:last] + data[len(data) - 4:]
             
-        return bytes(data).decode()
+        #return bytes(data)
+        return output
 
     def magic(self, data, index=None):
 
@@ -59,20 +76,24 @@ class JPEG(Strategy.Strategy):
         else:
             selection = index
 
-        length = len(data) - 8
-        index = random.choice(range(0, length))
+        index = random.choice(range(32, len(data) - 4))
         
+        output = data[:index]
         count = 0
         for element in magic_bytes[selection]:
-            data[index + count] = element
+            #data[index + count] = element
+            output += bytes(element)
             count += 1
 
-        return bytes(data).decode()
+        output += data[index + count:]
+        #return bytes(data)
+        return output
         
 
 	# create new jpg with mutated data
     def run(self):
 
+        #yield self.original_input
         for i in range(0, 10):
             yield self.magic(self.data, i)
         for i in range(0, 10):
