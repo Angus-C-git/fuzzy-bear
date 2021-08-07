@@ -14,7 +14,7 @@
 import csv
 from pathlib import Path
 import sys
-from colorama import Fore, Style
+# from colorama import Fore, Style
 
 from fuzzybear import Harness
 import argparse
@@ -44,9 +44,9 @@ from fuzzybear.strategies import XML
 ## ADD TEST IMPORT ## ^
 
 
-
+# Fore.RED +
 def print_banner():
-    print(Fore.RED + '''
+    print('''
 
           ____    _____ _____ ____ _____   _____ _   _ ____________   __   
           \ \ \  |_   _| ____/ ___|_   _| |  ___| | | |__  /__  /\ \ / /   
@@ -61,7 +61,7 @@ def print_banner():
          |____/|_____/_/   \_\_| \_\          
                            
     ''')
-    print(Style.RESET_ALL)
+    # print(Style.RESET_ALL)
 
 
 ########################## :: [DEFINE TESTS] :: ##########################

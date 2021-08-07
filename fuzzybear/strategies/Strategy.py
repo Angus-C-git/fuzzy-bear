@@ -1,7 +1,7 @@
 from random import randint, randrange
 from pwn import cyclic
 
-'''
+"""
 BASE CLASS
 
 	► Other strategy classes inherit from this base class to build new strats
@@ -10,7 +10,7 @@ BASE CLASS
 	► Inherit this class to build other strategies 
 
 	► TODO :: Should be a factory model
-'''
+"""
 
 GEN_MAX = 100
 
@@ -18,7 +18,7 @@ GEN_MAX = 100
 tmp_cumulative = 0
 
 class Strategy():
-	
+	# max constants
 	CHAR_MAX = 255
 	INT_MAX  = 4294967295
 	INT_MAX_SIGNED = 2147483648
@@ -181,7 +181,7 @@ class Strategy():
 		""" Gen random integers """
 		int_list = []
 		for i in range(0, self.gen_max):
-			num = randint(-self.INT_MAX_SIGNED, Integers.INT_MAX_SIGNED)
+			num = randint(-self.INT_MAX_SIGNED, self.INT_MAX_SIGNED)
 			int_list.append(num)
 		int_list.append(self.INT_MAX)
 		int_list.append(self.BYTE_8_MAX)
