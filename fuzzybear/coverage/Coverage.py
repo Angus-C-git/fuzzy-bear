@@ -78,9 +78,9 @@ class Coverage:
 					self.jumpBlocks.add(blockStart, ops[i].address)
 					#print(f'      added a new block: start{hex(blockStart)} end: {hex(ops[i].address)}')
 					blockStart = ops[i+1].address
-			elif 'call'
-			# elif 'ret' in ops[i].mnemonic:
-			# 	self.jumpBlocks.add(blockStart, ops[i].address)
+			#elif 'call'
+		#	elif 'ret' in ops[i].mnemonic:
+		#	 	self.jumpBlocks.add(blockStart, ops[i].address)
 				#print(f'blockStart: {hex(blockStart)} current instruction address: {hex(ops[i].address)} == {ops[i].mnemonic}')
 
 	def gen_code_paths(self):
