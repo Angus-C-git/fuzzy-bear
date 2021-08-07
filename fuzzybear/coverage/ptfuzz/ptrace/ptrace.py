@@ -116,6 +116,8 @@ def trace_me():
 	print(f"[>>] Attempting trace me")
 	trace_me_res = ptrace(PTRACE_TRACEME, 0, 0, 0)
 	print(f"[>>] Trace me returned {trace_me_res}")
+	
+
 	if (trace_me_res < 0):
 		print(f"[>>] Traceme failed with error code {trace_me_res}")
 
