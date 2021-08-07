@@ -1,5 +1,5 @@
 from os import execl, fork, waitpid, WIFSTOPPED, WSTOPSIG
-from ptrace.ptrace import trace_me, continue_exc, pokedata, gen_breakpoint
+from .ptrace.ptrace import trace_me, continue_exc, pokedata, gen_breakpoint, SIG_TRAP
 
 """
  ____ _____ _____ _   _ __________
@@ -47,8 +47,12 @@ test_tracee = 'tmp_tests/linear'
 
 
 class PtFuzz:
-	def __init__(self, target):
+	def __init__(self, target=None, pid=None, entry=None, exit=None):
 		self.tracee = target
+		self.pid = pid
+		self.entry = entry
+		self.exit = exit
+
 		
 	def begin_trace(self):
 		""" 
@@ -70,14 +74,12 @@ class PtFuzz:
 		else:
 			# executing as the parent
 			self.launch_tracee()
-		pass
 	
 	
 	def init_trace_target(self):
 		""" Launch the process to be traced """
 		print("[>>] setting up tracee")
 		trace_me()
-		# TODO :: Disable ASLR ?
 
 		# replace the forked clone of main process
 		# with this process, does not return
@@ -89,13 +91,15 @@ class PtFuzz:
 		pid_child = self.pid
 
 		print(f"[>>] Starting trace of {pid_child}")
+		# continue_exc(pid_child)
 
 		# wait for trap
 		status = waitpid(pid_child, 0)
 		print(f"[>>] Waitpid returned {status}")
 
-		start_addr = tmp_proc_bs['_start']
-		end_addr = tmp_proc_bs['_end']
+		# TODO :: resolve dynamically
+		start_addr = self.entry #tmp_proc_bs['_start']
+		end_addr = self.exit  #tmp_proc_bs['_end']
 
 		self.set_anchors(start_addr, end_addr)
 
@@ -108,7 +112,7 @@ class PtFuzz:
 		print(f"[>>] Waitpid returned {status}")
 		
 		if (WIFSTOPPED(status[1])):
-			if (WSTOPSIG(status[1]) == 5):
+			if (WSTOPSIG(status[1]) == SIG_TRAP):
 				print(f"[>>] Hit breakpoint!")
 				print("[>>] Handling trap signal ...")
 				print(f"[>>] ;) Not implemented")
@@ -152,9 +156,9 @@ class PtFuzz:
 
 """ tmp testing """
 
-print("[>>] Starting kessel run")
-PtFuzz(test_tracee).begin_trace()
-print("[>>] Finished kessel run")
+# print("[>>] Starting kessel run")
+# PtFuzz(test_tracee).begin_trace()
+# print("[>>] Finished kessel run")
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

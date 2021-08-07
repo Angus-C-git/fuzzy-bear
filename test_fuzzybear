@@ -89,6 +89,31 @@ def test_harness():
                     [+] Response from {binary.name} was {res}
             ''')
 
+
+def test_coverage():
+    TEST_DIR = './tests/components/coverage'
+    TEST_BINARY = f'{TEST_DIR}/simple'
+    TEST_SAMPLE = f'{TEST_DIR}/codecs/simple.txt'
+
+    print(f"""
+        [>>] Running coverage test against {TEST_BINARY.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
+    """)
+
+    harness = Harness.Harness(TEST_BINARY)
+    txt_worker = TXT.TXT(TEST_SAMPLE)
+    for u in txt_worker.run():
+        try:
+            # print(f'[DEBUG] test mutation was:\n{u}')
+            retCode = harness.open_pipe(u)
+            # print(f"\n  Piping to harness, res was {retCode}\n")
+            if retCode == -11:
+                print(f'[+] CRASH? {retCode}')
+                return
+        except:
+            print('Either the generators are empty, or I fucked up')
+            break    
+
+
 # test csv1
 def test_csv():
     TEST_DIR = './tests/complete'
@@ -285,6 +310,13 @@ parser.add_argument('-P', '--your-test',
                     )
 '''
 
+parser.add_argument('-CT', '--coverage-tracking',
+                    dest = 'coverage',
+                    action='store_true',
+                    help = 'test coverage tracking'
+                    )
+
+
 parser.add_argument('-H', '--harness',
                     dest = 'harness',
                     action='store_true',
@@ -376,3 +408,4 @@ if (args.JPEG): test_jpeg()
 
 if (args.TXT): test_plaintext()
 
+if (args.coverage): test_coverage()

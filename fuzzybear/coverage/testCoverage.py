@@ -1,4 +1,4 @@
-from Coverage import Coverage
+from Coverage import Coverage, PtFuzz
 from pwn import *
 
 # Make sure this path is right for you.
@@ -20,6 +20,13 @@ proc = process(target_binary)
 
 
 coverage_runner = Coverage(proc, target_binary, proc.pid)
-coverage_runner.get_function_calls()
+call_table = coverage_runner.get_function_calls()
+print(call_table)
+
+print("[>>] Starting kessel run")
+PtFuzz(target_binary).begin_trace()
+print("[>>] Finished kessel run")
+
+
 # coverage_runner.gen_code_paths()
 
