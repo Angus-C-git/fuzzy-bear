@@ -3,6 +3,8 @@
 from .. import Strategy
 import sys
 import random
+from pexpect import run
+from pipes import quote
 
 class JPEG(Strategy.Strategy):
     
@@ -15,11 +17,12 @@ class JPEG(Strategy.Strategy):
     def parse_input(self):
         
         f = open(self.data, "rb").read()
+        
         self.data = bytearray(f)
 
     def fuzz(self, data):
 
-        num_of_flips = int((len(data) - 4) * 100)
+        num_of_flips = int((len(data) - 4) * 0.01)
 
         indexes = range(4, (len(data) - 4))
 
@@ -30,81 +33,83 @@ class JPEG(Strategy.Strategy):
             chosen_indexes.append(random.choice(indexes))
 
         for x in chosen_indexes:
-            current = (bin(data[x]).replace("0b",""))
-            current = "0" * (8 - len(current)) + current
-            indexes = range(0,8)
-            target = random.choice(indexes)
-            new_number = []
-
-            # our new_number list now has all the digits, example: ['1', '0', '1', '0', '1', '0', '1', '0']
-            for i in current:
-                new_number.append(i)
-
-            # if the number at our randomly selected index is a 1, make it a 0, and vice versa
-            if new_number[target] == "1":
-                new_number[target] = "0"
-            else:
-                new_number[target] = "1"
-
-            # create our new binary string of our bit-flipped number
-            current = ''
-            for i in new_number:
-                current += i
-
-            current = int(current,2)
-            data[x] = current
+            current = data[x]
+            target = random.choice(range(0,8))
+            bit_flipper = 0b1 << target
+            data[x] = current ^ bit_flipper
             
-        with open('new.txt', 'wb') as f:
-            f.write(data)
+        return data
 
     def magic(self, data, index=None):
 
-        magic_vals = [
-			(1, 255),
-			(1, 255),
-			(1, 127),
-			(1, 0),
-			(2, 255),
-			(2, 0),
-			(4, 255),
-			(4, 0),
-			(4, 128),
-			(4, 64),
-			(4, 127)
+        magic_bytes = [
+			[0xFF],
+			[0x7F],
+			[0x00],
+			[0xFF, 0xFF],
+			[0x00, 0x00],
+			[0xFF, 0xFF, 0xFF, 0xFF],
+			[0x00, 0x00, 0x00, 0x00],
+			[0x80, 0x00, 0x00, 0x00],
+			[0x40, 0x00, 0x00, 0x00],
+			[0x7F, 0xFF, 0xFF, 0xFF]
 		]
         if (index == None):
-            selection = random.choice(magic_vals)
+            selection = random.choice(magic_bytes)
         else:
             selection = index
 
         length = len(data) - 8
         index = random.choice(range(0, length))
-
-        if (selection[0] == 4 and selection[1] != 0 and selection[1] != 255):
-            if (selection[1] == 128):	# 0x80000000
-                data[index] = 128
-                data[index + 1] = 0
-                data[index + 2] = 0
-                data[index + 3] = 0
-            elif selection[1] == 64:   # 0x40000000
-                data[index] = 64
-                data[index + 1] = 0
-                data[index + 2] = 0
-                data[index + 3] = 0
-            elif selection[1] == 127:# 0x7FFFFFFF
-                data[index] = 127
-                data[index + 1] = 255
-                data[index + 2] = 255
-                data[index + 3] = 255
-        else:
-            for i in range(0,selection[0]):
-                data[index + i] = selection[1]
         
-        with open('new.jpeg', 'wb') as f:
-            f.write(data)
+        count = 0
+        for element in magic_bytes[selection]:
+            data[index + count] = element
+            count += 1
+
+        return data
         
 
 	# create new jpg with mutated data
     def run(self):
-        yield self.fuzz(self.data)
-        yield self.magic(self.data)
+
+        for i in range(0, 10):
+            yield self.magic(self.data, i)
+        for i in range(0, 10):
+            yield self.fuzz(self.data)
+        '''
+        counter = 0
+        while counter < 100000:
+            picked_function = random.randint(0,2)
+            if picked_function == 0:
+                mutated = self.magic(self.data)
+                self.create_new(mutated)
+                self.exif(counter,mutated)
+            else:
+                mutated = self.fuzz(self.data)
+                self.create_new(mutated)
+                self.exif(counter,mutated)
+            counter += 1
+        '''
+    '''
+        # create new jpg with mutated data
+    def create_new(self, data):
+
+        f = open("mutated.jpeg", "wb+")
+        f.write(self.data)
+        f.close()
+
+    def exif(self, counter, data):
+
+        command = "cat mutated.jpeg > ./tests/complete/jpg1 -verbose"
+
+        out, returncode = run("sh -c " + quote(command), withexitstatus=1)
+        if b'Seg' in out:
+            print(out)
+            f = open("crashes/crash.{}.txt".format(str(counter)), "wb+")
+            f.write(data)
+
+        if (counter % 100 == 0):
+            print(counter)
+
+    '''
