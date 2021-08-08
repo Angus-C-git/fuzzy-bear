@@ -54,7 +54,7 @@ JSON mutator implements is the ability to select a random field to alter with an
 The XML generator modifies valid XML files by appending elements, inserting sub elements and overwritting elements/attributes with data from the strategy generator. This generator also creates files that include other files such as dev/random with the intention of creating buffer overflows in the target program. 
 
 ### PDF
-The PDF generator
+The PDF generator creates large pdf documents to test memory management of a PDF parser and invalid pdf documents, testing for memory corruption vulnerabilities where the length field doesnt match up with the stream object size. The PDF generator inserts stream objects with data from the strategy generator, which can include javascript to format string vunerabilities. The intention of the PDF generator is to test to the extremities of PDF parsers, creating documents which arent seen usually in the real world and thus are more likely to break parsers. 
 
 ## Aggregator
 
