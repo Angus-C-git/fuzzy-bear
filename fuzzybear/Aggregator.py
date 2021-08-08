@@ -1,4 +1,5 @@
 from .Harness import Harness
+from .HarnessV2 import HarnessV2
 from .utility import response_codes
 from .utility import codec
 from .strategies import get_generator

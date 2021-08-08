@@ -17,6 +17,7 @@ import sys
 # from colorama import Fore, Style
 
 from fuzzybear import Harness
+from fuzzybear import HarnessV2
 import argparse
 from pathlib import Path
 
@@ -99,19 +100,19 @@ def test_coverage():
         [>>] Running coverage test against {TEST_BINARY.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
     """)
 
-    harness = Harness.Harness(TEST_BINARY)
+    harness = HarnessV2.HarnessV2(TEST_BINARY)
     txt_worker = TXT.TXT(TEST_SAMPLE)
     for u in txt_worker.run():
-        try:
+        # try:
             # print(f'[DEBUG] test mutation was:\n{u}')
-            retCode = harness.open_pipe(u)
-            # print(f"\n  Piping to harness, res was {retCode}\n")
-            if retCode == -11:
-                print(f'[+] CRASH? {retCode}')
-                return
-        except:
-            print('Either the generators are empty, or I fucked up')
-            break    
+        retCode = harness.open_pipe(u)
+        # print(f"\n  Piping to harness, res was {retCode}\n")
+        if retCode == -11:
+            print(f'[+] CRASH? {retCode}')
+            return
+        # except:
+        #     print('Either the generators are empty, or I fucked up')
+        #     break    
 
 
 # test csv1

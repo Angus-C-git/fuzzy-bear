@@ -92,11 +92,12 @@ def peekdata(target_pid, address):
 		)
 
 
-def get_registers(target_pid):
+def get_registers(target_pid, registers):
 	# TODO :: dynamic arch
-	registers = Registers_x86()
+	# registers = Registers_x86()
 
 	res = ptrace(PTRACE_GETREGS, target_pid, 0, byref(registers))
+	print_register_state_x86(registers)
 	if (res < 0):
 		print(
 			f"[>>] Get registers failed, error code {res}"
@@ -105,6 +106,7 @@ def get_registers(target_pid):
 
 def set_registers(target_pid, new_registers):
 	res = ptrace(PTRACE_SETREGS, target_pid, 0, new_registers)
+	print(f"[>>] set registers returned {res}")
 	if (res < 0):
 		print(
 			f"[>>] Set registers failed, error code {res}"
@@ -115,8 +117,9 @@ def trace_me():
 	""" Trace current process """
 	print(f"[>>] Attempting trace me")
 	# should be child here
+	print("[>>] PID chid is:", getpid())
+	
 	trace_me_res = ptrace(PTRACE_TRACEME, 0, 0, 0)
-	print("[>>] PID chid is:", getpid()) 
 	if (trace_me_res < 0):
 		print(f"[>>] Traceme failed with error code {trace_me_res}")
 

@@ -133,23 +133,27 @@ class PtFuzz:
 		pid_child = self.pid
 		print(f"[>>] Setting start/end point at {hex(_start)}/{hex(_end)}")
 		
-		start_bp = gen_breakpoint(_start)
-		end_bp = gen_breakpoint(_start)
+		self.start_bp = gen_breakpoint(_start)
+		self.end_bp = gen_breakpoint(_start)
 
-		print(f"[>>] Start breakpoint: {hex(start_bp)}")
-		print(f"[>>] End breakpoint: {hex(end_bp)}")
+		print(f"[>>] Start breakpoint: {hex(self.start_bp)}")
+		print(f"[>>] End breakpoint: {hex(self.end_bp)}")
 
-		pokedata(pid_child, _start, start_bp)
-		pokedata(pid_child, _end, end_bp)
+		pokedata(pid_child, _start, self.start_bp)
+		pokedata(pid_child, _end, self.end_bp)
 
 
 	def set_checkpoints(self):
 		""" Set dynamic breakpoints """
 		pid_child = self.pid
+
+		self.breakpoints = {}
+
 		print(f"[>>] Setting dynamic breakpoints")
 		for bp in self.dynamic_breakpoints.keys():
 			print(f"[>>] Setting dynamic bp {hex(bp)}")
 			bp_addr = gen_breakpoint(bp)
+			self.breakpoints[bp] = bp_addr
 			pokedata(pid_child, bp, bp_addr)
 
 
