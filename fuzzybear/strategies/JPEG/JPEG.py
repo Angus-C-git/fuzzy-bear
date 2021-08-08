@@ -18,47 +18,66 @@ class JPEG(Strategy.Strategy):
     def parse_input(self):
         
         f = open(self.data, "rb").read()
-        self.data = f
-        #self.data = bytearray(f)
+        #elf.data = f
+        self.data = bytearray(f)
 
     def fuzz(self, data):
 
-        num_of_flips = int((len(data) - 4) * 0.01)
+        num_of_flips = int((len(data) - 4) * 0.0001)
+        indexes = range(0x550, len(data) - 4)
 
-        indexes = range(32, (len(data) - 4))
-
-        #chosen_indexes = []
-        index_bits = {}
+        chosen_indexes = []
+        #index_bits = {}
 
         # iterate selecting indexes until we've hit our num_of_flips number
         for i in range(0, num_of_flips):
-            #chosen_indexes.append(random.choice(indexes))
-            index_bits[str(random.choice(indexes))] = 0
-
+            chosen_indexes.append(random.choice(indexes))
         # bytearray version
-        #for x in chosen_indexes:
-        for x in index_bits:
+        newdata = data[:]
+        chosen_indexes = chosen_indexes[:1]
+        for x in chosen_indexes:
+            if (0xFF in data[x-10:x+10]):
+                continue
             current = data[x]
             target = random.choice(range(0,8))
             bit_flipper = 0b1 << target
-            #data[x] = current ^ bit_flipper
-            index_bits[x] = current ^ bit_flipper
+            newdata[x] = current ^ bit_flipper
 
-        first = 4
-        last = 4
-        output = data[:32]
-        for i in range(32, len(data) - 4):
-            last = i
-            if (str(i) in index_bits):
-                output += data[first:last] + index_bits[str(i)]
-                first = i
-        output += data[first:last] + data[len(data) - 4:]
-            
-        #return bytes(data)
-        return output
+            #print(f'Original: {bin(data[x])}\nFinal: {bin(newdata[x])}')
+
+        return bytes(newdata)
+
+    '''
+    def very_specific_fuzz(self, data):
+        markers = []
+        count = 0
+        for x in data:
+            if (x == 0xFF):
+              markers.append(count)
+            count += 1
+        
+        target_index = markers[6]#random.choice(markers)
+        #print(target_index)
+        newdata = data[:]
+        if (target_index < len(data) - 8):
+            #size = data[target_index + 2] * 16**2 + data[target_index + 3]
+            #print(hex(size))
+            #i = target_index + 4
+            #index = size
+            #while(index > 0):
+            #    newdata[i] = 0x00
+            #    index -= 1
+            #    i += 1
+            #print(hex(newdata[target_index + 6]))
+            newdata[target_index + 8] = 0x01#random.choice(range(0x00,0xFF))
+            #newdata[target_index + 10] = 0x10#random.choice(range(0x00,0xFF))
+        
+        return bytes(newdata)
+    '''
 
     def magic(self, data, index=None):
 
+        newdata = data[:]
         magic_bytes = [
 			[0xFF],
 			[0x7F],
@@ -74,30 +93,39 @@ class JPEG(Strategy.Strategy):
         if (index == None):
             selection = random.choice(magic_bytes)
         else:
-            selection = index
-
-        index = random.choice(range(32, len(data) - 4))
+            selection = magic_bytes[index]
+        #print(selection)
+        #print(len(data))
+        index = 50
+        while(0xFF in data[index-50:index+50]):
+            index = random.choice(range(50, len(data) - 50))
         
-        output = data[:index]
+        #output = data[:index]
         count = 0
-        for element in magic_bytes[selection]:
-            #data[index + count] = element
-            output += bytes(element)
+        for element in selection:
+            newdata[index + count] = element
+            #output += bytes(element)
             count += 1
 
-        output += data[index + count:]
-        #return bytes(data)
-        return output
+        #output += data[index + count:]
+        return bytes(newdata)
+        #return output
         
 
 	# create new jpg with mutated data
     def run(self):
 
-        #yield self.original_input
-        for i in range(0, 10):
-            yield self.magic(self.data, i)
-        for i in range(0, 10):
-            yield self.fuzz(self.data)
+        
+        #yield self.data
+        #yield self.magic(self.data)
+        #f = open('origfile.jpeg', 'wb')
+        #f.write(self.data)
+        #f = open('new.jpeg', 'wb')
+        #fuzz = self.fuzz(self.data)
+        #f.write(fuzz)
+        yield self.fuzz(self.data)
+        yield self.magic(self.data)
+        
         '''
         counter = 0
         while counter < 100000:
