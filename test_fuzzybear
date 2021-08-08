@@ -341,7 +341,7 @@ def test_xml():
     """)
 
     for x in xml_worker.run():
-        print(f'[DEBUG] test mutation was:\n{x}')
+        # print(f'[DEBUG] test mutation was:\n{x}')
 
         ret_code = harness.open_pipe(x)
         print(f"\nPiping to harness, res was {ret_code}\n")
@@ -456,7 +456,6 @@ parser.add_argument('-CT', '--coverage-tracking',
                     help = 'test coverage tracking'
                     )
 
-
 parser.add_argument('-H', '--harness',
                     dest = 'harness',
                     action='store_true',
@@ -495,28 +494,34 @@ parser.add_argument('-AC', '--all-codecs',
                     help = 'Test all the supported generators'
                     )
 
+parser.add_argument('-TXT', '--TXT-codec',
+                    dest = 'TXT',
+                    action='store_true',
+                    help = 'Test plaintext codec binaries'
+                    )
+
 parser.add_argument('-CSV', '--CSV-codec',
                     dest = 'CSV',
                     action='store_true',
-                    help = 'Test the csv codec binaries'
+                    help = 'Test csv codec binaries'
                     )
 
 parser.add_argument('-JSON', '--JSON-codec',
                     dest = 'JSON',
                     action='store_true',
-                    help = 'Test the json codec binaries'
+                    help = 'Test json codec binaries'
                     )
 
 parser.add_argument('-JPEG', '--JPEG-codec',
                     dest = 'JPEG',
                     action='store_true',
-                    help = 'Test the jpeg codec binaries'
+                    help = 'Test jpeg codec binaries'
                     )
 
 parser.add_argument('-XML', '--XML-codec',
                     dest = 'XML',
                     action='store_true',
-                    help = 'test the xml codec binaries'
+                    help = 'Test xml codec binaries'
                     )
 
 parser.add_argument('-PDF', '--PDF-test',
@@ -566,6 +571,7 @@ if (args.NEGATE): test_negate()
 
 if (args.JPEG): test_jpeg()
 
+if (args.TXT): test_plaintext()
 
 if (args.PDF): test_pdf()
 

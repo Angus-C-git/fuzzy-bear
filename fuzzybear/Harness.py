@@ -28,8 +28,9 @@ def init_trace_target(tracee):
 
 
 class Harness():
-	def __init__(self, binary):
+	def __init__(self, binary, codec=None):
 		self.binary = binary
+		self.codec = codec
 			
 
 	def open_pipe(self, data):
@@ -45,7 +46,7 @@ class Harness():
 			"""" ptrace operations would theoretically begin here """
 			# continue_exc(pipe.pid)
 
-			if codec == 'jpeg':
+			if self.codec == 'jpeg':
 				# send raw bytes
 				pipe.communicate(data)
 			else:
