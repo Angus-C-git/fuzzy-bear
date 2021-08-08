@@ -323,7 +323,7 @@ def test_pdf():
         try:
             # print(u)
             # print(f'[DEBUG] test mutation was:\n{u}')
-            ret_code = harness.open_pipe(u)
+            ret_code = harness.open_pipe(u, codec='pdf')
             # print(f"\n  Piping to harness, res was {ret_code}\n")
             if ret_code == -11:
                 print(f"{'':10}[+] CRASH? {ret_code}")
