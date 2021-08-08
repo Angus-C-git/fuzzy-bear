@@ -12,17 +12,20 @@ BASE CLASS
 	► TODO :: Should be a factory model
 """
 
-GEN_MAX = 100
+
 
 # tmp UI manager
 tmp_cumulative = 0
 
 class Strategy():
+	GEN_MAX = 100
+
 	# max constants
 	CHAR_MAX = 255
 	INT_MAX  = 4294967295
 	INT_MAX_SIGNED = 2147483648
 	BYTE_8_MAX = 18446744073709551615
+	INSTRUCTION_SIZE = 32
 
 
 	def __init__(self):
@@ -99,8 +102,10 @@ class Strategy():
 		yield data + f'%{offset}$@'
 		yield data + f'%{offset}$hn'
 		yield data + f'%{offset}hhn'
-		yield data + f'\x00\x00\x00\x01%{offset}$n'
-		yield data + f'%99999$hn'
+		yield data + f'%99999$n'
+		yield data + f'%400$n'
+		for modifier in range(self.INSTRUCTION_SIZE):
+			yield data + f'%{2**modifier}$n'
 	
 
 	def system_words(self, data='', arg=''):
@@ -141,6 +146,16 @@ class Strategy():
 
 		yield data + """'/**/"# -- """
 
+		yield data + """{}:(){ | &;:[]"""
+
+		yield "' OR 1=1 -- v "
+		
+		yield "<script>document.cookie(1);</script>"
+		
+		yield "\"\""
+
+		yield "\n" * 100
+
 	
 	def rand_int_range(self, lower, upper):
 		""" Gen random integers in a range """
@@ -157,7 +172,7 @@ class Strategy():
 	def rand_positive(self):
 		""" Gen random positive integers """
 		int_list = []
-		for i in range(0, self.gen_max):
+		for i in range(0, self.GEN_MAX):
 			num = randint(0 , self.INT_MAX_SIGNED)
 			int_list.append(num)
 		int_list.append(self.INT_MAX)
@@ -165,22 +180,22 @@ class Strategy():
 		yield  int_list
 
 
-	def rand_negative(self):
-		""" Gen random negative integers """
-		int_list = []
-		for i in range(0, self.gen_max):
-			num = randint(-self.INT_MAX_SIGNED, 0)
-			int_list.append(num)
-		int_list.append(0)
-		int_list.append(self.INT_MAX)
-		int_list.append(self.BYTE_8_MAX)
-		yield int_list
+	def large_negatives(self):
+		""" Gen large negative integers """
+		for i in range(0, self.INSTRUCTION_SIZE):
+			yield str(-(2 ** i))
+
+
+	def large_positives(self):
+		""" Gen large negative integers """
+		for i in range(0, self.INSTRUCTION_SIZE):
+			yield str(2 ** i)
 
 
 	def rand(self):
 		""" Gen random integers """
 		int_list = []
-		for i in range(0, self.gen_max):
+		for i in range(0, self.GEN_MAX):
 			num = randint(-self.INT_MAX_SIGNED, self.INT_MAX_SIGNED)
 			int_list.append(num)
 		int_list.append(self.INT_MAX)
@@ -194,6 +209,12 @@ class Strategy():
 		yield '4294967295'
 		yield '2147483648'
 		yield '18446744073709551615'
+		yield str(0)
+		yield str(-self.INT_MAX)
+		yield str(-self.BYTE_8_MAX)
+		yield str(-self.CHAR_MAX)
+		yield str(self.INT_MAX + 1)
+		yield str(self.CHAR_MAX + 1)
 
 
 	def xor_data(self, data):
