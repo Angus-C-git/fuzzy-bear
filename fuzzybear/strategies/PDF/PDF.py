@@ -361,6 +361,9 @@ class PDF(Strategy.Strategy):
         for i in self.format_strings():
             yield(create_invalid(i, 0))
 
+        for i in self.polyglots():
+            yield(create_invalid(i, 0))
+
         
 
 
