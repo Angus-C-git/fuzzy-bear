@@ -46,6 +46,21 @@ Furthermore, this functionallity works even with PIE and ASLR enabled. Since we 
 - The jump block data structure that we build is not exactly like the static path analysis performed by BinaryNinja, it could be made more comprehensive. We do not capture blocks that end in a non returning function call like exit. We also are not able to capture blocks that are defined by looping mechanics.
 - We did not implement a infinite loop detection algorithm but I think the existing data structures support it. Our idea is to have some sort of a triggering mechanism when we are suspect that a loop is occuring, and then build a graph which grows when an existing jump block is visited. After a certain amount of iterations we start comparing the previous size of the graph to the new size of the graph. If it doesn't grow then we can assume the same places in the code are being repeatively jumped to, and the binary is stuck in an infinite loop.
 
+## Coverage
+
+The project implements a module `ptfuzz` which supports a pythonic interface to the unix `ptrace` syscall. 
+
+### ptfuzz
+
+The **ptfuzz** module is a pythonic interface to the `ptrace` unix sys call specifically targeted at fuzzing. It exposes the methods necessary to collect coverage information from a binary in blackbox settings as well as the ability to fuzz programs entirely in memory, only forking once, by saving and restoring register state in the target program.
+
+It aims to provide an easy way to harness the power of `ptrace` for fuzzing through simple abstracted methods. Being written in python also has advantages for portability and easy of use/extensibility.
+
+#### Architectures 
+
+Currently the module only supports `x86` and `x86_64` trace targets  however extending this support is nearly as simple as adding the necessary registers and types to the `ptfuzz/registers` file. Assuming that the `ptrace` syscall is supported on the architecture the port should be simple. 
+
+
 
 ## Strategies
 
@@ -84,4 +99,18 @@ The aggregator is the component of the fuzzer responsible for bridging the gap b
 
 
 
+# Project Limitations
 
+In its current form the project has a number of key limitations.
+
+### Code Coverage
+
+Although support for code coverage exists it is currently in its infancy and needs work.
+
+### Format Support
+
+Currently there is no support for ELF files.
+
+### Test Cases
+
+currently xml3 cannot be crashed.
