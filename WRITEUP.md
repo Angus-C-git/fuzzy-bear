@@ -29,6 +29,24 @@ Aggregator --> Strategies ---
 Second only to the generators themselves is the harness. The harness is the component of the fuzzer which really makes it useful. It is responsible for feeding input to the binary through `stdin` and collecting the response from the binary to return to the aggregator. The harness also implements a **health check** function which aims to detect hangs and infinite loops in the binary. 
 
 
+## Static Path Analysis
+
+The fuzzer includes functionallity to parse a binary and extract static paths, similarly to the disassembler BinaryNinja. We use the capstone library in order to disassemble the bytes of the 
+binary into instructions. The instructions are then parsed in 2 ways:
+1. By looking for jump instructions. The analysis tools keep track of the most recent point in the binary it began searching from (startPoint), and when an unseen jump instruction is found, it stores a 'jump block' which is denoted by startPoint and the address of the instructin that contains the jump. 
+This is done recursively untill all jump blocks in the binary are found. From this we are able to build a data structure that represents all blocks in the code that end in a jump.
+2. By looking for function calls. When the analysis tool finds a call instruction it stores both the address of the call instruction and the address of the function being called. Into a data structure.
+Once both of these data structures are built. 
+
+We use pwntools in order to resolve the function names in the function call data structure. We also contextualise each jump block and denote in which function that jump block resides. 
+
+Furthermore, this functionallity works even with PIE and ASLR enabled. Since we have the PID of the process running the binary, we are able to inspect /proc/{pid}/maps before fuzzing begins and find the base address of the binary and libc. 
+
+### Potential Improvements
+- The jump block data structure that we build is not exactly like the static path analysis performed by BinaryNinja, it could be made more comprehensive. We do not capture blocks that end in a non returning function call like exit. We also are not able to capture blocks that are defined by looping mechanics.
+- We did not implement a infinite loop detection algorithm but I think the existing data structures support it. Our idea is to have some sort of a triggering mechanism when we are suspect that a loop is occuring, and then build a graph which grows when an existing jump block is visited. After a certain amount of iterations we start comparing the previous size of the graph to the new size of the graph. If it doesn't grow then we can assume the same places in the code are being repeatively jumped to, and the binary is stuck in an infinite loop.
+
+
 ## Strategies
 
 ### Common
@@ -59,4 +77,7 @@ The PDF generator creates large pdf documents to test memory management of a PDF
 ## Aggregator
 
 The aggregator is the component of the fuzzer responsible for bridging the gap between the generators (strategies) and the harness. It functions as the manager for the fuzzing campaign taking in user supplied parameters and orchestrating the calling of generators whose output it then feeds to the harness. It then monitors the response from the harness to deicide if a crash file should be written and the campaign halted, or if the program is hanging / stuck in an infinite loop in which case the strategy should be evolved.
+
+
+
 
