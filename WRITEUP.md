@@ -50,6 +50,10 @@ CSV strategies focus on generating oddball data to place into *sensible* places 
 Similarly to the CSV based strategies the JSON generator attempts to create sane json structures with unnatural and unexpected fields which may cause a parser to break and  memory corruption to occur. A key strategy that the
 JSON mutator implements is the ability to select a random field to alter with another tactics data. The JSON generator also implements a function to add a large number of extra fields in the hopes of causing overflow based crashes to occur.
 
+### JPEG
+
+While JPEG fuzzing was unsucessful, we implemented strategies by attempting to flip bits and replace bits with bits known to break jpeg files, such as 0x00 and 0xFF, and other large numbers. Unfortunately, this caused the JPEG file to be read as invalid. Afterwards, we attempted to also only fuzz bits which were a certain "distance" away from the markers (0xFF), but still the file was invalid 20% of the time. Unsure of the cause of this.
+
 ### XML
 The XML generator modifies valid XML files by appending elements, inserting sub elements and overwritting elements/attributes with data from the strategy generator. This generator also creates files that include other files such as dev/random with the intention of creating buffer overflows in the target program. 
 
