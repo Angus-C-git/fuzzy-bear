@@ -79,27 +79,28 @@ def create_info_obj(obj_num):
     return stream
 
 def create_img_stream(obj_num, data, type_encoding):
-    stream = str(obj_num) + ' 0 obj\n<<\n'
-    stream += '/Type /XObject\n'
-    stream += '/Subtype /Image\n'
-    stream += '/Width  3510\n'
-    stream += '/Height 2491\n'
-    stream += '/ColorSpace /DeviceRGB\n'
-    stream += 'BitsPerComponent 8\n'
-    stream += '/Filter ' + type_encoding + '\n'
-    stream += '/Length ' + str(len(data)) + '\n' 
-    stream += '>>\n'
-    stream += 'stream\n'
+    stream = str(obj_num) + b' 0 obj\n<<\n'
+    stream += b'/Type /XObject\n'
+    stream += b'/Subtype /Image\n'
+    stream += b'/Width  3510\n'
+    stream += b'/Height 2491\n'
+    stream += b'/ColorSpace /DeviceRGB\n'
+    stream += b'BitsPerComponent 8\n'
+    stream += b'/Filter ' + type_encoding + b'\n'
+    stream += b'/Length ' + str(len(data)) + b'\n' 
+    stream += b'>>\n'
+    stream += b'stream\n'
     stream += data
-    stream += '\nendstream\n'
-    stream += 'endobj\n'
+    stream += b'\nendstream\n'
+    stream += b'endobj\n'
+    return stream
 
 #assuming data is a string
-def create_stream(obj_num ,data, encoding):
+def create_stream(obj_num ,data, encoding, length):
     stream = str(obj_num) + ' 0 obj\n<<\n'
     if encoding:
         stream += '/Filter /FlateDecode\n'
-    stream += '/Length ' + str(len(data)) + '\n'
+    stream += '/Length ' + str(length) + '\n'
     stream += '>>\n'
     stream += 'stream\n'
     stream += str(data)
@@ -138,6 +139,8 @@ def create_trailer(root_obj_id, num_objects, info_obj_id, lenth_to_xref, prev_xr
     trailer += '%%EOF'
     return trailer
 
+
+################################ Document Creation ################################################
 #doc_catalog 1
 #info 2
 #page_node 3
@@ -166,10 +169,12 @@ def create_pdf_basic():
     pdf_document += page_leaf_obj(obj_num , 3, 9, 7)
     obj_num += 1
     obj_locations.append(len(pdf_document))
-    pdf_document += create_stream(obj_num ,"BT /F1 12 Tf 100 700 Td (Hello World)Tj ET", False)
+    data = "BT /F1 12 Tf 100 700 Td (Hello World)Tj ET"
+    pdf_document += create_stream(obj_num ,data, False, len(data))
     obj_num += 1
     obj_locations.append(len(pdf_document))
-    pdf_document += create_stream(obj_num ,"BT /F1 24 Tf 200 700 Td (Nice to meet you)Tj ET", False)
+    data = "BT /F1 24 Tf 200 700 Td (Nice to meet you)Tj ET"
+    pdf_document += create_stream(obj_num ,data, False, len(data))
     obj_num += 1
     obj_locations.append(len(pdf_document))
     pdf_document += create_resource_obj(obj_num, 10)
@@ -208,7 +213,8 @@ def create_large_page_document(num):
     page_obj_nums = []
     for i in range(num):
         obj_locations.append(len(pdf_document))
-        pdf_document += create_stream(obj_num ,"BT /F1 12 Tf 100 700 Td (Hello Adam, I hope you enjoy a very large PDF Document... I have much pain form PDFs)Tj ET", False)
+        data = "BT /F1 12 Tf 100 700 Td (Hello Adam, I hope you enjoy a very large PDF Document... I have much pain form PDFs)Tj ET"
+        pdf_document += create_stream(obj_num ,data, False, len(data))
         obj_num += 1
         obj_locations.append(len(pdf_document))
         page_obj_nums.append(obj_num)
@@ -244,7 +250,8 @@ def create_bee_movie_page(data):
     page_obj_nums = []
     for i in data:
         obj_locations.append(len(pdf_document))
-        pdf_document += create_stream(obj_num ,"BT /F1 35 Tf 100 700 Td 1 Tr 2 w ("+i+")Tj ET", False)
+        val = "BT /F1 35 Tf 100 700 Td 1 Tr 2 w ("+i+")Tj ET"
+        pdf_document += create_stream(obj_num ,val, False, len(val))
         obj_num += 1
         obj_locations.append(len(pdf_document))
         page_obj_nums.append(obj_num)
@@ -275,7 +282,8 @@ def create_document_image(data):
     pdf_document += create_img_resouce_obj(obj_num, obj_num-1)
     obj_num += 1
     obj_locations.append(len(pdf_document))
-    pdf_document += create_stream(obj_num, 'q\n 1 0 0 1 100 200 cm\n 0 0 0 0 0 0 cm \n 150 0 0 80 0 0 cm\n /I1 Do\n Q', False)
+    val = 'q\n 1 0 0 1 100 200 cm\n 0 0 0 0 0 0 cm \n 150 0 0 80 0 0 cm\n /I1 Do\n Q'
+    pdf_document += create_stream(obj_num, val , False, len(val))
     obj_num += 1
     obj_locations.append(len(pdf_document))
     pdf_document += page_leaf_obj(obj_num, obj_num+1, obj_num-2, obj_num-1)
@@ -291,6 +299,39 @@ def create_document_image(data):
     pdf_document += create_trailer(obj_num-1, obj_num, 2, length_to_xref, None)
     return pdf_document
 
+def create_invalid(input, overflow_len):
+    obj_num = 1
+    obj_locations = []
+    pdf_document = ''
+    pdf_document += create_header()
+    obj_locations.append(len(pdf_document))
+    pdf_document += doc_catalog(obj_num,3)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += create_info_obj(obj_num)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += page_node_obj(obj_num, [4])
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += page_leaf_obj(obj_num , 3, 6, 5)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    data = "BT /F1 12 Tf 100 700 Td (I love in valid input "+ input +")Tj ET"
+    pdf_document += create_stream(obj_num ,data, False, len(data)-overflow_len)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += create_resource_obj(obj_num, 7)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += type_obj(obj_num)
+
+    length_to_xref = len(pdf_document)
+    pdf_document += create_xref(obj_locations)
+    pdf_document += create_trailer(1, obj_num, 2, length_to_xref, None)
+    return pdf_document
+    
+
 
 class PDF(Strategy.Strategy):
     # parse ___ input data
@@ -305,9 +346,21 @@ class PDF(Strategy.Strategy):
     def run(self):
         yield(create_pdf_basic())
         yield(create_large_page_document(10))
+
         with open('fuzzybear/strategies/PDF/bee_mov.txt') as f:
             lines = f.readlines()
             yield(create_bee_movie_page(lines))
+
+        # with open('fuzzybear/strategies/PDF/bee.jpg', 'rb') as f:
+        #     data = f.read()
+        #     yield(create_document_image(data.decode('utf-16')))
+
+        for i in self.chonk():
+            yield(create_invalid(i, len(i)))
+        
+        for i in self.format_strings():
+            yield(create_invalid(i, 0))
+
         
 
 
