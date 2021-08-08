@@ -300,6 +300,7 @@ def test_pdf():
 
     for u in pdf_worker.run():
         try:
+            # print(u)
             # print(f'[DEBUG] test mutation was:\n{u}')
             ret_code = harness.open_pipe(u)
             # print(f"\n  Piping to harness, res was {ret_code}\n")

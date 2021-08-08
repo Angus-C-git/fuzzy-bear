@@ -250,7 +250,7 @@ def create_bee_movie_page(data):
     page_obj_nums = []
     for i in data:
         obj_locations.append(len(pdf_document))
-        val = "BT /F1 35 Tf 100 700 Td 1 Tr 2 w ("+i+")Tj ET"
+        val = "BT /F1 23 Tf 100 700 Td 1 Tr 2 w 0.25 Tc 2.5 Tw("+i+")Tj ET"
         pdf_document += create_stream(obj_num ,val, False, len(val))
         obj_num += 1
         obj_locations.append(len(pdf_document))
@@ -331,7 +331,7 @@ def create_invalid(input, overflow_len):
     pdf_document += create_trailer(1, obj_num, 2, length_to_xref, None)
     return pdf_document
     
-    
+
 class PDF(Strategy.Strategy):
     # parse ___ input data
     def __init__(self, sample_input):
@@ -344,7 +344,7 @@ class PDF(Strategy.Strategy):
 
     def run(self):
         yield(create_pdf_basic())
-        yield(create_large_page_document(10))
+        yield(create_large_page_document(10000))
 
         with open('fuzzybear/strategies/PDF/bee_mov.txt') as f:
             lines = f.readlines()
