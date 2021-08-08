@@ -1,21 +1,315 @@
+from argparse import ONE_OR_MORE
 from .. import Strategy
 
+
+#creating the start of the pdf document
 def create_header():
-    pass
+    return '%PDF-1.4\n'
 
-def create_body():
-    pass
+def create_img_and_text_resouce(obj_num, img_num, font_num):
+    stream = str(obj_num) + ' 0 obj\n<<\n'
+    stream += '/XObject << /I1' + str(img_num) + ' 0 R >>\n'
+    stream += '/Font << /F1 ' + str(font_num) + ' 0 R >>\n'
+    stream += '/ProcSet [/PDF /Text /ImageB /ImageC /ImageI]'
+    stream += '>>\n'
+    stream += 'endobj\n'
+    return stream
 
+def create_img_resouce_obj(obj_num, img_num):
+    stream = str(obj_num) + ' 0 obj\n<<\n'
+    stream += '/XObject << ' + str(img_num) + ' 0 R >>\n'
+    stream += '/ProcSet [/PDF /ImageB /ImageC /ImageI]'
+    stream += '>>\n'
+    stream += 'endobj\n'
+    return stream
+
+def create_resource_obj(obj_num, font_num):
+    stream = str(obj_num) + ' 0 obj\n<<\n'
+    stream += '/Font << /F1 ' + str(font_num) + ' 0 R >>\n'
+    stream += '/ProcSet [/PDF /Text]\n'
+    stream += '>>\n'
+    stream += 'endobj\n'
+    return stream
+
+def type_obj(obj_num):
+    stream = str(obj_num) + ' 0 obj\n<<\n'
+    stream += '/Type /Font\n'
+    stream += '/Subtype /Type1\n'
+    stream += '/BaseFont /Helvetica\n'
+    stream += '>>\n'
+    stream += 'endobj\n'
+    return stream
+
+def page_node_obj(obj_num,page_leaf):
+    stream = str(obj_num) + ' 0 obj\n<<\n'
+    stream += '/Type /Pages\n'
+    stream += '/Kids [\n'
+    for i in page_leaf:
+        stream += str(i) + ' 0 R\n'
+    stream += ']\n'
+    stream += '/Count '+ str(len(page_leaf)) + '\n'
+    stream += '>>\nendobj\n'
+    return stream
+
+def page_leaf_obj(obj_num ,parent_node_num, resource_obj_num, contents_obj_num):
+    stream = str(obj_num) + ' 0 obj\n<<\n'
+    stream += '/Type /Page\n'
+    stream += '/Parent ' + str(parent_node_num)+ ' 0 R\n'
+    stream += '/Resources ' + str(resource_obj_num)+ ' 0 R\n'
+    stream += '/Contents ' + str(contents_obj_num) + ' 0 R\n'
+    stream += '/MediaBox [0 0 595.276 841.89]\n'
+    stream += '>>\n'
+    stream += 'endobj\n'
+    return stream
+
+def doc_catalog(obj_num, page_tree_obj_num):
+    stream = str(obj_num) + ' 0 obj\n<<\n'
+    stream += '/Type /Catalog\n'
+    stream += '/Pages '+str(page_tree_obj_num) + ' 0 R\n'
+    stream += '>>\n'
+    stream += 'endobj\n'
+    return stream
+
+def create_info_obj(obj_num):
+    stream = str(obj_num) + ' 0 obj\n<<\n'
+    stream += '/Type /Info\n'
+    stream += '/Producer (FuzzyBear fuzzer 11.1.1.1.1.11)\n'
+    stream += '>>\n'
+    stream += 'endobj\n'
+    return stream
+
+def create_img_stream(obj_num, data, type_encoding):
+    stream = str(obj_num) + ' 0 obj\n<<\n'
+    stream += '/Type /XObject\n'
+    stream += '/Subtype /Image\n'
+    stream += '/Width  3510\n'
+    stream += '/Height 2491\n'
+    stream += '/ColorSpace /DeviceRGB\n'
+    stream += 'BitsPerComponent 8\n'
+    stream += '/Filter ' + type_encoding + '\n'
+    stream += '/Length ' + str(len(data)) + '\n' 
+    stream += '>>\n'
+    stream += 'stream\n'
+    stream += data
+    stream += '\nendstream\n'
+    stream += 'endobj\n'
+
+#assuming data is a string
+def create_stream(obj_num ,data, encoding):
+    stream = str(obj_num) + ' 0 obj\n<<\n'
+    if encoding:
+        stream += '/Filter /FlateDecode\n'
+    stream += '/Length ' + str(len(data)) + '\n'
+    stream += '>>\n'
+    stream += 'stream\n'
+    stream += str(data)
+    stream += '\nendstream\n'
+    stream += 'endobj\n'
+    return stream
+
+##Creating the ending of the pdf document uses create_xref and create_trailer
 def create_xref(object_locations):
-    pass
+    xref = 'xref\n'
+    xref += '0 ' + str(len(object_locations)+1) + '\n'
+    xref += '0000000000 65535 f\n'
+    for i in object_locations:
+        var = str(i)
+        offset = 10-len(var) #NOTE var should be < 10 bytes long
+        for i in range(0, offset):
+            xref += '0'
+        xref += var
+        xref += ' '
+        xref += '00000 n\n'
+    return xref
 
-def create_trailer():
-    pass
+
+#root_obj_id and info_obj_id must obj_id
+#NOTE R is for indirect object
+def create_trailer(root_obj_id, num_objects, info_obj_id, lenth_to_xref, prev_xref):
+    trailer = 'trailer\n<<'
+    trailer += '/Size '+ str(num_objects) + '\n'
+    trailer += '/Root '+ str(root_obj_id) + ' 0 R\n'
+    trailer += '/Info '+ str(info_obj_id) + ' 0 R\n'
+    if(prev_xref != None):
+        trailer += '/Prev '+ str(prev_xref)
+    trailer += '>>\n'
+    trailer += 'startxref\n'
+    trailer += str(lenth_to_xref) + '\n'
+    trailer += '%%EOF'
+    return trailer
+
+#doc_catalog 1
+#info 2
+#page_node 3
+#page_leaf 4 5
+#stream location 6 7
+#resouce_obj 8, 9
+#font_obj 10, 11
+def create_pdf_basic():
+    obj_num = 1
+    obj_locations = []
+    pdf_document = ''
+    pdf_document += create_header()
+    obj_locations.append(len(pdf_document))
+    pdf_document += doc_catalog(obj_num,3)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += create_info_obj(obj_num)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += page_node_obj(obj_num, [4, 5])
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += page_leaf_obj(obj_num , 3, 8, 6)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += page_leaf_obj(obj_num , 3, 9, 7)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += create_stream(obj_num ,"BT /F1 12 Tf 100 700 Td (Hello World)Tj ET", False)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += create_stream(obj_num ,"BT /F1 24 Tf 200 700 Td (Nice to meet you)Tj ET", False)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += create_resource_obj(obj_num, 10)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += create_resource_obj(obj_num, 11)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += type_obj(obj_num)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += type_obj(obj_num)
+
+    length_to_xref = len(pdf_document)
+    pdf_document += create_xref(obj_locations)
+    pdf_document += create_trailer(1, obj_num, 2, length_to_xref, None)
+    return pdf_document
+
+
+def create_large_page_document(num):
+    obj_num = 1
+    obj_locations = []
+    pdf_document = create_header()
+    obj_locations.append(len(pdf_document))
+    pdf_document += create_info_obj(obj_num)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += type_obj(obj_num)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    resouce_obj = obj_num
+    pdf_document += create_resource_obj(obj_num, obj_num-1)
+    obj_num += 1
+    
+    parent_obj = obj_num + (num*2)
+    page_obj_nums = []
+    for i in range(num):
+        obj_locations.append(len(pdf_document))
+        pdf_document += create_stream(obj_num ,"BT /F1 12 Tf 100 700 Td (Hello Adam, I hope you enjoy a very large PDF Document... I have much pain form PDFs)Tj ET", False)
+        obj_num += 1
+        obj_locations.append(len(pdf_document))
+        page_obj_nums.append(obj_num)
+        pdf_document += page_leaf_obj(obj_num , parent_obj, resouce_obj, obj_num-1)
+        obj_num += 1
+
+    obj_locations.append(len(pdf_document))
+    pdf_document += page_node_obj(obj_num, page_obj_nums)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += doc_catalog(obj_num,obj_num-1)
+    obj_num += 1
+    length_to_xref = len(pdf_document)
+    pdf_document += create_xref(obj_locations)
+    pdf_document += create_trailer(obj_num-1, obj_num, 2, length_to_xref, None)
+    return pdf_document
+
+def create_bee_movie_page(data):
+    obj_num = 1
+    obj_locations = []
+    pdf_document = create_header()
+    obj_locations.append(len(pdf_document))
+    pdf_document += create_info_obj(obj_num)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += type_obj(obj_num)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    resouce_obj = obj_num
+    pdf_document += create_resource_obj(obj_num, obj_num-1)
+    obj_num += 1
+    parent_obj = obj_num + (len(data)*2)
+    page_obj_nums = []
+    for i in data:
+        obj_locations.append(len(pdf_document))
+        pdf_document += create_stream(obj_num ,"BT /F1 35 Tf 100 700 Td 1 Tr 2 w ("+i+")Tj ET", False)
+        obj_num += 1
+        obj_locations.append(len(pdf_document))
+        page_obj_nums.append(obj_num)
+        pdf_document += page_leaf_obj(obj_num , parent_obj, resouce_obj, obj_num-1)
+        obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += page_node_obj(obj_num, page_obj_nums)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += doc_catalog(obj_num,obj_num-1)
+    obj_num += 1
+    length_to_xref = len(pdf_document)
+    pdf_document += create_xref(obj_locations)
+    pdf_document += create_trailer(obj_num-1, obj_num, 2, length_to_xref, None)
+    return pdf_document
+
+def create_document_image(data):
+    obj_num = 1
+    obj_locations = []
+    pdf_document = create_header()
+    obj_locations.append(len(pdf_document))
+    pdf_document += create_info_obj(obj_num)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += create_img_stream(obj_num, data,'/DCTDecode')
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += create_img_resouce_obj(obj_num, obj_num-1)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += create_stream(obj_num, 'q\n 1 0 0 1 100 200 cm\n 0 0 0 0 0 0 cm \n 150 0 0 80 0 0 cm\n /I1 Do\n Q', False)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += page_leaf_obj(obj_num, obj_num+1, obj_num-2, obj_num-1)
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += page_node_obj(obj_num, [(obj_num-1)])
+    obj_num += 1
+    obj_locations.append(len(pdf_document))
+    pdf_document += doc_catalog(obj_num,obj_num-1)
+    obj_num += 1
+    length_to_xref = len(pdf_document)
+    pdf_document += create_xref(obj_locations)
+    pdf_document += create_trailer(obj_num-1, obj_num, 2, length_to_xref, None)
+    return pdf_document
+
 
 class PDF(Strategy.Strategy):
     # parse ___ input data
     def __init__(self, sample_input):
+        super()
+        self.sample_input = sample_input
+        self.parse_pdf()
+
+    def parse_pdf(self):
         pass
+
+    def run(self):
+        yield(create_pdf_basic())
+        yield(create_large_page_document(10))
+        with open('fuzzybear/strategies/PDF/bee_mov.txt') as f:
+            lines = f.readlines()
+            yield(create_bee_movie_page(lines))
+        
+
 
 
 ''' Dev Notes
@@ -41,15 +335,11 @@ the version numbers go from 0-7 in the form 1.N
 
 
 
-
-
 The Body:
 The Body of the PDF document contain the objects that are typically included these can be.
 
 text streams, images and other media elements.
 the body seciton is used to hold all the document's data being shown to the user.
-
-
 
 
 
@@ -94,7 +384,6 @@ multiple subsections are usually present in PDF documents that have been increme
 
 
 
-
 Trailer:
 The PDF trailer specifies how the application reading the PDF document should find the xref table and other special objects. All PDF readers should starting reading a PDF from the end of the file
 
@@ -133,15 +422,12 @@ There are several keys in the trailer section these being:
 
 
 
-
 PDF incremental updates:
 We can append new objects to the end of the PDF file without rewriting the entire file. this allows changes to the PDF document to be saved quickly.
 
 PDF documents that have incremental updates still contain the original header, body, cross-reference tbale and trailer. There is an additional body, cross-reference and trialer section that is appended
 
 The additional cross-referece sections will contain only the entries for objects that have been changed, replaced or deleted. Deleted objects will stay in the file, but will be marked with a "f" flag. Each trailer needs to be terminated by the "%%EOF" tag and should contain the /Prev entry, which points to the previous cross-reference section.
-
-
 
 
 
