@@ -23,19 +23,24 @@ console = Console()
 
     TODO :: fill out function stubs
 """
-strategy_progress = Progress(
-    "{task.description}",
-    SpinnerColumn(),
-    BarColumn(),
-    TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
-)
-strategy_progress.add_task("[green]Max Constants")
-strategy_progress.add_task("[magenta]Bad Strings", total=200)
-strategy_progress.add_task("[cyan]Large fields", total=400)
+# strategy_progress = Progress(
+#     "{task.description}",
+#     SpinnerColumn(),
+#     BarColumn(),
+#     TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+# )
 
-total = sum(task.total for task in strategy_progress.tasks)
-overall_progress = Progress()
-overall_task = overall_progress.add_task("Progress", total=int(total))
+# strategy_progress.add_task("[green]Max Constants")
+# strategy_progress.add_task("[magenta]Bad Strings", total=200)
+# strategy_progress.add_task("[cyan]Large fields", total=400)
+
+# total = sum(task.total for task in strategy_progress.tasks)
+# overall_progress = Progress()
+# overall_task = overall_progress.add_task("Progress", total=int(total))
+
+
+
+
 
 """
 Structure:
@@ -112,8 +117,27 @@ def update_coverage() -> None:
 # ======================================= #
 
 
+class Dashboard():
+    strategy_progress = Progress(
+        "{task.description}",
+        SpinnerColumn(),
+        BarColumn(),
+        TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+    )
+    overall_progress = Progress()
 
-class Banner:
+
+    def __init__(self, events):
+        # print(events)
+        for event in events.keys():
+            self.strategy_progress.add_task(f"[cyan] {event}", total=events[event][1])
+
+        net_sum = sum(task.total for task in self.strategy_progress.tasks)
+        self.overall_tasks = self.overall_progress.add_task("Progress", total=int(net_sum))
+
+
+
+class Banner():
     """Display banner block"""
     def __rich__(self) -> Panel:
         banner = Table(
@@ -139,13 +163,20 @@ class Banner:
 
 
 
-class Header:
+class Header():
     """Display upper row of panels"""
+
+
+    def __init__(self, strategy_progress, overall_progress):
+        self.strategy_progress = strategy_progress
+        self.overall_progress = overall_progress
+
     def __rich__(self) -> Table:
+        # super()
         progress_table = Table.grid(expand=True)
         progress_table.add_row(
             Panel(
-                overall_progress,
+                self.overall_progress,
                 title="[b]Overall Strategy Exhaustion",
                 border_style="green",
                 # down right
@@ -159,7 +190,7 @@ class Header:
                 padding=(4, 3),
             ),
             Panel(
-                strategy_progress, 
+                self.strategy_progress, 
                 title="[b]Stats", 
                 border_style="red", 
                 padding=(3, 2)
@@ -169,18 +200,23 @@ class Header:
 
 
 
-class Footer:
+class Footer():
     """ Display lower row of panels """
 
     # TMP samples
     time_stamp = '0:00'
-    log_msg = "Fuzzing csv1 ..."
+    log_msg = "Fuzzing ..."
+
+    def __init__(self, strategy_progress):
+        self.strategy_progress = strategy_progress
 
     def __rich__(self) -> Table:
+        # super()
         progress_table = Table.grid(expand=True)
         progress_table.add_row(
             Panel(
-                strategy_progress,
+                # super().strategy_progress,
+                self.strategy_progress, 
                 title="[b]Strategies",
                 border_style="green",
                 padding=(3, 10),
@@ -198,7 +234,7 @@ class Footer:
                 coverage_tree,
                 title="[b]Coverage", 
                 border_style="red", 
-                padding=(3, 10),
+                padding=(1, 15),
                 expand=True
             ),
         )
@@ -217,33 +253,36 @@ def make_layout() -> Layout:
     # main components
     layout.split_column(
         Layout(name="banner", size=5),
-        Layout(name="header", size=12),
-        Layout(name="footer", size=14),
+        Layout(name="header", size=25),
+        Layout(name="footer", size=25),
     )
     return layout
 
 # ======================================= #
 
-# TODO :: Move to method
-layout = make_layout()
+def init_layout(events, strategy_progress, overall_progress):
+    layout = make_layout()
 
-layout["banner"].update(Banner())  
-layout["header"].update(Header())                
-layout["footer"].update(Footer())
+    layout["banner"].update(Banner())  
+    layout["header"].update(Header(strategy_progress, overall_progress))                
+    layout["footer"].update(Footer(strategy_progress))
+
+    return layout
 
 # ======================================= #
 
 # TODO :: Move to method and tie in event handlers
 # probably an update method
-with Live(layout, refresh_per_second=10, screen=True):
-    while not overall_progress.finished:
-        sleep(0.1)
-        for job in strategy_progress.tasks:
-            if not job.finished:
-                strategy_progress.advance(job.id)
 
-        completed = sum(task.completed for task in strategy_progress.tasks)
-        overall_progress.update(overall_task, completed=completed)
+# with Live(init_layout(), refresh_per_second=10, screen=True):
+#     while not overall_progress.finished:
+#         sleep(0.1)
+#         for job in strategy_progress.tasks:
+#             if not job.finished:
+#                 strategy_progress.advance(job.id)
+
+#         completed = sum(task.completed for task in strategy_progress.tasks)
+#         overall_progress.update(overall_task, completed=completed)
 
 # ======================================= #
 

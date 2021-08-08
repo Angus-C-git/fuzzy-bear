@@ -33,11 +33,24 @@ def pack_csv(data):
 
 
 class CSV(Strategy.Strategy):
-	
+
 	def __init__(self, sample_input):
 		super()
 		self.sample_input = sample_input
 		self.parse_csv()
+
+		self.fuzzcases = super().strategy_cases
+
+		# register ui events for used fuzzcases
+		self.ui_events = {
+			'emoji': [0, self.fuzzcases['emoji']],
+			'chonk': [0, self.fuzzcases['chonk']],
+			'add entries': [0, ENTRIES_THRESHOLD * 2],
+			'constants': [0, self.fuzzcases['constants']],
+			'xor': [0, self.size[0]],
+			'bit flip': [0, self.size[0]],
+			'negate':  [0, self.size[0]],
+		}
 
 
 	def parse_csv(self):
@@ -48,6 +61,13 @@ class CSV(Strategy.Strategy):
 		self.size = (len(self.candidate_input), 
 					len(self.candidate_input[0]))
 
+
+	def update_ui_event(self, event):
+		self.ui_events[event][0] += 1
+		# print("[>>] Updated ui events")
+		# print(self.ui_events)
+
+	# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 	def add_entries(self, preserve_header=False):
 		""" adds extra entries to csv file in a random range """
@@ -64,7 +84,7 @@ class CSV(Strategy.Strategy):
 
 			mutation.append(new_row)
 
-		super().ui_event('additional rows', 10)
+		self.update_ui_event('add entries')
 		return mutation
 
 
@@ -75,14 +95,14 @@ class CSV(Strategy.Strategy):
 		for emoji in super().emoji():
 			mutation[row][col] = emoji   
 			yield pack_csv(mutation)
-			super().ui_event('emoji', 25)
+			self.update_ui_event('emoji')
 		
 		mutation = copy.deepcopy(self.candidate_input)
 		row, col = random_row_col(self.size)
 		for chonk in super().chonk():
 			mutation[row][col] = chonk
 			yield pack_csv(mutation)
-			super().ui_event('chonk', 20)
+			self.update_ui_event('chonk')
 		
 		for count in range(ENTRIES_THRESHOLD):
 			yield pack_csv(self.add_entries())
@@ -95,7 +115,7 @@ class CSV(Strategy.Strategy):
 		for constant in super().max_constants():
 			mutation[row][col] = constant
 			yield pack_csv(mutation)
-			super().ui_event('constants', 25)
+			self.update_ui_event('constants')
 	
 		mutation = copy.deepcopy(self.candidate_input)
 		row, col = self.size
@@ -103,7 +123,7 @@ class CSV(Strategy.Strategy):
 			for c in range(col):
 				mutation[r][c] = super().xor_data(self.candidate_input[r][c])
 				yield pack_csv(mutation)
-				super().ui_event('xor', 1, row)
+				self.update_ui_event('xor')
 
 		mutation = copy.deepcopy(self.candidate_input)
 		row, col = self.size
@@ -112,7 +132,7 @@ class CSV(Strategy.Strategy):
 				mutation[r][c] = super().bit_flip(self.candidate_input[r][c])
 				print(f"[>>] mutation was {mutation}")
 				yield pack_csv(mutation)
-				super().ui_event('bit flip', 1, row)
+				self.update_ui_event('bit flip')
 
 		mutation = copy.deepcopy(self.candidate_input)
 		row, col = self.size
@@ -120,7 +140,7 @@ class CSV(Strategy.Strategy):
 			for c in range(col):
 				mutation[r][c] = super().negate(self.candidate_input[r][c])
 				yield pack_csv(mutation)
-				super().ui_event('negate', 1, row)
+				self.update_ui_event('negate')
 
 
 """dev_notes

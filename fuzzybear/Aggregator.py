@@ -7,14 +7,22 @@ from .strategies import get_generator
 # highlight crash
 from colorama import Fore, Style
 
+# run UI
+from .ui.UiRunner import UiRunner, init_layout
+from rich.live import Live
+from time import sleep
+from rich.console import Console, RenderGroup
+
+# console = Console()
+
 '''
 ::::::::::::::::: [Aggregator] :::::::::::::::::
 
-    ► Takes responses (or lack of) from the
-      binary and decides what changes if any 
-      should be triggered (maybe)
-    
-    ► Runner Class for strategies/generators 
+	► Takes responses (or lack of) from the
+	  binary and decides what changes if any 
+	  should be triggered (maybe)
+	
+	► Runner Class for strategies/generators 
 
 '''
 
@@ -24,6 +32,22 @@ def write_crash(crashing_input):
 
 	with open('./bad.txt', 'w') as crash:
 		crash.write(crashing_input)
+	
+	exit(0)
+
+
+def run_dash(inputs, events, strategy_progress, overall_progress, overall_tasks):
+	with Live(init_layout(events, strategy_progress, overall_progress), refresh_per_second=10, screen=True):
+		while not overall_progress.finished:
+			sleep(0.1)
+
+			for input in inputs:
+				for job in strategy_progress.tasks:
+					if not job.finished:
+						strategy_progress.advance(job.id)
+
+				completed = sum(task.completed for task in strategy_progress.tasks)
+				overall_progress.update(overall_tasks, completed=completed)
 
 
 class Aggregator():
@@ -33,9 +57,9 @@ class Aggregator():
 		self.codec = codec.detect(input_file)
 		# print(f'   [DEBUG] {self.codec}')
 		self.base_file = input_file
+		self.ui_runner = UiRunner()
 
-	# TODO :: Should internals be exported
-	# to standalone fuzzing class ?
+
 	def run_fuzzer(self):
 		# TODO :: run generator here <codec>
 		# format runner 
@@ -46,18 +70,35 @@ class Aggregator():
 			print(f'\n   [>>] The format of {self.base_file} is not supported')
 			return None
 		
-		print('   [>>] Running fuzzer ...')
+		print(f"{'':3}[>>] Running fuzzer ...")
+
+		DashboardUI = self.ui_runner.register_events(Generator.ui_events)
+
+
 
 		## TMP RUNNER >> ##
-		while True:
-			inputs = Generator.run()
-
+		# while True:
+		print("[>>] In fuzing loop")
+		inputs = Generator.run()
+		jobs = DashboardUI.strategy_progress.tasks
+		current_job = 0
 		
-			for input in inputs:
-				# print(f"	 [DEBUG] mutation was {input}")
-				response_code = self.harness.open_pipe(input, self.codec)
-				# print(f"\n   [DEBUG] Aggregator received {response_codes.lookup(response_code)} from binary")
-				if (response_code): 
-					write_crash(input)
-					exit(0)				# exit on crash ? 
+		with Live(init_layout(self.ui_runner.events, DashboardUI.strategy_progress, DashboardUI.overall_progress), refresh_per_second=10, screen=True):
+			while not DashboardUI.overall_progress.finished:
+				sleep(0.3)
 
+				for input in inputs:
+					response_code = self.harness.open_pipe(input)
+
+					if not jobs[current_job].finished:
+						DashboardUI.strategy_progress.advance(jobs[current_job].id)
+					else:
+						current_job += 1
+						if current_job > len(jobs):
+							current_job = 0
+				
+					completed = sum(task.completed for task in DashboardUI.strategy_progress.tasks)
+					DashboardUI.overall_progress.update(DashboardUI.overall_tasks, completed=completed)
+
+					if (response_code == -11):
+						write_crash(input)
