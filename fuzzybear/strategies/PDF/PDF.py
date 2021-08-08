@@ -1,4 +1,5 @@
 from argparse import ONE_OR_MORE
+from fuzzybear.strategies.JPEG.JPEG import JPEG
 from .. import Strategy
 
 
@@ -79,15 +80,15 @@ def create_info_obj(obj_num):
     return stream
 
 def create_img_stream(obj_num, data, type_encoding):
-    stream = str(obj_num) + b' 0 obj\n<<\n'
+    stream = bytes(str(obj_num),'utf-8') + b' 0 obj\n<<\n'
     stream += b'/Type /XObject\n'
     stream += b'/Subtype /Image\n'
     stream += b'/Width  3510\n'
     stream += b'/Height 2491\n'
     stream += b'/ColorSpace /DeviceRGB\n'
     stream += b'BitsPerComponent 8\n'
-    stream += b'/Filter ' + type_encoding + b'\n'
-    stream += b'/Length ' + str(len(data)) + b'\n' 
+    stream += b'/Filter ' + bytes(type_encoding,'utf-8') + b'\n'
+    stream += b'/Length ' + bytes(str(len(data)),'utf-8') + b'\n' 
     stream += b'>>\n'
     stream += b'stream\n'
     stream += data
@@ -271,32 +272,32 @@ def create_bee_movie_page(data):
 def create_document_image(data):
     obj_num = 1
     obj_locations = []
-    pdf_document = create_header()
+    pdf_document = bytes(create_header(),'utf-8')
     obj_locations.append(len(pdf_document))
-    pdf_document += create_info_obj(obj_num)
+    pdf_document += bytes(create_info_obj(obj_num),'utf-8')
     obj_num += 1
     obj_locations.append(len(pdf_document))
     pdf_document += create_img_stream(obj_num, data,'/DCTDecode')
     obj_num += 1
     obj_locations.append(len(pdf_document))
-    pdf_document += create_img_resouce_obj(obj_num, obj_num-1)
+    pdf_document += bytes(create_img_resouce_obj(obj_num, obj_num-1),'utf-8')
     obj_num += 1
     obj_locations.append(len(pdf_document))
     val = 'q\n 1 0 0 1 100 200 cm\n 0 0 0 0 0 0 cm \n 150 0 0 80 0 0 cm\n /I1 Do\n Q'
-    pdf_document += create_stream(obj_num, val , False, len(val))
+    pdf_document += bytes(create_stream(obj_num, val , False, len(val)),'utf-8')
     obj_num += 1
     obj_locations.append(len(pdf_document))
-    pdf_document += page_leaf_obj(obj_num, obj_num+1, obj_num-2, obj_num-1)
+    pdf_document += bytes(page_leaf_obj(obj_num, obj_num+1, obj_num-2, obj_num-1),'utf-8')
     obj_num += 1
     obj_locations.append(len(pdf_document))
-    pdf_document += page_node_obj(obj_num, [(obj_num-1)])
+    pdf_document += bytes(page_node_obj(obj_num, [(obj_num-1)]),'utf-8')
     obj_num += 1
     obj_locations.append(len(pdf_document))
-    pdf_document += doc_catalog(obj_num,obj_num-1)
+    pdf_document += bytes(doc_catalog(obj_num,obj_num-1),'utf-8')
     obj_num += 1
     length_to_xref = len(pdf_document)
-    pdf_document += create_xref(obj_locations)
-    pdf_document += create_trailer(obj_num-1, obj_num, 2, length_to_xref, None)
+    pdf_document += bytes(create_xref(obj_locations),'utf-8')
+    pdf_document += bytes(create_trailer(obj_num-1, obj_num, 2, length_to_xref, None),'utf-8')
     return pdf_document
 
 def create_invalid(input, overflow_len):
@@ -343,25 +344,25 @@ class PDF(Strategy.Strategy):
         pass
 
     def run(self):
-        yield(create_pdf_basic())
-        yield(create_large_page_document(10000))
+        yield(bytes(create_pdf_basic(),'utf-8'))
+        yield(bytes(create_large_page_document(10000),'utf-8'))
 
         with open('fuzzybear/strategies/PDF/bee_mov.txt') as f:
             lines = f.readlines()
-            yield(create_bee_movie_page(lines))
+            yield(bytes(create_bee_movie_page(lines),'utf-8'))
 
-        # with open('fuzzybear/strategies/PDF/bee.jpg', 'rb') as f:
-        #     data = f.read()
-        #     yield(create_document_image(data.decode('utf-16')))
+        jpg_gen  = JPEG('fuzzybear/strategies/PDF/bee.jpg')
+        for i in jpg_gen.run():
+            yield(create_document_image(i))
 
         for i in self.chonk():
-            yield(create_invalid(i, len(i)))
+            yield(bytes(create_invalid(i, len(i)),'utf-8'))
         
         for i in self.format_strings():
-            yield(create_invalid(i, 0))
+            yield(bytes(create_invalid(i, 0),'utf-8'))
 
         for i in self.polyglots():
-            yield(create_invalid(i, 0))
+            yield(bytes(create_invalid(i, 0),'utf-8'))
 
         
 
