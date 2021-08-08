@@ -100,14 +100,9 @@ def test_csv():
     """)
 
     harness = Harness.Harness(TEST_BINARY)
-
     csv_worker = CSV.CSV(TEST_SAMPLE)
     
-    # for x in range(5):
     for x in csv_worker.run():
-        
-        # @ here would mark the place the 
-        # aggregator feeds harness
         # print(f'[DEBUG] test mutation was\n{x}')
         ret_code = harness.open_pipe(x)
         # print(f"\nPiping to harness, res was {ret_code}\n")
@@ -118,14 +113,14 @@ def test_csv():
     TEST_BINARY = f'{TEST_DIR}/csv2'
     TEST_SAMPLE = f'{TEST_DIR}/codecs/csv2.txt'
 
+    harness = Harness.Harness(TEST_BINARY)
+    csv_worker = CSV.CSV(TEST_SAMPLE)
+
     print(f"""
         [>>] Running CSV test against {TEST_BINARY.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
     """)
 
     for x in csv_worker.run():
-        
-        # @ here would mark the place the 
-        # aggregator feeds harness
         # print(f'[DEBUG] test mutation was\n{x}')
         ret_code = harness.open_pipe(x)
         # print(f"\nPiping to harness, res was {ret_code}\n")
@@ -159,6 +154,9 @@ def test_json():
     TEST_BINARY = f'{TEST_DIR}/json2'
     TEST_SAMPLE = f'{TEST_DIR}/codecs/json2.txt'
 
+    harness = Harness.Harness(TEST_BINARY)
+    json_worker = JSON.JSON(TEST_SAMPLE)
+
     print(f"""
         [>>] Running JSON test against {TEST_BINARY.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
     """)
@@ -183,6 +181,7 @@ def test_plaintext():
 
     harness = Harness.Harness(TEST_BINARY)
     txt_worker = TXT.TXT(TEST_SAMPLE)
+
     for u in txt_worker.run():
         try:
             # print(f'[DEBUG] test mutation was:\n{u}')
@@ -197,6 +196,9 @@ def test_plaintext():
 
     TEST_BINARY = f'{TEST_DIR}/plaintext2'
     TEST_SAMPLE = f'{TEST_DIR}/codecs/plaintext2.txt'
+
+    harness = Harness.Harness(TEST_BINARY)
+    txt_worker = TXT.TXT(TEST_SAMPLE)
 
     print(f"""
         [>>] Running TXT test against {TEST_BINARY.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
@@ -216,6 +218,9 @@ def test_plaintext():
 
     TEST_BINARY = f'{TEST_DIR}/plaintext3'
     TEST_SAMPLE = f'{TEST_DIR}/codecs/plaintext3.txt'
+
+    harness = Harness.Harness(TEST_BINARY)
+    txt_worker = TXT.TXT(TEST_SAMPLE)
 
     print(f"""
         [>>] Running TXT test against {TEST_BINARY.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
@@ -264,8 +269,8 @@ def test_pdf():
 def test_xml():
 
     TEST_DIR = './tests/complete'
-    TEST_BINARY = f'{TEST_DIR}/xml2'
-    TEST_SAMPLE = f'{TEST_DIR}/codecs/xml2.txt'
+    TEST_BINARY = f'{TEST_DIR}/xml1'
+    TEST_SAMPLE = f'{TEST_DIR}/codecs/xml1.txt'
 
     print(f"""
         [>>] Running XML test against {TEST_BINARY.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
@@ -274,17 +279,49 @@ def test_xml():
     harness = Harness.Harness(TEST_BINARY)
     xml_worker = XML.XML(TEST_SAMPLE)
 
-    # for x in range(10):
     for x in xml_worker.run():
-        # @ here would mark the place the 
-        # aggregator feeds harness
-        # print(f'[DEBUG] test mutation was\n{x}')
-        res = harness.open_pipe(x)
-        print(f"\nPiping to harness, res was {res}\n")
-        if res == -11:
-            print(f"[>>] CRASHED on {x}")
-            exit(0)
+        ret_code = harness.open_pipe(x)
+        # print(f"\nPiping to harness, res was {ret_code}\n")
+        if ret_code == -11:
+            print(f"{'':10}[+] CRASH? {ret_code}")
+            break
 
+    
+    TEST_BINARY = f'{TEST_DIR}/xml2'
+    TEST_SAMPLE = f'{TEST_DIR}/codecs/xml2.txt'
+
+    harness = Harness.Harness(TEST_BINARY)
+    xml_worker = XML.XML(TEST_SAMPLE)
+
+    print(f"""
+        [>>] Running XML test against {TEST_BINARY.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
+    """)
+
+    for x in xml_worker.run():
+        ret_code = harness.open_pipe(x)
+        # print(f"\nPiping to harness, res was {ret_code}\n")
+        if ret_code == -11:
+            print(f"{'':10}[+] CRASH? {ret_code}")
+            break
+
+    TEST_BINARY = f'{TEST_DIR}/xml3'
+    TEST_SAMPLE = f'{TEST_DIR}/codecs/xml3.txt'
+
+    harness = Harness.Harness(TEST_BINARY)
+    xml_worker = XML.XML(TEST_SAMPLE)
+
+    print(f"""
+        [>>] Running XML test against {TEST_BINARY.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
+    """)
+
+    for x in xml_worker.run():
+        print(f'[DEBUG] test mutation was:\n{x}')
+
+        ret_code = harness.open_pipe(x)
+        print(f"\nPiping to harness, res was {ret_code}\n")
+        if ret_code == -11:
+            print(f"{'':10}[+] CRASH? {ret_code}")
+            break
 
 
 def test_negate():
@@ -483,6 +520,7 @@ if (args.all_codec):
     test_json()
     test_plaintext()
     test_pdf()
+    test_xml()
     #test_jpeg()
 
 if (args.CSV): test_csv()

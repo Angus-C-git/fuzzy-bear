@@ -32,11 +32,15 @@ def nest_em(elem_obj,insert_text, count=0):
         nest_em(child, insert_text, count+1)
 
 
-def change_element(elem_obj, new_elm, elem_type):
+def change_attributes(elem_obj, new_elm, elem_type, append=False):
     for child in elem_obj.iter():
         if elem_type in child.attrib.keys():
             base_str = child.attrib[elem_type]
-            child.attrib[elem_type] = base_str + base_str + base_str + base_str + base_str + base_str + base_str + new_elm
+            if append:
+                child.attrib[elem_type] = base_str + base_str + base_str + base_str + base_str + base_str + base_str + new_elm
+            else:
+                child.attrib[elem_type] = new_elm
+
 
 def append_elem(elem_obj, elem_type):
     append_list = []
@@ -77,37 +81,39 @@ class XML(Strategy.Strategy):
     def run(self):
         # print(f"\n   [DEBUG] mutating {self.candidate_input} \n")        
 
-        mutation = copy.deepcopy(self.candidate_input)
-        emoji = next(super().emoji())
-        # removed loop here
-        nest_em(mutation, emoji)   
-        yield prettify(mutation)
+        # mutation = copy.deepcopy(self.candidate_input)
+        # emoji = next(super().emoji())
+        # # removed loop here
+        # nest_em(mutation, emoji)   
+        # yield prettify(mutation)
         
-        mutation = copy.deepcopy(self.candidate_input)
-        for chonk in super().chonk():
-            for e in target_elements:
-                change_element(mutation, chonk, e)
-            yield prettify(mutation)
+        # mutation = copy.deepcopy(self.candidate_input)
+        # for chonk in super().chonk():
+        #     for e in target_elements:
+        #         change_element(mutation, chonk, e)
+        #     yield prettify(mutation)
 
         
-        for e in target_tags:
+        for element in target_tags:
             mutation = copy.deepcopy(self.candidate_input)
-            append_elem(mutation,e)
+            append_elem(mutation, element)
             yield prettify(mutation)
 
-        mutation = spicy_file() 
-        # print(f"[>>] mutation was {mutation}")
-        yield mutation
+        # mutation = spicy_file() 
+        # # print(f"[>>] mutation was {mutation}")
+        # yield mutation
 
         # TODO :: make more reliable 
         for fstring in super().format_strings():
             mutation = copy.deepcopy(self.candidate_input)
-            for e in target_elements:
-                change_element(mutation, fstring, e)
-            
-            try:
+            for element in target_elements:
+                change_attributes(mutation, fstring, element, append=True)
+            yield prettify(mutation)
+
+        
+        for polyglot in super().polyglots():
+            mutation = copy.deepcopy(self.candidate_input)
+            for element in target_elements:
+                change_attributes(mutation, polyglot, element)
                 yield prettify(mutation)
-            except:
-                print("[>>] failed to yield")
-                pass
 

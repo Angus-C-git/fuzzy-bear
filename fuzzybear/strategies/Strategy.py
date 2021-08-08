@@ -102,9 +102,10 @@ class Strategy():
 		yield data + f'%{offset}$@'
 		yield data + f'%{offset}$hn'
 		yield data + f'%{offset}hhn'
-		yield data + f'\x00\x00\x00\x01%{offset}$n'
 		yield data + f'%99999$n'
 		yield data + f'%400$n'
+		for modifier in range(self.INSTRUCTION_SIZE):
+			yield data + f'%{2**modifier}$n'
 	
 
 	def system_words(self, data='', arg=''):
@@ -144,6 +145,16 @@ class Strategy():
 		yield data + """${{<%[%'"}}%\""""
 
 		yield data + """'/**/"# -- """
+
+		yield data + """{}:(){ | &;:[]"""
+
+		yield "' OR 1=1 -- v "
+		
+		yield "<script>document.cookie(1);</script>"
+		
+		yield "\"\""
+
+		yield "\n" * 100
 
 	
 	def rand_int_range(self, lower, upper):
