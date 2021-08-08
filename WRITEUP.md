@@ -31,19 +31,34 @@ Second only to the generators themselves is the harness. The harness is the comp
 
 ## Strategies
 
-### Common
+### Common / Base Strategies
 
 There exist a number of mutations which are agnostic to the file format being utilized for mutation or which can and should be used within format specific mutations. For this reason we implement a base class `Strategies` which is extended by all other strategies the fuzzer currently supports. This has several major benefits:
 
-    + It reduces code reuse 
-    + Makes extending the functionality of the fuzzer `trivial`
-      + Add new broad strategies with class methods to the base class
-      + Or add support for more file formats without losing the ability to utilise existing code
-    + It makes it easy to focus on writing format specific generators
+  + It reduces code reuse 
+  + Makes extending the functionality of the fuzzer `trivial`
+    + Add new broad strategies with class methods to the base class
+    + Or add support for more file formats without losing the ability to utilise existing code
+  + It makes it easy to focus on writing format specific generators
+
+We implement the following universal strategies:
+
++ Chonk / Overflow - generates increasingly large string patterns 
++ Negate - Turns an integer to its negative counterpart or appends a `-` symbol to the front of supplied data
++ Format Strings - Generates format string payloads, supports width modifier
++ System Words - Generates unix like system commands 
++ System Paths - Generates unix like system paths
++ Polyglots - Generates polyglots of various bad strings, web, sql, XXE, newlines
++ Random Integers - Various random integer generators
++ Max Constants - Generates type threshold values
++ XOR
++ Bitflip
++ Byteflip
+
 
 ### CSV
 
-CSV strategies focus on generating oddball data to place into *sensible* places within a CSV file. Currently this mainly revolves around loading the input file into memory and then mutating that data structures fields using tactics implemented in the base class. The CSV strategy also implements `add_entries` which focuses on creating a large valid csv structure with many rows/columns.
+CSV strategies focus on generating oddball data to place into *sensible* places within a CSV file. Currently this mainly revolves around loading the input file into memory and then mutating that data structures fields using tactics implemented in the base class. The CSV strategy also implements `add_entries` which focuses on creating a large valid csv structure with many rows/columns. Another key tactic that CSV implements is `negate` which makes the entries in the CSV negative.
 
 ### JSON
 
@@ -51,10 +66,11 @@ Similarly to the CSV based strategies the JSON generator attempts to create sane
 JSON mutator implements is the ability to select a random field to alter with another tactics data. The JSON generator also implements a function to add a large number of extra fields in the hopes of causing overflow based crashes to occur.
 
 ### XML
-The XML generator modifies valid XML files by appending elements, inserting sub elements and overwritting elements/attributes with data from the strategy generator. This generator also creates files that include other files such as dev/random with the intention of creating buffer overflows in the target program. 
+The XML generator modifies valid XML files by appending/altering attributes, inserting sub elements and overwriting elements/attributes with data from the strategy generator. This generator also creates files that include other files such as dev/random with the intention of creating buffer overflows in the target program. 
 
 ### PDF
-The PDF generator creates large pdf documents to test memory management of a PDF parser and invalid pdf documents, testing for memory corruption vulnerabilities where the length field doesnt match up with the stream object size. The PDF generator inserts stream objects with data from the strategy generator, which can include javascript to format string vunerabilities. The intention of the PDF generator is to test to the extremities of PDF parsers, creating documents which arent seen usually in the real world and thus are more likely to break parsers. 
+
+The PDF generator creates large pdf documents to test memory management of a PDF parser and invalid pdf documents, testing for memory corruption vulnerabilities where the length field doesn't match up with the stream object size. The PDF generator inserts stream objects with data from the strategy generator, which can include javascript to format string vulnerabilities. The intention of the PDF generator is to test to the extremities of PDF parsers, creating documents which aren't seen usually in the real world and thus are more likely to break parsers. 
 
 ## Aggregator
 
