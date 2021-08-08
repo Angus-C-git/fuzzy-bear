@@ -9,75 +9,59 @@ import random
 from .. import Strategy
 import copy
 
+#config
+PREPEND = 0
+
+# helpers
+
+def pack_txt(data):
+	""" pack csv list into string """
+	return "".join(data)
 
 
-class TextFile():
-    def __init__(self, contents):
-        self.contents = contents
-        self.lines = []
-        self.recentMutations = [] # <-- for fuzzing guided by run time introspection
-        for line in self.contents:
-            self.lines.append(line)
-        self.mutations = []
-    
-    def append(self, line):
-        self.lines.append(str(line))
+def pack_stream(bytes):
+	""" pack csv list into string """
+	return "".join(map(chr, bytes))
 
-    def insert(self, pos, line):
-        self.lines.insert(pos, line)
-    
-    def prepend(self, line):
-        self.insert(line, 0)
 
-    def mutateLine(self, lineNum, newLine):
-        # Should have some cooler shit here.
-        self.lines[lineNum] = newLine
-    
-    def doubleLineLength(self, lineNum):
-        self.lines[lineNum] *= 2
+def values():
+    v = 1
+    for i in range(8):
+        yield v
+        v <<= 1
+    # if the value is beyond 8 yield 0xff
+    yield 0xFF
 
-    def extendLine(self, lineNum, length):
-        pass
 
-    def addControlCharacters(self, lineNum, num=3):
-        for i in range(num):
-            randomChar = chr(random.randint(0, 0x20))
-            randomPlace = random.randint(0, len(self.lines)-1)
-            self.lines[lineNum] = self.lines[lineNum][:randomPlace] + randomChar + self.lines[lineNum][randomPlace:]
+def xor_bytes(bytes, index, value):
+    prev_byte = bytes[index]
+    bytes[index] ^= value
+    yield pack_stream(bytes)
+    bytes[index] = prev_byte
 
-    def injectWhiteSpace(self):
-        lineNum = random.randrange(0, len(self.lines))
-        if len(self.lines[lineNum]) == 0: 
-            return
-        posNum  = random.randrange(0, len(self.lines[lineNum]))
-        self.lines[lineNum] = self.lines[lineNum][:posNum] + ' '*lineNum + self.lines[lineNum][posNum:]
-        
 
-    def injectBlankLines(self):
-        lineNum = random.randrange(0, len(self.lines))
-        self.lines.insert(lineNum, '\n\n\r\n   \n\n  \n\r')
-        self.lines.insert(lineNum, '')
+def add_control_chars(lines, lineNum, num=10):
+    for i in range(num):
+        randomChar = chr(random.randint(0, 0x20))
+        randomPlace = random.randint(0, len(lines)-1)
+        lines[lineNum] = lines[lineNum][:randomPlace] + randomChar + lines[lineNum][randomPlace:]    
+    return lines
 
-    def bitFlip(self, s):
-        pass 
 
-    def remove(self, pos):
-        # Might want to return an error code.
-        self.lines.remove(self.lines[pos])
+def inject_white_space(lines):
+    lineNum = random.randrange(0, len(lines))
+    if not len(lines[lineNum]): return
+    posNum  = random.randrange(0, len(lines[lineNum]))
+    lines[lineNum] = lines[lineNum][:posNum] + ' '*lineNum + lines[lineNum][posNum:]
+    return lines
 
-    def removeSpecificLine(self, line):
-        # Might want to return an error code.
-        self.lines.remove(line) 
-    
-    def updateRecentMutation(self, mutation):
-        # some sort of logging logic
-        pass
 
-    def __str__(self):
-        ret = ""
-        for l in self.lines:
-            ret += l
-        return ret
+def inject_blank_lines(lines):
+    lineNum = random.randrange(0, len(lines))
+    lines.insert(lineNum, '\n\n\r\n   \n\n  \n\r')
+    lines.insert(lineNum, '')
+    return lines
+
 
 
 class TXT(Strategy.Strategy):
@@ -86,53 +70,124 @@ class TXT(Strategy.Strategy):
         super()
         try:
             with open(sample_input) as f:
-                self.textfile = TextFile(f.readlines())
+                self.candidate_input = f.readlines()
         except FileNotFoundError as err:
             # propper error logic goes here.
             print(f' [>>] File not found, {err}')
             exit(0)
 
-
     def run(self):
-        randCounter = random.randrange(0, 10)
-        mutation = copy.deepcopy(self.textfile)
-        mutation.append(next(self.string('overflow')))
-        yield str(mutation)
+        """ run TXT generator """
+        mutation = copy.deepcopy(self.candidate_input)
+        for chonk in super().chonk():
+            mutation.append(chonk)
+            yield pack_txt(mutation)
 
-
-        randNum = random.randrange(0, len(self.textfile.lines))
-        mutation = copy.deepcopy(self.textfile)
-        mutation.mutateLine(randNum, next(self.string('badchars', 200)))
-        yield str(mutation)
+        # append format strings to input
+        for fmtstring in super().format_strings():
+            mutation = copy.deepcopy(self.candidate_input)
+            mutation.append(fmtstring) 
+            yield pack_txt(mutation)
         
-        mutation = copy.deepcopy(self.textfile)
-        if randCounter == 7:
-            randNum = random.randrange(0, len(self.textfile.lines))
-            mutation.doubleLineLength(randNum)
-            yield str(mutation)
+        mutation = copy.deepcopy(self.candidate_input)
+        # double line length
+        for line in range(len(mutation)):
+            mutation[line] *= 2
+            yield pack_txt(mutation)
 
-        mutation = copy.deepcopy(self.textfile)
-        for i in range(5):
-            randNum = random.randrange(0, len(self.textfile.lines))
-            mutation.addControlCharacters(randNum, 10)
-        yield str(mutation)
+        mutation = copy.deepcopy(self.candidate_input)
+        # add control characters
+        for line in range(len(mutation)):
+            mutation = add_control_chars(mutation, line)
+            yield pack_txt(mutation)
 
-        mutation = copy.deepcopy(self.textfile)
-        mutation.append(next(self.string('fuzz', 1000)))
-        yield str(self.textfile)
+        mutation = copy.deepcopy(self.candidate_input)
+        # inject blank lines
+        for line in range(len(mutation)):
+            mutation = inject_blank_lines(mutation)
+            yield pack_txt(mutation)
+        
+        mutation = copy.deepcopy(self.candidate_input)
+        # inject white space
+        for line in range(len(mutation)):
+            mutation = inject_white_space(mutation)
+            yield pack_txt(mutation)
+        
+        # append system words to candidate input
+        for sysword in super().system_words(): 
+            mutation = copy.deepcopy(self.candidate_input)
+            mutation.append(sysword)
+            yield pack_txt(mutation)
 
-        mutation = copy.deepcopy(self.textfile)
-        if randCounter == 2:
-            mutation.injectWhiteSpace()
-            yield str(mutation)
+        # xor parts of input file
+        mutation = copy.deepcopy(self.candidate_input)
+        for line in range(len(mutation)):
+            mutation.append(super().xor_data(mutation[line]))
+            yield pack_txt(mutation)
+        
+        mutation = copy.deepcopy(self.candidate_input)
+        for line in range(len(mutation)):
+            # append on newline
+            mutation[line] = (super().xor_data(mutation[line]) + '\n')
+            yield pack_txt(mutation)
+            mutation = copy.deepcopy(self.candidate_input)
 
-        if randCounter == 9:
-            mutation.injectBlankLines()
-            yield str(mutation)
+        mutation = copy.deepcopy(self.candidate_input)
+        for line in range(len(mutation)):
+            # prepend
+            mutation.insert(PREPEND, super().xor_data(mutation[line]))
+            yield pack_txt(mutation)
 
+        stream = list(pack_txt(copy.deepcopy(self.candidate_input)).encode())
+        for line in range(len(stream)):
+            # byte by byte
+            for value in values():
+                for mutation in xor_bytes(stream, line, value):
+                    yield mutation
+                
+        # append polyglots
+        for polyglot in super().polyglots():
+            mutation = copy.deepcopy(self.candidate_input)
+            mutation.append(polyglot)
+            yield pack_txt(mutation)
+
+        for polyglot in super().polyglots():
+            mutation = copy.deepcopy(self.candidate_input)
+            for line in range(len(mutation)):
+                # append on newline
+                mutation[line] = polyglot + '\n'
+                yield pack_txt(mutation)
+        
+        for polyglot in super().polyglots():
+            mutation = copy.deepcopy(self.candidate_input)
+            mutation.insert(PREPEND, polyglot)
+            yield pack_txt(mutation)
+
+        # append max constants
+        for negative in super().max_constants():
+            mutation = copy.deepcopy(self.candidate_input)
+            for line in range(len(mutation)):
+                mutation = copy.deepcopy(self.candidate_input)
+                mutation[line] = negative + '\n'
+                yield pack_txt(mutation)
+
+        # append large negatives
+        for negative in super().large_negatives():
+            mutation = copy.deepcopy(self.candidate_input)
+            for line in range(len(mutation)):
+                mutation = copy.deepcopy(self.candidate_input)
+                mutation[line] = negative + '\n'
+                yield pack_txt(mutation)
+
+        # append large positives
+        for big_int in super().large_positives():
+            mutation = copy.deepcopy(self.candidate_input)
+            for line in range(len(mutation)):
+                mutation = copy.deepcopy(self.candidate_input)
+                mutation[line] = big_int + '\n'
+                yield pack_txt(mutation)
 
 
 '''devnotes
-- I basically just do random shit in the run method. Will definitely need to be more heuristic
-in order to find more obscure bugs.
+- Mostly tries random strategies or systematically mutates each line
 '''

@@ -118,6 +118,22 @@ class JSON(Strategy.Strategy):
                 mutation[field_value] = polyglot
                 yield json.dumps(mutation)
 
+        # replace random fields with max constants
+        for field in range(ITERATION_MAX):
+            mutation = copy.deepcopy(self.candidate_input)
+            rand_field = get_rand_field(mutation)
+            for constant in super().max_constants():
+                field_value = rand_field[0] if (type(rand_field) is not list) else rand_field[1][0]
+                mutation[field_value] = constant
+                yield json.dumps(mutation)
+
+        # replace random fields with byte flips
+        for field in range(ITERATION_MAX):
+            mutation = copy.deepcopy(self.candidate_input)
+            rand_field = get_rand_field(mutation)
+            field_value = rand_field[0] if (type(rand_field) is not list) else rand_field[1][0]
+            mutation[field_value] = super().byte_flip(field_value)
+            yield json.dumps(mutation)
 
 
 """devnotes

@@ -54,7 +54,7 @@ class Aggregator():
 		
 			for input in inputs:
 				# print(f"	 [DEBUG] mutation was {input}")
-				response_code = self.harness.open_pipe(input)
+				response_code = self.harness.open_pipe(input, self.codec)
 				# print(f"\n   [DEBUG] Aggregator received {response_codes.lookup(response_code)} from binary")
 				if (response_code): 
 					write_crash(input)
