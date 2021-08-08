@@ -33,9 +33,9 @@ Second only to the generators themselves is the harness. The harness is the comp
 
 The fuzzer includes functionallity to parse a binary and extract static paths, similarly to the disassembler BinaryNinja. We use the capstone library in order to disassemble the bytes of the 
 binary into instructions. The instructions are then parsed in 2 ways:
-1. By looking for jump instructions. The analysis tools keep track of the most recent point in the binary it began searching from (startPoint), and when an unseen jump instruction is found, it stores a 'jump block' which is denoted by startPoint and the address of the instructin that contains the jump. 
+1. By looking for jump instructions. The analysis tools keep track of the most recent point in the binary it began searching from (startPoint), and when an unseen jump instruction is found, it stores a 'jump block' which is denoted by startPoint and the address of the instruction that contains the jump. 
 This is done recursively untill all jump blocks in the binary are found. From this we are able to build a data structure that represents all blocks in the code that end in a jump.
-2. By looking for function calls. When the analysis tool finds a call instruction it stores both the address of the call instruction and the address of the function being called. Into a data structure.
+2. By looking for function calls. When the analysis tool finds a call instruction it stores both the address of the call instruction and the address of the function being called, into a data structure.
 Once both of these data structures are built. 
 
 We use pwntools in order to resolve the function names in the function call data structure. We also contextualise each jump block and denote in which function that jump block resides. 
