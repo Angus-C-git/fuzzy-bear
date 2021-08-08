@@ -277,13 +277,34 @@ def test_jpeg():
     harness = Harness.Harness(TEST_BINARY)
     jpeg_worker = JPEG.JPEG(TEST_SAMPLE)
 
-    for x in range(10):
+    data = [0,0,0]
+    for x in range(100):
         for x in jpeg_worker.run():
-            ret_code = harness.open_pipe(x)
-            # print(f"\nPiping to harness, res was {ret_code}\n")
-            if ret_code == -11:
-                print(f"{'':10}[+] CRASH? {ret_code}")
-                break
+
+            # @ here would mark the place the 
+            # aggregator feeds harness
+            #print(f'[DEBUG] test mutation was {x}')
+            exitcode = harness.open_pipe(x, codec='jpeg')
+            
+            if (exitcode == 0):
+                #print("Success")
+                data[0] += 1
+            elif (exitcode == 1):
+                data[1] += 1
+            else:
+                data[2] += 1
+                print(f'ERROR!!!! OUTCOME {exitcode}')
+
+            
+            #print(f"\nPiping to harness, res was {harness.open_pipe(x, codec='jpeg')}\n")
+    print(exitcode)
+    print(f'\nNoramal exit: {data[0]}\nError input: {data[1]}\nSegfault: {data[2]}')
+
+#             ret_code = harness.open_pipe(x)
+#             # print(f"\nPiping to harness, res was {ret_code}\n")
+#             if ret_code == -11:
+#                 print(f"{'':10}[+] CRASH? {ret_code}")
+#                 break
         
 
 def test_pdf():
@@ -370,7 +391,7 @@ def test_xml():
             print(f"{'':10}[+] CRASH? {ret_code}")
             break
 
-
+            
 def test_negate():
 
     from fuzzybear.strategies import Strategy
