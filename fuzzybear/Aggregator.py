@@ -18,13 +18,17 @@ from colorama import Fore, Style
 
 '''
 
-def write_crash(crashing_input):
+def write_crash(crashing_input, codec):
 	print(Fore.RED + f'\n\n   [>>] CRASH DETECTED, dropping bad.txt')
 	print(Style.RESET_ALL)
 
-	with open('./bad.txt', 'w') as crash:
-		crash.write(crashing_input)
-
+	if codec == 'jpeg' or codec == 'pdf':
+		with open('./bad.txt', 'wb') as crash:
+			crash.write(crashing_input)
+	else:
+		with open('./bad.txt', 'w') as crash:
+			crash.write(crashing_input)
+	
 
 class Aggregator():
 	def __init__(self, binary, input_file):
@@ -57,6 +61,6 @@ class Aggregator():
 				response_code = self.harness.open_pipe(input)
 				# print(f"\n   [DEBUG] Aggregator received {response_codes.lookup(response_code)} from binary")
 				if (response_code == -11): 
-					write_crash(input)
+					write_crash(input, self.codec)
 					exit(0)				# exit on crash ? 
 
