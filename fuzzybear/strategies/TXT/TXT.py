@@ -9,9 +9,10 @@ import random
 from .. import Strategy
 import copy
 
-
+#config
 PREPEND = 0
 
+# helpers
 
 def pack_txt(data):
 	""" pack csv list into string """
@@ -161,6 +162,30 @@ class TXT(Strategy.Strategy):
             mutation = copy.deepcopy(self.candidate_input)
             mutation.insert(PREPEND, polyglot)
             yield pack_txt(mutation)
+
+        # append max constants
+        for negative in super().max_constants():
+            mutation = copy.deepcopy(self.candidate_input)
+            for line in range(len(mutation)):
+                mutation = copy.deepcopy(self.candidate_input)
+                mutation[line] = negative + '\n'
+                yield pack_txt(mutation)
+
+        # append large negatives
+        for negative in super().large_negatives():
+            mutation = copy.deepcopy(self.candidate_input)
+            for line in range(len(mutation)):
+                mutation = copy.deepcopy(self.candidate_input)
+                mutation[line] = negative + '\n'
+                yield pack_txt(mutation)
+
+        # append large positives
+        for big_int in super().large_positives():
+            mutation = copy.deepcopy(self.candidate_input)
+            for line in range(len(mutation)):
+                mutation = copy.deepcopy(self.candidate_input)
+                mutation[line] = big_int + '\n'
+                yield pack_txt(mutation)
 
 
 '''devnotes

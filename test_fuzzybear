@@ -92,8 +92,8 @@ def test_harness():
 # test csv1
 def test_csv():
     TEST_DIR = './tests/complete'
-    TEST_BINARY = f'{TEST_DIR}/csv2'
-    TEST_SAMPLE = f'{TEST_DIR}/codecs/csv2.txt'
+    TEST_BINARY = f'{TEST_DIR}/csv1'
+    TEST_SAMPLE = f'{TEST_DIR}/codecs/csv1.txt'
 
     print(f"""
         [>>] Running CSV test against {TEST_BINARY.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
@@ -109,11 +109,29 @@ def test_csv():
         # @ here would mark the place the 
         # aggregator feeds harness
         # print(f'[DEBUG] test mutation was\n{x}')
-        res = harness.open_pipe(x)
-        print(f"\nPiping to harness, res was {res}\n")
-        if res != 0:
-            print(f'[+] CRASH? {res}')
-            return
+        ret_code = harness.open_pipe(x)
+        # print(f"\nPiping to harness, res was {ret_code}\n")
+        if ret_code == -11:
+            print(f"{'':10}[+] CRASH? {ret_code}")
+            break
+
+    TEST_BINARY = f'{TEST_DIR}/csv2'
+    TEST_SAMPLE = f'{TEST_DIR}/codecs/csv2.txt'
+
+    print(f"""
+        [>>] Running CSV test against {TEST_BINARY.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
+    """)
+
+    for x in csv_worker.run():
+        
+        # @ here would mark the place the 
+        # aggregator feeds harness
+        # print(f'[DEBUG] test mutation was\n{x}')
+        ret_code = harness.open_pipe(x)
+        # print(f"\nPiping to harness, res was {ret_code}\n")
+        if ret_code == -11:
+            print(f"{'':10}[+] CRASH? {ret_code}")
+            break
 
 
 # test json1
@@ -132,20 +150,32 @@ def test_json():
     # for x in range(10):
     for x in json_worker.run():
         # print(f'[DEBUG] test mutation was {x}')
-        # @ here would mark the place the 
-        # aggregator feeds harness
-        res = harness.open_pipe(x)
-        print(f"\nPiping to harness, res was {res}\n")
-        if res != 0:
-            print(f'[+] CRASH? {res}')
-            return
+        ret_code = harness.open_pipe(x)
+        # print(f"\nPiping to harness, res was {ret_code}\n")
+        if ret_code == -11:
+            print(f"{'':10}[+] CRASH? {ret_code}")
+            break
+
+    TEST_BINARY = f'{TEST_DIR}/json2'
+    TEST_SAMPLE = f'{TEST_DIR}/codecs/json2.txt'
+
+    print(f"""
+        [>>] Running JSON test against {TEST_BINARY.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
+    """)
+
+    for x in json_worker.run():
+        ret_code = harness.open_pipe(x)
+        # print(f"\nPiping to harness, res was {ret_code}\n")
+        if ret_code == -11:
+            print(f"{'':10}[+] CRASH? {ret_code}")
+            break
 
 
 # test plaintext
 def test_plaintext():
     TEST_DIR = './tests/complete'
-    TEST_BINARY = f'{TEST_DIR}/plaintext3'
-    TEST_SAMPLE = f'{TEST_DIR}/codecs/plaintext3.txt'
+    TEST_BINARY = f'{TEST_DIR}/plaintext1'
+    TEST_SAMPLE = f'{TEST_DIR}/codecs/plaintext1.txt'
 
     print(f"""
         [>>] Running TXT test against {TEST_BINARY.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
@@ -155,14 +185,52 @@ def test_plaintext():
     txt_worker = TXT.TXT(TEST_SAMPLE)
     for u in txt_worker.run():
         try:
-            print(f'[DEBUG] test mutation was:\n{u}')
-            retCode = harness.open_pipe(u)
-            print(f"\n  Piping to harness, res was {retCode}\n")
-            if retCode == -11:
-                print(f'[+] CRASH? {retCode}')
-                return
+            # print(f'[DEBUG] test mutation was:\n{u}')
+            ret_code = harness.open_pipe(u)
+            # print(f"\n  Piping to harness, res was {ret_code}\n")
+            if ret_code == -11:
+                print(f"{'':10}[+] CRASH? {ret_code}")
+                break
         except:
-            print('Either the generators are empty, or I fucked up')
+            print('[>>] Failed to run worker, is generator empty?')
+            break
+
+    TEST_BINARY = f'{TEST_DIR}/plaintext2'
+    TEST_SAMPLE = f'{TEST_DIR}/codecs/plaintext2.txt'
+
+    print(f"""
+        [>>] Running TXT test against {TEST_BINARY.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
+    """)
+
+    for u in txt_worker.run():
+        try:
+            # print(f'[DEBUG] test mutation was:\n{u}')
+            ret_code = harness.open_pipe(u)
+            # print(f"\n  Piping to harness, res was {retCode}\n")
+            if ret_code == -11:
+                print(f"{'':10}[+] CRASH? {ret_code}")
+                break
+        except:
+            print('[>>] Failed to run worker, is generator empty?')
+            break
+
+    TEST_BINARY = f'{TEST_DIR}/plaintext3'
+    TEST_SAMPLE = f'{TEST_DIR}/codecs/plaintext3.txt'
+
+    print(f"""
+        [>>] Running TXT test against {TEST_BINARY.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
+    """)
+
+    for u in txt_worker.run():
+        try:
+            # print(f'[DEBUG] test mutation was:\n{u}')
+            ret_code = harness.open_pipe(u)
+            # print(f"\n  Piping to harness, res was {retCode}\n")
+            if ret_code == -11:
+                print(f"{'':10}[+] CRASH? {ret_code}")
+                break
+        except:
+            print('[>>] Failed to run worker, is generator empty?')
             break
 
 
@@ -180,10 +248,18 @@ def test_jpeg():
 
     for x in range(10):
         for x in jpeg_worker.run():
-            # @ here would mark the place the 
-            # aggregator feeds harness
-            print(f'[DEBUG] test mutation was {x}')
-            print(f"\nPiping to harness, res was {harness.open_pipe(x)}\n")
+            ret_code = harness.open_pipe(x)
+            # print(f"\nPiping to harness, res was {ret_code}\n")
+            if ret_code == -11:
+                print(f"{'':10}[+] CRASH? {ret_code}")
+                break
+        
+
+def test_pdf():
+    pdf = PDF.PDF('yeet')
+    for i in pdf.run():
+        # print(i)
+        continue
 
 
 def test_negate():
@@ -269,10 +345,7 @@ def test_byte_flips():
         res = strategy_driver.byte_flip(x)
         print(f'Byte flipped {x} to {res}')
 
-def test_pdf():
-    pdf = PDF.PDF('yeet')
-    for i in pdf.run():
-        print(i)
+
 
 ###########################################################################
 
@@ -295,13 +368,11 @@ parser.add_argument('-H', '--harness',
                     help = 'test harness'
                     )
 
-
 parser.add_argument('-BF', '--bit-flips',
                     dest = 'bitflips',
                     action='store_true',
                     help = 'test bit flips strategy'
                     )
-
 
 parser.add_argument('-NEGATE', '--negate-test',
                     dest = 'NEGATE',
@@ -309,38 +380,42 @@ parser.add_argument('-NEGATE', '--negate-test',
                     help = 'test the negation strategy'
                     )
 
-
 parser.add_argument('-BYTEFLIP', '--byte-flips',
                     dest = 'byteflips',
                     action='store_true',
                     help = 'test bit flips strategy'
                     )
 
-
 parser.add_argument('-XOR', '--xor-chars',
                     dest = 'xor',
                     action='store_true',
-                    help = 'what is your test'
+                    help = 'Test XOR'
                     )
 
+# :::::::::::::::::::::: [Codec Tests] :::::::::::::::::::::::::::
+
+parser.add_argument('-AC', '--all-codecs',
+                    dest = 'all_codec',
+                    action='store_true',
+                    help = 'Test all the supported generators'
+                    )
 
 parser.add_argument('-CSV', '--CSV-codec',
                     dest = 'CSV',
                     action='store_true',
-                    help = 'test the csv codec binaries'
+                    help = 'Test the csv codec binaries'
                     )
-
 
 parser.add_argument('-JSON', '--JSON-codec',
                     dest = 'JSON',
                     action='store_true',
-                    help = 'test the json codec binaries'
+                    help = 'Test the json codec binaries'
                     )
 
 parser.add_argument('-JPEG', '--JPEG-codec',
                     dest = 'JPEG',
                     action='store_true',
-                    help = 'test the jpeg codec binaries'
+                    help = 'Test the jpeg codec binaries'
                     )
 
 parser.add_argument('-TXT', '--TXT-test',
@@ -375,6 +450,15 @@ if (args.bitflips): test_bit_flips()
 if (args.byteflips): test_byte_flips()
 
 if (args.xor): test_xor_data()
+
+# codec tests 
+
+if (args.all_codec):
+    test_csv()
+    test_json()
+    test_plaintext()
+    test_pdf()
+    #test_jpeg()
 
 if (args.CSV): test_csv()
 
