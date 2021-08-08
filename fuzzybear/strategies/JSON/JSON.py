@@ -136,6 +136,7 @@ class JSON(Strategy.Strategy):
             yield json.dumps(mutation)
 
 
+
 """devnotes
 
 -> Some of the code above is truly fucking magical

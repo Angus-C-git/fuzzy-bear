@@ -36,19 +36,6 @@ def write_crash(crashing_input):
 	exit(0)
 
 
-def run_dash(inputs, events, strategy_progress, overall_progress, overall_tasks):
-	with Live(init_layout(events, strategy_progress, overall_progress), refresh_per_second=10, screen=True):
-		while not overall_progress.finished:
-			sleep(0.1)
-
-			for input in inputs:
-				for job in strategy_progress.tasks:
-					if not job.finished:
-						strategy_progress.advance(job.id)
-
-				completed = sum(task.completed for task in strategy_progress.tasks)
-				overall_progress.update(overall_tasks, completed=completed)
-
 
 class Aggregator():
 	def __init__(self, binary, input_file):
@@ -90,15 +77,17 @@ class Aggregator():
 				for input in inputs:
 					response_code = self.harness.open_pipe(input)
 
-					if not jobs[current_job].finished:
-						DashboardUI.strategy_progress.advance(jobs[current_job].id)
-					else:
-						current_job += 1
-						if current_job > len(jobs):
-							current_job = 0
+					if current_job <= len(jobs):
+							# current_job = 0
+						if not jobs[current_job].finished:
+							DashboardUI.strategy_progress.advance(jobs[current_job].id)
+						else:
+							current_job += 1
+						
 				
-					completed = sum(task.completed for task in DashboardUI.strategy_progress.tasks)
-					DashboardUI.overall_progress.update(DashboardUI.overall_tasks, completed=completed)
+						completed = sum(task.completed for task in DashboardUI.strategy_progress.tasks)
+						DashboardUI.overall_progress.update(DashboardUI.overall_tasks, completed=completed)
 
+					# sleep(0.2)
 					if (response_code == -11):
 						write_crash(input)

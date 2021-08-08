@@ -232,7 +232,7 @@ def test_plaintext():
 
     for u in txt_worker.run():
         try:
-            # print(f'[DEBUG] test mutation was:\n{u}')
+            print(f'[DEBUG] test mutation was:\n{u}')
             ret_code = harness.open_pipe(u)
             # print(f"\n  Piping to harness, res was {retCode}\n")
             if ret_code == -11:
@@ -242,27 +242,27 @@ def test_plaintext():
             print('[>>] Failed to run worker, is generator empty?')
             break
 
-    TEST_BINARY = f'{TEST_DIR}/plaintext3'
-    TEST_SAMPLE = f'{TEST_DIR}/codecs/plaintext3.txt'
+    # TEST_BINARY = f'{TEST_DIR}/plaintext3'
+    # TEST_SAMPLE = f'{TEST_DIR}/codecs/plaintext3.txt'
 
-    harness = Harness.Harness(TEST_BINARY)
-    txt_worker = TXT.TXT(TEST_SAMPLE)
+    # harness = Harness.Harness(TEST_BINARY)
+    # txt_worker = TXT.TXT(TEST_SAMPLE)
 
-    print(f"""
-        [>>] Running TXT test against {TEST_BINARY.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
-    """)
+    # print(f"""
+    #     [>>] Running TXT test against {TEST_BINARY.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
+    # """)
 
-    for u in txt_worker.run():
-        try:
-            # print(f'[DEBUG] test mutation was:\n{u}')
-            ret_code = harness.open_pipe(u)
-            # print(f"\n  Piping to harness, res was {retCode}\n")
-            if ret_code == -11:
-                print(f"{'':10}[+] CRASH? {ret_code}")
-                break
-        except:
-            print('[>>] Failed to run worker, is generator empty?')
-            break
+    # for u in txt_worker.run():
+    #     try:
+    #         # print(f'[DEBUG] test mutation was:\n{u}')
+    #         ret_code = harness.open_pipe(u)
+    #         # print(f"\n  Piping to harness, res was {retCode}\n")
+    #         if ret_code == -11:
+    #             print(f"{'':10}[+] CRASH? {ret_code}")
+    #             break
+    #     except:
+    #         print('[>>] Failed to run worker, is generator empty?')
+    #         break
 
 
 def test_jpeg():

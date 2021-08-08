@@ -35,7 +35,9 @@ class Strategy():
 		'system_words': 9,
 		'system_paths': 7,
 		'polyglots': 10,
-		'constants': 10
+		'constants': 10,
+		'large_negatives': INSTRUCTION_SIZE,
+		'large_positives': INSTRUCTION_SIZE
 	}
 
 
