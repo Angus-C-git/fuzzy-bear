@@ -31,7 +31,7 @@ class Aggregator():
 		print(f"   [>>] Running fuzzer against <{binary.split('/')[-1]}> mutating <{input_file.split('/')[-1]}>")
 		self.harness = Harness(binary)
 		self.codec = codec.detect(input_file)
-		# print(f'   [DEBUG] {self.codec}')
+		print(f'   [DEBUG] {self.codec}')
 		self.base_file = input_file
 
 	# TODO :: Should internals be exported
@@ -55,7 +55,7 @@ class Aggregator():
 		
 			for input in inputs:
 				# print(f"	 [DEBUG] mutation was {input}")
-				response_code = self.harness.open_pipe(input, self.codec)
+				response_code = self.harness.open_pipe(input)
 				# print(f"\n   [DEBUG] Aggregator received {response_codes.lookup(response_code)} from binary")
 				if (response_code): 
 					write_crash(input)

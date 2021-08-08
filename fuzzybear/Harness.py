@@ -46,7 +46,7 @@ class Harness():
 			"""" ptrace operations would theoretically begin here """
 			# continue_exc(pipe.pid)
 
-			if self.codec == 'jpeg':
+			if self.codec == "jpeg":
 				# send raw bytes
 				pipe.communicate(data)
 			else:
