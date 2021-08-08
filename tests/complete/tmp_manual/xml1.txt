@@ -1,0 +1,43 @@
+<html>
+  
+    
+  <head>
+    
+        
+    <link href="http://somewebsite.comhttp://somewebsite.comhttp://somewebsite.comhttp://somewebsite.comhttp://somewebsite.comhttp://somewebsite.comhttp://somewebsite.com%400$n"/>
+    
+    
+  </head>
+  
+    
+  <body>
+    
+        
+    <h1>I'm not a web developer.</h1>
+    
+    
+  </body>
+  
+
+    
+  <div id="#lol#lol#lol#lol#lol#lol#lol%400$n">
+    
+        
+    <a href="http://google.comhttp://google.comhttp://google.comhttp://google.comhttp://google.comhttp://google.comhttp://google.com%400$n">Here is some link...</a>
+    
+    
+  </div>
+  
+
+
+    
+  <tail>
+    
+        
+    <a href="http://bing.comhttp://bing.comhttp://bing.comhttp://bing.comhttp://bing.comhttp://bing.comhttp://bing.com%400$n">Footer link</a>
+    
+    
+  </tail>
+  
+
+</html>

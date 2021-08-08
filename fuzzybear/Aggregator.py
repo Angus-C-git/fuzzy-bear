@@ -1,4 +1,5 @@
 from .Harness import Harness
+from .HarnessV2 import HarnessV2
 from .utility import response_codes
 from .utility import codec
 from .strategies import get_generator
@@ -54,7 +55,7 @@ class Aggregator():
 		
 			for input in inputs:
 				# print(f"	 [DEBUG] mutation was {input}")
-				response_code = self.harness.open_pipe(input)
+				response_code = self.harness.open_pipe(input, self.codec)
 				# print(f"\n   [DEBUG] Aggregator received {response_codes.lookup(response_code)} from binary")
 				if (response_code): 
 					write_crash(input)

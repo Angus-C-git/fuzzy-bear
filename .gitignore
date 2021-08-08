@@ -18,3 +18,7 @@ releases/
 .gdb_history
 
 bad.txt
+
+binaries
+
+nohup.out
