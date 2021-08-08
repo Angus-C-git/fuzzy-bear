@@ -17,6 +17,7 @@ import sys
 # from colorama import Fore, Style
 
 from fuzzybear import Harness
+from fuzzybear import HarnessV2
 import argparse
 from pathlib import Path
 
@@ -88,6 +89,31 @@ def test_harness():
             print(f'''
                     [+] Response from {binary.name} was {res}
             ''')
+
+
+def test_coverage():
+    TEST_DIR = './tests/components/coverage'
+    TEST_BINARY = f'{TEST_DIR}/simple'
+    TEST_SAMPLE = f'{TEST_DIR}/codecs/simple.txt'
+
+    print(f"""
+        [>>] Running coverage test against {TEST_BINARY.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
+    """)
+
+    harness = HarnessV2.HarnessV2(TEST_BINARY)
+    txt_worker = TXT.TXT(TEST_SAMPLE)
+    for u in txt_worker.run():
+        # try:
+            # print(f'[DEBUG] test mutation was:\n{u}')
+        retCode = harness.open_pipe(u)
+        # print(f"\n  Piping to harness, res was {retCode}\n")
+        if retCode == -11:
+            print(f'[+] CRASH? {retCode}')
+            return
+        # except:
+        #     print('Either the generators are empty, or I fucked up')
+        #     break    
+
 
 # test csv1
 def test_csv():
@@ -315,7 +341,7 @@ def test_xml():
     """)
 
     for x in xml_worker.run():
-        print(f'[DEBUG] test mutation was:\n{x}')
+        # print(f'[DEBUG] test mutation was:\n{x}')
 
         ret_code = harness.open_pipe(x)
         print(f"\nPiping to harness, res was {ret_code}\n")
@@ -424,6 +450,12 @@ parser.add_argument('-P', '--your-test',
                     )
 '''
 
+parser.add_argument('-CT', '--coverage-tracking',
+                    dest = 'coverage',
+                    action='store_true',
+                    help = 'test coverage tracking'
+                    )
+
 parser.add_argument('-H', '--harness',
                     dest = 'harness',
                     action='store_true',
@@ -462,28 +494,34 @@ parser.add_argument('-AC', '--all-codecs',
                     help = 'Test all the supported generators'
                     )
 
+parser.add_argument('-TXT', '--TXT-codec',
+                    dest = 'TXT',
+                    action='store_true',
+                    help = 'Test plaintext codec binaries'
+                    )
+
 parser.add_argument('-CSV', '--CSV-codec',
                     dest = 'CSV',
                     action='store_true',
-                    help = 'Test the csv codec binaries'
+                    help = 'Test csv codec binaries'
                     )
 
 parser.add_argument('-JSON', '--JSON-codec',
                     dest = 'JSON',
                     action='store_true',
-                    help = 'Test the json codec binaries'
+                    help = 'Test json codec binaries'
                     )
 
 parser.add_argument('-JPEG', '--JPEG-codec',
                     dest = 'JPEG',
                     action='store_true',
-                    help = 'Test the jpeg codec binaries'
+                    help = 'Test jpeg codec binaries'
                     )
 
 parser.add_argument('-XML', '--XML-codec',
                     dest = 'XML',
                     action='store_true',
-                    help = 'test the xml codec binaries'
+                    help = 'Test xml codec binaries'
                     )
 
 parser.add_argument('-PDF', '--PDF-test',
@@ -533,6 +571,8 @@ if (args.NEGATE): test_negate()
 
 if (args.JPEG): test_jpeg()
 
+if (args.TXT): test_plaintext()
 
 if (args.PDF): test_pdf()
 
+if (args.coverage): test_coverage()
