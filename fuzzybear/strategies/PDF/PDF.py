@@ -331,8 +331,7 @@ def create_invalid(input, overflow_len):
     pdf_document += create_trailer(1, obj_num, 2, length_to_xref, None)
     return pdf_document
     
-
-
+    
 class PDF(Strategy.Strategy):
     # parse ___ input data
     def __init__(self, sample_input):

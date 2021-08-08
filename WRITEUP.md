@@ -53,6 +53,9 @@ JSON mutator implements is the ability to select a random field to alter with an
 ### XML
 The XML generator modifies valid XML files by appending elements, inserting sub elements and overwritting elements/attributes with data from the strategy generator. This generator also creates files that include other files such as dev/random with the intention of creating buffer overflows in the target program. 
 
+### PDF
+The PDF generator
+
 ## Aggregator
 
 The aggregator is the component of the fuzzer responsible for bridging the gap between the generators (strategies) and the harness. It functions as the manager for the fuzzing campaign taking in user supplied parameters and orchestrating the calling of generators whose output it then feeds to the harness. It then monitors the response from the harness to deicide if a crash file should be written and the campaign halted, or if the program is hanging / stuck in an infinite loop in which case the strategy should be evolved.

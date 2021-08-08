@@ -287,10 +287,30 @@ def test_jpeg():
         
 
 def test_pdf():
-    pdf = PDF.PDF('yeet')
-    for i in pdf.run():
-        # print(i)
-        continue
+    TEST_DIR = './tests/complete'
+    TEST_BINARY = f'{TEST_DIR}/plaintext1'
+    TEST_SAMPLE = f'{TEST_DIR}/codecs/plaintext1.txt'
+
+    print(f"""
+        [>>] Running PDF test against {TEST_BINARY.split('/')[-1]} with {TEST_SAMPLE.split('/')[-1]}
+    """)
+
+    harness = Harness.Harness(TEST_BINARY)
+    pdf_worker = PDF.PDF(TEST_SAMPLE)
+
+    for u in pdf_worker.run():
+        try:
+            # print(f'[DEBUG] test mutation was:\n{u}')
+            ret_code = harness.open_pipe(u)
+            # print(f"\n  Piping to harness, res was {ret_code}\n")
+            if ret_code == -11:
+                print(f"{'':10}[+] CRASH? {ret_code}")
+                break
+        except:
+            print('[>>] Failed to run worker, is generator empty?')
+            break
+    
+    
 
 def test_xml():
 
