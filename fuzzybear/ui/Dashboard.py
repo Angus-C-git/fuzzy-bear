@@ -66,6 +66,7 @@ dummy_code_paths = {
     ]
 }
 
+
 def build_coverage_tree(code_paths=dummy_code_paths):
     """ Build coverage tree """
     root = Text("main", EXPLORED)
@@ -73,46 +74,30 @@ def build_coverage_tree(code_paths=dummy_code_paths):
     paths_tree = Tree(root, guide_style="white")
     
     # code paths
-    branch = paths_tree.add(Text("get_input", EXPLORED))
-    
-    branch.add(Text("send_input", UNEXPLORED))
-    branch.add(Text("validate_input", UNEXPLORED))
+    for function_name in code_paths:
+        branch = paths_tree.add(Text(function_name, UNEXPLORED))
 
-    paths_tree.add(Text("vuln", UNEXPLORED))
+    # branch.add(Text("send_input", UNEXPLORED))
+    # branch.add(Text("validate_input", UNEXPLORED))
+    # paths_tree.add(Text("vuln", UNEXPLORED))
+
     return paths_tree
        
-coverage_tree = build_coverage_tree()
-
-# ======================================= #
-
-""" UI Event Handlers """
-
-def update_strategies() -> None:
-    # Update current strategy progress
-
-    # Update Overall progress
-    pass
 
 
-def update_quote() -> str:
-    # update current quote
-    pass
+def tmp_stats():
+
+    return (
+"""
+[] Hangs 
+[] Aborts
+"""
+    )
 
 
-def update_stats() -> None:
-    # update current stats
-    pass
-
-
-def log_event(event) -> None:
-    # update logs
-    pass
-
-
-def update_coverage() -> None:
-    # update coverage
-    pass
-
+def quotes():
+    yield "Have you tried AFL?"
+    yield "Are we there yet?"
 
 # ======================================= #
 
@@ -126,9 +111,7 @@ class Dashboard():
     )
     overall_progress = Progress()
 
-
     def __init__(self, events):
-        # print(events)
         for event in events.keys():
             self.strategy_progress.add_task(f"[cyan] {event}", total=events[event][1])
 
@@ -170,6 +153,8 @@ class Header():
     def __init__(self, strategy_progress, overall_progress):
         self.strategy_progress = strategy_progress
         self.overall_progress = overall_progress
+        self.stat_events = tmp_stats()
+
 
     def __rich__(self) -> Table:
         # super()
@@ -180,20 +165,20 @@ class Header():
                 title="[b]Overall Strategy Exhaustion",
                 border_style="green",
                 # down right
-                padding=(4, 10),     
+                padding=(4, 2),     
             ),
             # Display inspirational 'quotes'
             Panel(
-                f"'Have you tried AFL?'{'':15}", 
+                f"'{next(quotes())}'{'':15}", 
                 title="[b]Quotes", 
                 border_style="magenta",
                 padding=(4, 3),
             ),
             Panel(
-                self.strategy_progress, 
+                self.stat_events, 
                 title="[b]Stats", 
                 border_style="red", 
-                padding=(3, 2)
+                padding=(2, 3)
             ),
         )
         return progress_table
@@ -207,8 +192,9 @@ class Footer():
     time_stamp = '0:00'
     log_msg = "Fuzzing ..."
 
-    def __init__(self, strategy_progress):
+    def __init__(self, strategy_progress, functions):
         self.strategy_progress = strategy_progress
+        self.coverage_tree = build_coverage_tree(functions)
 
     def __rich__(self) -> Table:
         # super()
@@ -219,22 +205,22 @@ class Footer():
                 self.strategy_progress, 
                 title="[b]Strategies",
                 border_style="green",
-                padding=(3, 10),
+                padding=(5, 10),
             ),
             # Display logging data
             Panel(
-                f"[{self.time_stamp}]{'':3}{self.log_msg}{'':10}", 
+                f"[{self.time_stamp}]{'':3}{self.log_msg}{'':10}\n[0:10]{'':3}'detecting hang'", 
                 title="[b]Logs", 
                 border_style="cyan",
-                padding=(4, 10),
+                padding=(7, 2),
             ),
             # Display current coverage data
             Panel(
                 # strategy_progress, 
-                coverage_tree,
+                self.coverage_tree,
                 title="[b]Coverage", 
                 border_style="red", 
-                padding=(1, 15),
+                padding=(3, 2),
                 expand=True
             ),
         )
@@ -253,19 +239,19 @@ def make_layout() -> Layout:
     # main components
     layout.split_column(
         Layout(name="banner", size=5),
-        Layout(name="header", size=25),
-        Layout(name="footer", size=25),
+        Layout(name="header", size=12),
+        Layout(name="footer", size=20),
     )
     return layout
 
 # ======================================= #
 
-def init_layout(events, strategy_progress, overall_progress):
+def init_layout(events, strategy_progress, overall_progress, coverage_paths):
     layout = make_layout()
 
     layout["banner"].update(Banner())  
     layout["header"].update(Header(strategy_progress, overall_progress))                
-    layout["footer"].update(Footer(strategy_progress))
+    layout["footer"].update(Footer(strategy_progress, coverage_paths))
 
     return layout
 

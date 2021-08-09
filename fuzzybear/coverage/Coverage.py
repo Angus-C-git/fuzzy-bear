@@ -13,28 +13,12 @@ from .symbols import defaults
 # from ptfuzz.ptfuzz import PtFuzz
 
 
-# ================================================================= #
-
-test_binary = "../../tests/components/coverage/complex"
-simple_binary = "../../tests/components/coverage/simple"
-
-# ================================================================= #
-
 def update_coverage(address):
 	""" Update coverage data """
 	# TODO :: resolve function/blockname, send to UI event
 	# handler
 	print(f"[>>] Updating coverage, hit {hex(address)}")
 	print("[>>] Not implemented")
-
-
-tree = {
-	'0': 'main'
-}
-
-def build_call_tree(branch, called_address):
-	""" builds a tree of function calls """
-	pass
 
 
 '''Ideas:
@@ -45,13 +29,22 @@ def build_call_tree(branch, called_address):
 # TODO :: Finish implementing
 class Coverage:
 	""" handler class for coverage ops """
-	def __init__(self, target_path, target_pid):
+	def __init__(self, target_path, target_pid=None):
 		# self.coverage_target = coverage_target.elf
 		self.target_elf = ELF(target_path, checksec=False)
 		self.pid = target_pid
+		self.function_names = []
 
 
-	def getVmmap(self, pid):
+	def get_function_names(self):
+		functions = self.target_elf.functions
+		for name in functions.keys():
+			if name not in defaults:
+				self.function_names.append(name)
+		return self.function_names
+
+
+	def get_vmmap(self, pid):
 		""" pulls the vmmap for target pid """
 		with open(f'/proc/{pid}/maps', 'r') as mmap:
 			vmmap = mmap.readlines()
@@ -82,7 +75,7 @@ class Coverage:
 	
 	def rebase(self):
 		""" rebase binary for given pid """
-		vmmap = self.getVmmap(self.pid)
+		vmmap = self.get_vmmap(self.pid)
 		self.getBinaryBase(vmmap)
 		self.getLibcBase(vmmap)
 		# self.getHeapBase(vmmap)
@@ -103,12 +96,11 @@ class Coverage:
 			# address : name
 		}
 
-		for key in functions.keys():
-			if key not in defaults:
-				function_table[functions[key].address] =  key
-				# print(f"{key}: {hex(functions[key].address)}")
-
-		# print(function_table)
+		for name in functions.keys():
+			if name not in defaults:
+				function_table[functions[name].address] = name
+				self.function_names.append(name)
+		
 		return function_table
 
 	# =================================================================
@@ -174,38 +166,5 @@ class Coverage:
 	# 	""" begin coverage ops"""
 	# 	pass
 
-
-# ================================================================= #
-""" debugging/tmp """
-def print_symbols(proc):
-	""" Print symbols """
-	elf = ELF(proc)
-	print(elf.symbols, "\n\n")
-	print("Functions: \n", elf.functions.keys(), "\n\n")
-	print('\n\n')
-
-
-_default_symbols = [
-	'_start',
-	'_init',
-	'stack_chk_fail',
-	'__libc_csu_init',
-	'__libc_csu_fini',
-	'__stack_chk_fail_local'
-]
-
-blocks = [
-	{
-		'_start': [],    # opcodes for start
-		'block_num': 0   # block number
-	}, 
-	{
-		'main' : [],     # opcodes for main
-		'block_num': 0   # block number
-	}
-]
-
-
-# print_symbols(simple_binary)
 
 # ================================================================= #

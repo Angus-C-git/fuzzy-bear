@@ -27,7 +27,7 @@ class Strategy():
 	BYTE_8_MAX = 18446744073709551615
 	INSTRUCTION_SIZE = 32
 
-	# strategy registrar
+	# strategy registrar + counts
 	strategy_cases = {
 		'emoji': 4,
 		'chonk': 5,
@@ -44,25 +44,6 @@ class Strategy():
 	def __init__(self):
 		# self.ui_events = {}
 		return
-
-
-	# def ui_event(self, event, boost=10, target=100):
-	# 	""" handels triggering strategy progress for UI """
-	# 	global tmp_cumulative
-	# 	tmp_cumulative += boost
-	# 	""" handels triggering strategy progress for UI """
-	# 	print(f'   [>>] Updating {event} progress %{tmp_cumulative} done')
-	# 	if tmp_cumulative >= target:
-	# 		tmp_cumulative = 0
-
-
-	def register_ui_events(self, events):
-		""" Register a list of UI events """
-		
-		# initialise UI manager with 
-		# used strategies
-		
-		# self.ui_runner.add_strategy_targets()
 
 
 	def emoji(self):

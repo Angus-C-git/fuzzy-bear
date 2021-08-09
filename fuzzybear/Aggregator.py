@@ -3,6 +3,7 @@ from .HarnessV2 import HarnessV2
 from .utility import response_codes
 from .utility import codec
 from .strategies import get_generator
+from .coverage.Coverage import Coverage
 
 # highlight crash
 from colorama import Fore, Style
@@ -42,9 +43,9 @@ class Aggregator():
 		print(f"   [>>] Running fuzzer against <{binary.split('/')[-1]}> mutating <{input_file.split('/')[-1]}>")
 		self.harness = Harness(binary)
 		self.codec = codec.detect(input_file)
-		# print(f'   [DEBUG] {self.codec}')
 		self.base_file = input_file
 		self.ui_runner = UiRunner()
+		self.coverage_runner = Coverage(binary)
 
 
 	def run_fuzzer(self):
@@ -60,34 +61,45 @@ class Aggregator():
 		print(f"{'':3}[>>] Running fuzzer ...")
 
 		DashboardUI = self.ui_runner.register_events(Generator.ui_events)
+		strategy_progress = DashboardUI.strategy_progress
+		overall_progress = DashboardUI.overall_progress
 
+		coverage_paths = self.coverage_runner.get_function_names()
 
 
 		## TMP RUNNER >> ##
 		# while True:
-		print("[>>] In fuzing loop")
+		print(f"{'':3}[>>] In fuzing loop")
 		inputs = Generator.run()
 		jobs = DashboardUI.strategy_progress.tasks
 		current_job = 0
 		
-		with Live(init_layout(self.ui_runner.events, DashboardUI.strategy_progress, DashboardUI.overall_progress), refresh_per_second=10, screen=True):
-			while not DashboardUI.overall_progress.finished:
-				sleep(0.3)
+		with Live(
+				init_layout(
+					self.ui_runner.events, 
+					strategy_progress, 
+					overall_progress,
+					coverage_paths
+				), 
+				refresh_per_second=10, screen=True
+			):
+				while not DashboardUI.overall_progress.finished:
+					sleep(0.3)
 
-				for input in inputs:
-					response_code = self.harness.open_pipe(input)
+					for input in inputs:
+						response_code = self.harness.open_pipe(input)
 
-					if current_job <= len(jobs):
-							# current_job = 0
-						if not jobs[current_job].finished:
-							DashboardUI.strategy_progress.advance(jobs[current_job].id)
-						else:
-							current_job += 1
-						
-				
-						completed = sum(task.completed for task in DashboardUI.strategy_progress.tasks)
-						DashboardUI.overall_progress.update(DashboardUI.overall_tasks, completed=completed)
+						if current_job <= len(jobs):
+								# current_job = 0
+							if not jobs[current_job].finished:
+								DashboardUI.strategy_progress.advance(jobs[current_job].id)
+							else:
+								current_job += 1
+							
+					
+							completed = sum(task.completed for task in DashboardUI.strategy_progress.tasks)
+							DashboardUI.overall_progress.update(DashboardUI.overall_tasks, completed=completed)
 
-					# sleep(0.2)
-					if (response_code == -11):
-						write_crash(input)
+						sleep(3.2)
+						if (response_code == -11):
+							write_crash(input)

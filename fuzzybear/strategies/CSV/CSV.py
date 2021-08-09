@@ -62,12 +62,8 @@ class CSV(Strategy.Strategy):
 					len(self.candidate_input[0]))
 
 
-	def update_ui_event(self, event):
-		self.ui_events[event][0] += 1
-		# print("[>>] Updated ui events")
-		# print(self.ui_events)
-
 	# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 
 	def add_entries(self, preserve_header=False):
 		""" adds extra entries to csv file in a random range """
@@ -84,7 +80,6 @@ class CSV(Strategy.Strategy):
 
 			mutation.append(new_row)
 
-		self.update_ui_event('add entries')
 		return mutation
 
 
@@ -95,14 +90,12 @@ class CSV(Strategy.Strategy):
 		for emoji in super().emoji():
 			mutation[row][col] = emoji   
 			yield pack_csv(mutation)
-			self.update_ui_event('emoji')
 		
 		mutation = copy.deepcopy(self.candidate_input)
 		row, col = random_row_col(self.size)
 		for chonk in super().chonk():
 			mutation[row][col] = chonk
 			yield pack_csv(mutation)
-			self.update_ui_event('chonk')
 		
 		for count in range(ENTRIES_THRESHOLD):
 			yield pack_csv(self.add_entries())
@@ -115,7 +108,6 @@ class CSV(Strategy.Strategy):
 		for constant in super().max_constants():
 			mutation[row][col] = constant
 			yield pack_csv(mutation)
-			self.update_ui_event('constants')
 	
 		mutation = copy.deepcopy(self.candidate_input)
 		row, col = self.size
@@ -123,7 +115,6 @@ class CSV(Strategy.Strategy):
 			for c in range(col):
 				mutation[r][c] = super().xor_data(self.candidate_input[r][c])
 				yield pack_csv(mutation)
-				self.update_ui_event('xor')
 
 		mutation = copy.deepcopy(self.candidate_input)
 		row, col = self.size
@@ -132,7 +123,6 @@ class CSV(Strategy.Strategy):
 				mutation[r][c] = super().bit_flip(self.candidate_input[r][c])
 				print(f"[>>] mutation was {mutation}")
 				yield pack_csv(mutation)
-				self.update_ui_event('bit flip')
 
 		mutation = copy.deepcopy(self.candidate_input)
 		row, col = self.size
@@ -140,7 +130,6 @@ class CSV(Strategy.Strategy):
 			for c in range(col):
 				mutation[r][c] = super().negate(self.candidate_input[r][c])
 				yield pack_csv(mutation)
-				self.update_ui_event('negate')
 
 
 """dev_notes

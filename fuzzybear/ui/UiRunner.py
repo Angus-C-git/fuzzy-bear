@@ -2,7 +2,7 @@
 Handles UI events and feeds data to components.
 
 '''
-from .Dashboard import Dashboard, init_layout, coverage_tree
+from .Dashboard import Dashboard, init_layout
 
 
 class UiRunner():

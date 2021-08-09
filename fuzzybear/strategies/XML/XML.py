@@ -59,11 +59,13 @@ def append_elem(elem_obj, elem_type):
 def spicy_file():
 	
 	spicy_string = '''
+
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE root [
- <!ENTITY spooky SYSTEM "file:///dev/random">
-  ]>
-  <root>&spooky;</root>
+	<!ENTITY spooky SYSTEM "file:///dev/random">
+]>
+<root>&spooky;</root>
+	
 	'''
 	return spicy_string
 
@@ -88,53 +90,40 @@ class XML(Strategy.Strategy):
 			'polyglots': [0, self.fuzzcases['polyglots']],
 		}
 
-	def update_ui_event(self, event):
-		self.ui_events[event][0] += 1
 
-	# run strategies
-	def run(self):
-		# print(f"\n   [DEBUG] mutating {self.candidate_input} \n")        
-
+	def run(self):   
+		""" run XML generator """
 		mutation = copy.deepcopy(self.candidate_input)
 		emoji = next(super().emoji())
 		# removed loop here
 		nest_em(mutation, emoji)   
 		yield prettify(mutation)
-		self.update_ui_event('deep elements')
-		
 		
 		mutation = copy.deepcopy(self.candidate_input)
 		for chonk in super().chonk():
 			for e in target_elements:
 				change_attributes(mutation, chonk, e)
 			yield prettify(mutation)
-			self.update_ui_event('chonk')
-
 		
+		# repeated tags
 		for element in target_tags:
 			mutation = copy.deepcopy(self.candidate_input)
 			append_elem(mutation, element)
 			yield prettify(mutation)
-			self.update_ui_event('repeated tags')
 
-		mutation = spicy_file() 
-		# print(f"[>>] mutation was {mutation}")
-		yield mutation
-		self.update_ui_event('XXE')
+		# XXE
+		yield spicy_file() 
 
-
-		for fstring in super().format_strings():
+		# format strings
+		for fmtstr in super().format_strings():
 			mutation = copy.deepcopy(self.candidate_input)
 			for element in target_elements:
-				change_attributes(mutation, fstring, element, append=True)
+				change_attributes(mutation, fmtstr, element, append=True)
 			yield prettify(mutation)
-			self.update_ui_event('format strings')
 
-		
+		# polyglots 
 		for polyglot in super().polyglots():
 			mutation = copy.deepcopy(self.candidate_input)
 			for element in target_elements:
 				change_attributes(mutation, polyglot, element)
 				yield prettify(mutation)
-				self.update_ui_event('polyglots')
-
