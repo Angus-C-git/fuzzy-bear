@@ -2,8 +2,9 @@
 response_codes = {
     0: 'normal exit',
     -11: 'segfault',
+    -3: 'abort',
+    -5: 'sigtrap',
     
-
     '-': 'no such code'
 }
 

@@ -1,33 +1,42 @@
-#!/usr/bin/env python3
-
 from .. import Strategy
 import sys
 import random
 from pexpect import run
 from pipes import quote
 
+
+def debug(input, fuzzcase):
+    """ debugging method writes 
+    generated jpg to file"""
+    f = open('origfile.jpeg', 'wb')
+    f.write(input)
+
+    f = open('fuzzcase.jpeg', 'wb')
+    f.write(fuzzcase)
+
+
+
 class JPEG(Strategy.Strategy):
     
-    # parse ___ input data
     def __init__(self, sample_input):
         self.data = sample_input
         self.original_input = self.data
         self.parse_input()
 
-    # read bytes from our valid JPEG and return them in a mutable bytearray 
+
     def parse_input(self):
-        
+        """ read bytes from our valid JPEG and return 
+        them in a mutable bytearray """
         f = open(self.data, "rb").read()
-        #elf.data = f
         self.data = bytearray(f)
 
-    def fuzz(self, data):
 
+    def fuzz(self, data):
+        """ attack data section """
         num_of_flips = int((len(data) - 4) * 0.0001)
         indexes = range(0x550, len(data) - 4)
 
         chosen_indexes = []
-        #index_bits = {}
 
         # iterate selecting indexes until we've hit our num_of_flips number
         for i in range(0, num_of_flips):
@@ -42,8 +51,6 @@ class JPEG(Strategy.Strategy):
             target = random.choice(range(0,8))
             bit_flipper = 0b1 << target
             newdata[x] = current ^ bit_flipper
-
-            #print(f'Original: {bin(data[x])}\nFinal: {bin(newdata[x])}')
 
         return bytes(newdata)
 
@@ -76,7 +83,7 @@ class JPEG(Strategy.Strategy):
     '''
 
     def magic(self, data, index=None):
-
+        """ attack magic bytes """
         newdata = data[:]
         magic_bytes = [
 			[0xFF],
@@ -94,71 +101,21 @@ class JPEG(Strategy.Strategy):
             selection = random.choice(magic_bytes)
         else:
             selection = magic_bytes[index]
-        #print(selection)
-        #print(len(data))
         index = 50
         while(0xFF in data[index-50:index+50]):
             index = random.choice(range(50, len(data) - 50))
-        
-        #output = data[:index]
+
         count = 0
         for element in selection:
             newdata[index + count] = element
-            #output += bytes(element)
             count += 1
-
-        #output += data[index + count:]
         return bytes(newdata)
-        #return output
         
 
 	# create new jpg with mutated data
-    def run(self):
-
-        
-        #yield self.data
-        #yield self.magic(self.data)
-        #f = open('origfile.jpeg', 'wb')
-        #f.write(self.data)
-        #f = open('new.jpeg', 'wb')
-        #fuzz = self.fuzz(self.data)
-        #f.write(fuzz)
+    def run(self):        
+        # debug(self.data, self.fuzz(self.data))
+        # debug(self.data, self.magic(self.data))
         yield self.fuzz(self.data)
         yield self.magic(self.data)
         
-        '''
-        counter = 0
-        while counter < 100000:
-            picked_function = random.randint(0,2)
-            if picked_function == 0:
-                mutated = self.magic(self.data)
-                self.create_new(mutated)
-                self.exif(counter,mutated)
-            else:
-                mutated = self.fuzz(self.data)
-                self.create_new(mutated)
-                self.exif(counter,mutated)
-            counter += 1
-        '''
-    '''
-        # create new jpg with mutated data
-    def create_new(self, data):
-
-        f = open("mutated.jpeg", "wb+")
-        f.write(self.data)
-        f.close()
-
-    def exif(self, counter, data):
-
-        command = "cat mutated.jpeg > ./tests/complete/jpg1 -verbose"
-
-        out, returncode = run("sh -c " + quote(command), withexitstatus=1)
-        if b'Seg' in out:
-            print(out)
-            f = open("crashes/crash.{}.txt".format(str(counter)), "wb+")
-            f.write(data)
-
-        if (counter % 100 == 0):
-            print(counter)
-
-    '''

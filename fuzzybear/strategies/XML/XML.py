@@ -81,17 +81,17 @@ class XML(Strategy.Strategy):
     def run(self):
         # print(f"\n   [DEBUG] mutating {self.candidate_input} \n")        
 
-        # mutation = copy.deepcopy(self.candidate_input)
-        # emoji = next(super().emoji())
-        # # removed loop here
-        # nest_em(mutation, emoji)   
-        # yield prettify(mutation)
+        mutation = copy.deepcopy(self.candidate_input)
+        emoji = next(super().emoji())
+        # removed loop here
+        nest_em(mutation, emoji)   
+        yield prettify(mutation)
         
-        # mutation = copy.deepcopy(self.candidate_input)
-        # for chonk in super().chonk():
-        #     for e in target_elements:
-        #         change_element(mutation, chonk, e)
-        #     yield prettify(mutation)
+        mutation = copy.deepcopy(self.candidate_input)
+        for chonk in super().chonk():
+            for e in target_elements:
+                change_attributes(mutation, chonk, e)
+            yield prettify(mutation)
 
         
         for element in target_tags:
