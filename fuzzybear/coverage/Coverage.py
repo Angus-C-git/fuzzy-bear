@@ -34,6 +34,12 @@ class Coverage:
 		self.target_elf = ELF(target_path, checksec=False)
 		self.pid = target_pid
 		self.function_names = []
+		self.coverage_target = coverage_target.elf
+		self.pid = coverage_target.pid
+		self.dubstep()
+		self.jumpBlocks = JumpBlocks(self.binaryBase, self.coverage_target)
+		self.jumps = 0
+		# Trying this since /proc/pid is being created but all the files are empty
 
 
 	def get_function_names(self):
@@ -80,6 +86,65 @@ class Coverage:
 		self.getLibcBase(vmmap)
 		# self.getHeapBase(vmmap)
 
+	def generateAllInstructions(self, generator):
+		instructions = []
+		for i in generator:
+			instructions.append(i)
+		return instructions
+
+	def findJmp(self, addrStart, blockStart, ops):
+		if not self.jumpBlocks.isNewPath(blockStart):
+			return
+		blockStart = blockStart
+		for i in range(len(ops)-1):
+			#print("0x%x:\t%s\t%s" %(ops[i].address, ops[i].mnemonic, ops[i].op_str))
+			if 'j' in ops[i].mnemonic and not re.search('r..', ops[i].op_str) and not re.search('e..', ops[i].op_str):
+				#print(f'ops.address: {ops[i].address} blockStart: {blockStart}')
+				if ops[i].address >= blockStart:
+					self.jumpBlocks.add(blockStart, ops[i].address)
+					blockStart = ops[i+1].address
+			try:
+				key = hex(int(ops[i].op_str, 0x10))
+				if 'call' in ops[i].mnemonic and key in self.addressNameMap and self.addressNameMap[key] == 'exit':
+					self.jumpBlocks.add(blockStart, ops[i].address)
+					# print('\n\n=====================\n')
+					# print(f'blockStart: {hex(blockStart)} currInstr: {hex(ops[i].address)}')
+					# print('\n\n=====================\n')
+			except:
+				pass
+		#	elif 'ret' in ops[i].mnemonic:
+		#	 	self.jumpBlocks.add(blockStart, ops[i].address)
+				#print(f'blockStart: {hex(blockStart)} current instruction address: {hex(ops[i].address)} == {ops[i].mnemonic}')
+
+	# Need to make sure this works with PIE / ASLR
+	def gen_code_paths(self):
+		# addrMain = elf.symbols['main']
+		#pprint(self.coverage_target.functions)
+		functionAddrList = []
+		addressNameMap = {}
+		elf = self.coverage_target
+		for fnName, fnObj in elf.functions.items():
+			addressNameMap[hex(fnObj.address)] = fnName
+		self.addressNameMap = addressNameMap # Need to make all of this code much nicer
+		for fnName, addr in elf.plt.items():
+			#print(fnName, addr)
+			addressNameMap[hex(addr)] = fnName
+
+		pprint(self.addressNameMap)
+		for fnName, fnObj in elf.functions.items():
+			functionAddrList.append(fnObj.address)
+		functionAddrList.sort()
+		#self.jumpBlocks.buildRangeFinder(functionAddrList, addressNameMap)
+
+		addrStart = self.coverage_target.symbols['_start'] #  <-- make sure this is what we want
+		addrMain = self.coverage_target.symbols['main']
+		target = Cs(CS_ARCH_X86, CS_MODE_32)
+		target.detail = True
+		elf = self.coverage_target
+		opcodes = elf.section('.text')
+		#print(f'\n-------------\naddrStart {hex(addrStart)}\n----------------\n')
+		generator = target.disasm(opcodes, addrStart)
+		ops = self.generateAllInstructions(generator)
 
 	def get_function_calls(self):
 		""" Get the function calls for the binary as a lookup table"""
@@ -101,11 +166,16 @@ class Coverage:
 				function_table[functions[name].address] = name
 				self.function_names.append(name)
 		
+		self.findJmp(addrStart, addrStart, ops)
+		self.findJmp(addrStart, addrMain, ops)
+		self.jumpBlocks.resolveFunctionContext()
+		print(self.jumpBlocks)
 		return function_table
 
 	# =================================================================
 
 
+<<<<<<<
 	# def gen_code_paths(self):
 	# 	""" establish all paths through target """
 		
@@ -117,11 +187,20 @@ class Coverage:
 		
 	# 	# executable code lives in .text section
 	# 	opcodes = elf.section('.text')
+=======
+		#functionCalls.resolveFunctionNames()
+		# print('printing function calls')
+		# print(functionCalls)
+>>>>>>>
 
+<<<<<<<
 	# 	# get section entry/exits
 	# 	addrMain = elf.symbols['main']
 	# 	addrStart = elf.symbols['_start'] #  <-- make sure this is what we want
 	# 	print(f"[>>] addrMain: {hex(addrMain)}")
+=======
+				
+>>>>>>>
 
 	# 	# rebase binary	
 	# 	# self.rebase()
