@@ -1,6 +1,9 @@
 from pprint import pprint
 # Assume that the base addr of the binary is passed in so it 
 # can resolve function names.
+
+
+
 class FunctionCalls:
 	def __init__(self, binaryBase, elf=None):
 		self.calls = {}
@@ -19,7 +22,9 @@ class FunctionCalls:
 		# - value should be a list of functionCall's, otherwise we can't record
 		#   different calls to the same function.
 
-	def resolveFunctionNames(self):
+ 
+	
+	def resolve_function_names(self):
 		addressNameMap = {}
 		# elf.functions returns a dictionary that maps function names to function objects.
 		# function object basically encapsulate some data about a function, incl its addr.
@@ -31,7 +36,7 @@ class FunctionCalls:
 		for key, val in self.calls.items():
 			try:
 				# our functionCalls data structure is indexed by function address.
-				self.calls[key].setFunctionName(addressNameMap[key])
+				self.calls[key].set_function_name(addressNameMap[key])
 			except:
 				continue
 
@@ -40,25 +45,30 @@ class FunctionCalls:
 	def __str__(self):
 		string = ""
 		for key, val in self.calls.items():
-			# Make sure you call resolveFunctionNames before printing if you want
+			# Make sure you call resolve_function_names before printing if you want
 			# to see what function names are being resolved.
 			string += f'{val.instAddr} = call {val.funcAddr} / {val.funcName}\n'
 		return string
 
-# Stored all values as strings since funcAddr will be used as a key
-# so for consistency they're all strings.
+
+
+
+
 class FunctionCall:
+	""" Stored all values as strings since funcAddr will be used as a 
+	key so for consistency they're all strings. """
+	
 	def __init__(self, instAddr, funcAddr, pie, binaryBase):
 		self.instAddr = hex(instAddr + binaryBase) if pie else hex(instAddr)
 		self.funcAddr = hex(funcAddr + binaryBase) if pie else hex(funcAddr)
 		self.funcName = None
 		self.timesCalled  = 0
 
-	def setFunctionName(self, name):
+	def set_function_name(self, name):
 		self.funcName = name
 
 	def called(self):
 		self.timesCalled += 1
 
-	def nCalled(self):
+	def n_called(self):
 		return self.timesCalled

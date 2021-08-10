@@ -15,18 +15,18 @@ class JumpBlocks:
 
 
 	def add(self, start, end):
-		if self.isNewPath(start):
+		if self.is_new_path(start):
 			jumpBlock = JumpBlock(start, end, self.pie, self.binaryBase)
 			self.blocks[str(hex(jumpBlock.start))] = jumpBlock
 
 
 	# Assuming addr is a pointer thats jumped to in the binary.
 	# Unused atm.
-	def isNewPath(self, addr):
+	def is_new_path(self, addr):
 		return hex(addr) not in self.blocks.keys()
 
 
-	def resolveFunctionContext(self):
+	def resolve_function_context(self):
 		# functions = {}
 		# for fnName, fnObj in self.elf.functions.items():
 		# 	address = hex(fnObj.address + self.binaryBase) if self.pie else hex(fnObj.address)
@@ -43,13 +43,13 @@ class JumpBlocks:
 			addr = fnObj.address + self.binaryBase if self.pie else fnObj.address
 			functionAddrList.append(addr)
 		functionAddrList.sort()
-		self.buildRangeFinder(functionAddrList, addressNameMap)
+		self.build_range_finder(functionAddrList, addressNameMap)
 
 		for key, block in self.blocks.items():
-			block.setFunctionContext(self.whichRange(block.start))
+			block.set_function_context(self.which_range(block.start))
 
 	# Assumes address list is sorted
-	def buildRangeFinder(self, addressList, addressNameMap):
+	def build_range_finder(self, addressList, addressNameMap):
 		# pprint(addressList)
 		# pprint(addressNameMap)
 		rangeFinder = {}
@@ -61,7 +61,7 @@ class JumpBlocks:
 
 	# Give this function an address and a range finder and it will tell you which address
 	# that instruction lives in.
-	def whichRange(self, address):
+	def which_range(self, address):
 		for fnName, fnRange in self.rangeFinder.items():
 			if address >= int(fnRange['start']) and address <= int(fnRange['end']):
 				return fnName
@@ -81,17 +81,11 @@ class JumpBlock:
 		self.timesReached = 0
 		self.function = "unresolved"
 
-	# def orient(self, functions):
-	# 	addresses = list(functions.keys())
-	# 	addresses.sort()
-	# 	for i in range(len(addresses)-1):
-	# 		if self.start >= int(addresses[i],0x10) and self.start <= int(addresses[i+1],0x10):
-	# 			self.function = functions[addresses[i]]
-	def setFunctionContext(self, fnName):
+	def set_function_context(self, fnName):
 		self.function = fnName
 
 	def reached(self):
 		self.timesReached += 1
 
-	def nReached(self):
+	def n_reached(self):
 		return self.timesReached
