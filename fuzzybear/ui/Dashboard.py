@@ -89,8 +89,8 @@ def tmp_stats():
 
     return (
 """
-[] Hangs 
-[] Aborts
+[ 1 ] Hangs 
+[ 0 ] Aborts
 """
     )
 
@@ -160,25 +160,32 @@ class Header():
         # super()
         progress_table = Table.grid(expand=True)
         progress_table.add_row(
+            # Display overall progress bar
             Panel(
                 self.overall_progress,
                 title="[b]Overall Strategy Exhaustion",
                 border_style="green",
                 # down right
-                padding=(4, 2),     
+                padding=(6, 1),
+                height=15,
+                width=60     
             ),
             # Display inspirational 'quotes'
             Panel(
                 f"'{next(quotes())}'{'':15}", 
                 title="[b]Quotes", 
                 border_style="magenta",
-                padding=(4, 3),
+                padding=(6, 1),
+                height=15,
+                width=60 
             ),
             Panel(
                 self.stat_events, 
                 title="[b]Stats", 
                 border_style="red", 
-                padding=(2, 3)
+                padding=(1, 1),
+                height=15,
+                width=60 
             ),
         )
         return progress_table
@@ -205,14 +212,18 @@ class Footer():
                 self.strategy_progress, 
                 title="[b]Strategies",
                 border_style="green",
-                padding=(5, 10),
+                padding=(1, 1),
+                height=20,
+                width=60,
             ),
             # Display logging data
             Panel(
                 f"[{self.time_stamp}]{'':3}{self.log_msg}{'':10}\n[0:10]{'':3}'detecting hang'", 
                 title="[b]Logs", 
                 border_style="cyan",
-                padding=(7, 2),
+                padding=(1, 1),
+                height=20,
+                width=60 
             ),
             # Display current coverage data
             Panel(
@@ -220,8 +231,10 @@ class Footer():
                 self.coverage_tree,
                 title="[b]Coverage", 
                 border_style="red", 
-                padding=(3, 2),
-                expand=True
+                padding=(1, 1),
+                expand=True,
+                height=20,
+                width=60 
             ),
         )
         return progress_table
@@ -239,8 +252,8 @@ def make_layout() -> Layout:
     # main components
     layout.split_column(
         Layout(name="banner", size=5),
-        Layout(name="header", size=12),
-        Layout(name="footer", size=20),
+        Layout(name="header", size=16),
+        Layout(name="footer", size=21),
     )
     return layout
 

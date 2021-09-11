@@ -21,7 +21,7 @@ from rich.console import Console, RenderGroup
 
 	► Takes responses (or lack of) from the
 	  binary and decides what changes if any 
-	  should be triggered (maybe)
+	  should be triggered
 	
 	► Runner Class for strategies/generators 
 
@@ -81,8 +81,9 @@ class Aggregator():
 					overall_progress,
 					coverage_paths
 				), 
-				refresh_per_second=10, screen=True
-			):
+				refresh_per_second=2, 
+				screen=True
+			) as gui:
 				while not DashboardUI.overall_progress.finished:
 					sleep(0.3)
 
@@ -100,6 +101,7 @@ class Aggregator():
 							completed = sum(task.completed for task in DashboardUI.strategy_progress.tasks)
 							DashboardUI.overall_progress.update(DashboardUI.overall_tasks, completed=completed)
 
-						sleep(3.2)
+						sleep(0.3)
 						if (response_code == -11):
+							gui.stop()
 							write_crash(input)
