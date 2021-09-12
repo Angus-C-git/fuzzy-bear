@@ -96,8 +96,6 @@ class TXT(Strategy.Strategy):
             # propper error logic goes here.
             print(f' [>>] File not found, {err}')
             exit(0)
-        
-    
 
 
     def run(self):
@@ -168,7 +166,6 @@ class TXT(Strategy.Strategy):
             for value in values():
                 for mutation in xor_bytes(stream, line, value):
                     yield mutation
-
 
         # append polyglots
         for polyglot in super().polyglots():

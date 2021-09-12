@@ -9,7 +9,7 @@ import copy
 
 
 MAX_DEPTH = 100
-TAG_SPLUTTER = 90
+TAG_SPLUTTER = 100
 target_elements = ['href', 'id', 'style', 'class']
 target_tags = ['div', 'tail', 'head']
 
@@ -47,8 +47,7 @@ def append_elem(elem_obj, elem_type):
 	append_list = []
 	for child in elem_obj.iter():
 		if child.tag == elem_type:
-			new = child
-			append_list.append(new)
+			append_list.append(child)
 	
 	if append_list:
 		for elem in append_list:

@@ -13,6 +13,7 @@ from .ui.UiRunner import UiRunner, init_layout
 from rich.live import Live
 from time import sleep
 from rich.console import Console, RenderGroup
+from fuzzybear.ui.Summary import render_summary
 
 # console = Console()
 
@@ -28,14 +29,26 @@ from rich.console import Console, RenderGroup
 '''
 
 def write_crash(crashing_input):
+	""" write crashing input to file """
 	print(Fore.RED + f'\n\n   [>>] CRASH DETECTED, dropping bad.txt')
 	print(Style.RESET_ALL)
 
 	with open('./bad.txt', 'w') as crash:
 		crash.write(crashing_input)
 	
-	exit(0)
 
+# TODO :: finish implementing	
+def prepare_summary(crashing_strategy):
+	""" construct campaign summary """
+	summary_data = {
+		'crashing_strategy': crashing_strategy,
+		'hangs': str(0),
+		'codepaths': str(0),
+		'coverage': '0%',
+		'runtime': '0:00'
+	}
+
+	render_summary(summary_data)
 
 
 class Aggregator():
@@ -69,7 +82,7 @@ class Aggregator():
 
 		## TMP RUNNER >> ##
 		# while True:
-		print(f"{'':3}[>>] In fuzing loop")
+		print(f"{'':3}[>>] In fuzzing loop")
 		inputs = Generator.run()
 		jobs = DashboardUI.strategy_progress.tasks
 		current_job = 0
@@ -84,14 +97,14 @@ class Aggregator():
 				refresh_per_second=2, 
 				screen=True
 			) as gui:
-				while not DashboardUI.overall_progress.finished:
-					sleep(0.3)
+				while not DashboardUI.overall_progress.finished:					
 
 					for input in inputs:
+						
 						response_code = self.harness.open_pipe(input)
 
-						if current_job <= len(jobs):
-								# current_job = 0
+						if current_job < len(jobs):
+							
 							if not jobs[current_job].finished:
 								DashboardUI.strategy_progress.advance(jobs[current_job].id)
 							else:
@@ -101,7 +114,12 @@ class Aggregator():
 							completed = sum(task.completed for task in DashboardUI.strategy_progress.tasks)
 							DashboardUI.overall_progress.update(DashboardUI.overall_tasks, completed=completed)
 
-						sleep(0.3)
 						if (response_code == -11):
 							gui.stop()
 							write_crash(input)
+							prepare_summary(
+								jobs[current_job].description
+							)
+							exit(0)
+					
+						# sleep(0.4)

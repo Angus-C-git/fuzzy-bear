@@ -58,16 +58,8 @@ Structure:
 EXPLORED = "bright_green"
 UNEXPLORED = "bright_red"
 
-dummy_code_paths = {
-    "main": [
-        "get_input", 
-        ["validate_input", "send_input"],
-        "vuln"
-    ]
-}
 
-
-def build_coverage_tree(code_paths=dummy_code_paths):
+def build_coverage_tree(code_paths=None):
     """ Build coverage tree """
     root = Text("main", EXPLORED)
     # root node
@@ -227,7 +219,6 @@ class Footer():
             ),
             # Display current coverage data
             Panel(
-                # strategy_progress, 
                 self.coverage_tree,
                 title="[b]Coverage", 
                 border_style="red", 
@@ -309,6 +300,6 @@ def init_layout(events, strategy_progress, overall_progress, coverage_paths):
         + Does not indicate a halt in fuzzing just that all strategies have been
           exhausted in there basic forms
 
-+ Rendering the code paths will be a intrresting and should be done
++ Rendering the code paths will be a interesting and should be done
     recursively 
 '''

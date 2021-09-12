@@ -56,7 +56,18 @@ class JSON(Strategy.Strategy):
         with open(sample_input) as jsonfile:
             self.candidate_input = json.load(jsonfile)
         self.size = len(self.candidate_input)
-
+        
+        self.fuzzcases = super().strategy_cases
+        self.ui_events = {
+            'large random data': [0, 1],
+            'overflow fields': [0, self.fuzzcases['chonk']],
+            'negate fields': [0, ITERATION_MAX],
+            'format strings': [0, ITERATION_MAX],
+            'system paths': [0, ITERATION_MAX],
+            'polyglots': [0, ITERATION_MAX],
+            'max constants': [0, ITERATION_MAX],
+            'byte flips': [0, ITERATION_MAX]
+        }
 
     def run(self):
         """ run the JSON generator """
@@ -140,8 +151,7 @@ class JSON(Strategy.Strategy):
 """devnotes
 
 -> Some of the code above is truly fucking magical
-    -> like how does a tuple become mutable
-    -> we got list magic its all happening
+    -> like how does a tuple become mutable 
 
 TODO
 
