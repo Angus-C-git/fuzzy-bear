@@ -1,5 +1,4 @@
 from .Harness import Harness
-from .HarnessV2 import HarnessV2
 from .utility import response_codes
 from .utility import codec
 from .strategies import get_generator
@@ -15,7 +14,8 @@ from time import sleep
 from rich.console import Console, RenderGroup
 from fuzzybear.ui.Summary import render_summary
 
-# console = Console()
+# Debugging / Quite mode
+console = Console()
 
 '''
 ::::::::::::::::: [Aggregator] :::::::::::::::::
@@ -28,10 +28,10 @@ from fuzzybear.ui.Summary import render_summary
 
 '''
 
+
 def write_crash(crashing_input):
 	""" write crashing input to file """
-	print(Fore.RED + f'\n\n   [>>] CRASH DETECTED, dropping bad.txt')
-	print(Style.RESET_ALL)
+	console.print(f"{'':4}[>>] [b red]CRASH DETECTED[/b red], writing [b green] bad.txt[/b green]")
 
 	with open('./bad.txt', 'w') as crash:
 		crash.write(crashing_input)
@@ -53,7 +53,7 @@ def prepare_summary(crashing_strategy):
 
 class Aggregator():
 	def __init__(self, binary, input_file):
-		print(f"   [>>] Running fuzzer against <{binary.split('/')[-1]}> mutating <{input_file.split('/')[-1]}>")
+		self.binary = binary
 		self.harness = Harness(binary)
 		self.codec = codec.detect(input_file)
 		self.base_file = input_file
@@ -62,16 +62,15 @@ class Aggregator():
 
 
 	def run_fuzzer(self):
-		# TODO :: run generator here <codec>
-		# format runner 
 		Generator = get_generator(self.codec, self.base_file)
 
 		## Tmp handler
 		if (Generator is None): 
-			print(f'\n   [>>] The format of {self.base_file} is not supported')
+			console.print(f"[b] [>>] The format of [b red]{self.base_file}[/b red] is not supported")
 			return None
 		
-		print(f"{'':3}[>>] Running fuzzer ...")
+		startup_log = f"Running fuzzer against [b green] <{self.binary.split('/')[-1]}> [/b green]" + \
+					  f" mutating [b green] <{self.base_file.split('/')[-1]}> [/b green]"
 
 		DashboardUI = self.ui_runner.register_events(Generator.ui_events)
 		strategy_progress = DashboardUI.strategy_progress
@@ -79,10 +78,9 @@ class Aggregator():
 
 		coverage_paths = self.coverage_runner.get_function_names()
 
+		## <<-	 TMP RUNNER 	->> ##
 
-		## TMP RUNNER >> ##
 		# while True:
-		print(f"{'':3}[>>] In fuzzing loop")
 		inputs = Generator.run()
 		jobs = DashboardUI.strategy_progress.tasks
 		current_job = 0
@@ -92,13 +90,14 @@ class Aggregator():
 					self.ui_runner.events, 
 					strategy_progress, 
 					overall_progress,
-					coverage_paths
+					coverage_paths,
+					startup_log
 				), 
 				refresh_per_second=2, 
 				screen=True
 			) as gui:
 				while not DashboardUI.overall_progress.finished:					
-
+					
 					for input in inputs:
 						
 						response_code = self.harness.open_pipe(input)
@@ -121,5 +120,21 @@ class Aggregator():
 								jobs[current_job].description
 							)
 							exit(0)
+					# DEBUG
+					# sleep(0.4)
 					
-						# sleep(0.4)
+					# Kill the gui on next iteration
+					# gui.stop()
+
+
+'''devnotes
+
+- TODO - 
+
++ Port live render to another file
++ Use UiRunner to handle events and manage
+  UI component updates
++ Add the ability to cycle the UI to run
+  'forever'
+
+'''

@@ -20,16 +20,16 @@ def render_summary(campaign_data):
 						#title="Campaign Summary", 
 						box=box.SIMPLE_HEAVY,
 						collapse_padding=True,
-
+						padding=(1, 5)
 					)
 
 	# Display Title
 	summary_table.add_column(
 		"[b] Campaign Summary [/b]", 
 		justify="left", 
-		no_wrap=True
+		no_wrap=True,
 	)
-	summary_table.add_column(" ")
+	summary_table.add_column(" ", justify="left", no_wrap=True)
 
 	summary_table.add_row("‣ Crashing Strategy", campaign_data["crashing_strategy"])
 	summary_table.add_row("‣ Total Hangs", campaign_data["hangs"])

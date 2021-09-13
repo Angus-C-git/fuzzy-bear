@@ -4,45 +4,42 @@ from rich import box
 from rich.console import Console, RenderGroup
 from rich.layout import Layout
 from rich.panel import Panel
-from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn
+from rich.progress import (
+    Progress, 
+    SpinnerColumn, 
+    BarColumn, 
+    TextColumn
+)
 from rich.syntax import Syntax
 from rich.table import Table
 from rich.text import Text
 from rich.tree import Tree
 from rich.measure import Measurement
+from rich.logging import RichHandler
 from rich.live import Live
+
 from time import sleep
+import logging
 
 console = Console()
 
 # ======================================= #
 
 
-"""
-    TMP DUMMY VARIABLES TO SIMULATE ELEMENTS
+# - CONFIG - #
 
-    TODO :: fill out function stubs
-"""
-# strategy_progress = Progress(
-#     "{task.description}",
-#     SpinnerColumn(),
-#     BarColumn(),
-#     TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
-# )
+LOGGER_FORMAT = "%(messages)s%"
+logging.basicConfig(
+    level="NOTSET",
+    format=LOGGER_FORMAT,
+    datefmt="[%X]",
+    handlers=[RichHandler()]
+)
 
-# strategy_progress.add_task("[green]Max Constants")
-# strategy_progress.add_task("[magenta]Bad Strings", total=200)
-# strategy_progress.add_task("[cyan]Large fields", total=400)
-
-# total = sum(task.total for task in strategy_progress.tasks)
-# overall_progress = Progress()
-# overall_task = overall_progress.add_task("Progress", total=int(total))
+log = logging.getLogger("rich")
 
 
-
-
-
-"""
+'''
 Structure:
 - root = main
     |
@@ -51,8 +48,7 @@ Structure:
     - anchor (function): 
         |
         - [sub_function, thing]
-
-"""
+'''
 
 # Coverage Tree Colors
 EXPLORED = "bright_green"
@@ -87,7 +83,9 @@ def tmp_stats():
     )
 
 
-def quotes():
+# TODO :: finish implementing
+def quote():
+    """ Generate silly quotes """
     yield "Have you tried AFL?"
     yield "Are we there yet?"
 
@@ -105,10 +103,16 @@ class Dashboard():
 
     def __init__(self, events):
         for event in events.keys():
-            self.strategy_progress.add_task(f"[cyan] {event}", total=events[event][1])
+            self.strategy_progress.add_task(
+                f"[cyan]{event}", 
+                total=events[event][1]
+            )
 
         net_sum = sum(task.total for task in self.strategy_progress.tasks)
-        self.overall_tasks = self.overall_progress.add_task("Progress", total=int(net_sum))
+        self.overall_tasks = self.overall_progress.add_task(
+            "Progress", 
+            total=int(net_sum)
+        )
 
 
 
@@ -138,7 +142,7 @@ class Banner():
 
 
 
-class Header():
+class RowOne():
     """Display upper row of panels"""
 
 
@@ -146,6 +150,7 @@ class Header():
         self.strategy_progress = strategy_progress
         self.overall_progress = overall_progress
         self.stat_events = tmp_stats()
+        self.quote = next(quote())
 
 
     def __rich__(self) -> Table:
@@ -164,13 +169,14 @@ class Header():
             ),
             # Display inspirational 'quotes'
             Panel(
-                f"'{next(quotes())}'{'':15}", 
+                f"'{self.quote}'{'':15}", 
                 title="[b]Quotes", 
                 border_style="magenta",
                 padding=(6, 1),
                 height=15,
                 width=60 
             ),
+            # Display runtime stats
             Panel(
                 self.stat_events, 
                 title="[b]Stats", 
@@ -184,23 +190,25 @@ class Header():
 
 
 
-class Footer():
+class RowTwo():
     """ Display lower row of panels """
+    logs = [
+            'Fuzzer spooling up ...'
+        ]
 
-    # TMP samples
-    time_stamp = '0:00'
-    log_msg = "Fuzzing ..."
-
-    def __init__(self, strategy_progress, functions):
+    def __init__(self, strategy_progress, functions, log_msg):
         self.strategy_progress = strategy_progress
         self.coverage_tree = build_coverage_tree(functions)
+        if log_msg is not None:
+            self.logs.append(log_msg)
+
 
     def __rich__(self) -> Table:
-        # super()
+        
         progress_table = Table.grid(expand=True)
         progress_table.add_row(
+            # Display strategy progress bar
             Panel(
-                # super().strategy_progress,
                 self.strategy_progress, 
                 title="[b]Strategies",
                 border_style="green",
@@ -210,7 +218,7 @@ class Footer():
             ),
             # Display logging data
             Panel(
-                f"[{self.time_stamp}]{'':3}{self.log_msg}{'':10}\n[0:10]{'':3}'detecting hang'", 
+                f"{self.logs[-1]}", 
                 title="[b]Logs", 
                 border_style="cyan",
                 padding=(1, 1),
@@ -230,6 +238,7 @@ class Footer():
         )
         return progress_table
 
+
 # ======================================= #
 
 """ Initialise Dashboard """
@@ -243,55 +252,52 @@ def make_layout() -> Layout:
     # main components
     layout.split_column(
         Layout(name="banner", size=5),
-        Layout(name="header", size=16),
-        Layout(name="footer", size=21),
+        Layout(name="RowOne", size=16),
+        Layout(name="RowTwo", size=21),
     )
+    
     return layout
 
 # ======================================= #
 
-def init_layout(events, strategy_progress, overall_progress, coverage_paths):
-    layout = make_layout()
+def init_layout(
+        events, 
+        strategy_progress, 
+        overall_progress, 
+        coverage_paths, 
+        log_msg=None
+    ):
+        layout = make_layout()
 
-    layout["banner"].update(Banner())  
-    layout["header"].update(Header(strategy_progress, overall_progress))                
-    layout["footer"].update(Footer(strategy_progress, coverage_paths))
+        layout["banner"].update(Banner())  
+        layout["RowOne"].update(RowOne(strategy_progress, overall_progress))                
+        layout["RowTwo"].update(RowTwo(strategy_progress, coverage_paths, log_msg))
 
-    return layout
+        return layout
 
-# ======================================= #
-
-# TODO :: Move to method and tie in event handlers
-# probably an update method
-
-# with Live(init_layout(), refresh_per_second=10, screen=True):
-#     while not overall_progress.finished:
-#         sleep(0.1)
-#         for job in strategy_progress.tasks:
-#             if not job.finished:
-#                 strategy_progress.advance(job.id)
-
-#         completed = sum(task.completed for task in strategy_progress.tasks)
-#         overall_progress.update(overall_task, completed=completed)
-
-# ======================================= #
 
 '''devnotes
 
+ - TODO - 
 + Convert logging method to use console.log or create custom function
+    + Will likely need a custom function to deal with the need for
+      a renderable with multiple uncertain and changing events
 + Hookup event handlers
-+ Tie in Live handler
++ Manage component state from UiRunner
++ Make quotes generator work
 
-+ Rough plan
-    + Coverage: Display tree of decisions for binary and highlight
-      discovered code paths (kinda binja graph)
-    + Strategies: Display progress of current strategies
-    + Logging: Display messages from aggregator and other internals
-        + Live feed of detections
-        + Strategy changes
-        + Optionally debugging
-    + Quotes: Display quotes from various sources, yield one per UI refresh
-    + Stats: Display useful stats
+[-] -> half done / stalled
+
++ Goals
+    - [-] Coverage: Display tree of decisions for binary and highlight
+                   discovered code paths (kinda binja graph)
+    - [X] Strategies: Display progress of current strategies
+    - [ ] Logging: Display messages from aggregator and other internals
+            + Live feed of detections
+            + Strategy changes
+            + Optionally debugging
+    - [ ]  Quotes: Display quotes from various sources, yield one per UI refresh
+    - [ ] Stats: Display useful stats
         + [ ] Hangs
         + [ ] Loops
         + [ ] Speed (input/sec)
