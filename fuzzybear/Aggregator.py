@@ -31,7 +31,9 @@ console = Console()
 
 def write_crash(crashing_input):
 	""" write crashing input to file """
-	console.print(f"{'':4}[>>] [b red]CRASH DETECTED[/b red], writing [b green] bad.txt[/b green]")
+	console.print(
+		f"{'':4}[>>] [b red]CRASH DETECTED[/b red], writing [b green] bad.txt[/b green]"
+	)
 
 	with open('./bad.txt', 'w') as crash:
 		crash.write(crashing_input)
