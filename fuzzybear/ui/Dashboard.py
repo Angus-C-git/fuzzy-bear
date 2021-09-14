@@ -93,6 +93,7 @@ def quote():
 
 
 class Dashboard():
+    """ Display main fuzzer runtime UI """
     strategy_progress = Progress(
         "{task.description}",
         SpinnerColumn(),
@@ -145,7 +146,6 @@ class Banner():
 class RowOne():
     """Display upper row of panels"""
 
-
     def __init__(self, strategy_progress, overall_progress):
         self.strategy_progress = strategy_progress
         self.overall_progress = overall_progress
@@ -154,7 +154,6 @@ class RowOne():
 
 
     def __rich__(self) -> Table:
-        # super()
         progress_table = Table.grid(expand=True)
         progress_table.add_row(
             # Display overall progress bar
@@ -269,9 +268,22 @@ def init_layout(
     ):
         layout = make_layout()
 
-        layout["banner"].update(Banner())  
-        layout["RowOne"].update(RowOne(strategy_progress, overall_progress))                
-        layout["RowTwo"].update(RowTwo(strategy_progress, coverage_paths, log_msg))
+        layout["banner"].update(
+            Banner()
+        )  
+        layout["RowOne"].update(
+            RowOne(
+                strategy_progress, 
+                overall_progress
+            )
+        )                
+        layout["RowTwo"].update(
+            RowTwo(
+                strategy_progress, 
+                coverage_paths, 
+                log_msg
+            )
+        )
 
         return layout
 
@@ -285,8 +297,11 @@ def init_layout(
 + Hookup event handlers
 + Manage component state from UiRunner
 + Make quotes generator work
++ Fix stats
+___________________________________________________________________________
 
 [-] -> half done / stalled
+[X] -> done
 
 + Goals
     - [-] Coverage: Display tree of decisions for binary and highlight
@@ -306,6 +321,4 @@ def init_layout(
         + Does not indicate a halt in fuzzing just that all strategies have been
           exhausted in there basic forms
 
-+ Rendering the code paths will be a interesting and should be done
-    recursively 
 '''

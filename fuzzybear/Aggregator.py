@@ -32,18 +32,23 @@ console = Console()
 def write_crash(crashing_input):
 	""" write crashing input to file """
 	console.print(
-		f"{'':4}[>>] [b red]CRASH DETECTED[/b red], writing [b green] bad.txt[/b green]"
+		f"{'':1}[>>] [b red]CRASH DETECTED[/b red], writing [b green] crash.txt[/b green]"
 	)
 
-	with open('./bad.txt', 'w') as crash:
+	with open('./crash.txt', 'w') as crash:
 		crash.write(crashing_input)
 	
 
 # TODO :: finish implementing	
 def prepare_summary(crashing_strategy):
 	""" construct campaign summary """
+	console.print(
+		f"{'':1}[>>] [b]Fuzzing campaign ended[/b]"
+	)
 	summary_data = {
 		'crashing_strategy': crashing_strategy,
+		'unique_crashes': str(0),
+		'total_crashes': str(0),
 		'hangs': str(0),
 		'codepaths': str(0),
 		'coverage': '0%',
@@ -122,11 +127,18 @@ class Aggregator():
 								jobs[current_job].description
 							)
 							exit(0)
+					
+					
 					# DEBUG
 					# sleep(0.4)
 					
 					# Kill the gui on next iteration
 					# gui.stop()
+
+		# Display summary on exit
+		prepare_summary(
+			"None"
+		)
 
 
 '''devnotes
@@ -138,5 +150,7 @@ class Aggregator():
   UI component updates
 + Add the ability to cycle the UI to run
   'forever'
++ Update write crash to support writing
+  multiple crashes over campaign lifetime
 
 '''
