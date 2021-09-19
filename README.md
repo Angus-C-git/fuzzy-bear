@@ -2,7 +2,7 @@
 
 > "The fuzzer nobody wanted but everyone needed..."
 
-![tmp-logo](https://user-images.githubusercontent.com/44337835/122902328-b7a9a880-d391-11eb-96f2-a3c0a019de58.jpeg)
+![tmp-logo](https://user-images.githubusercontent.com/23151341/133920201-95362c64-3e02-4b20-98e2-601470069065.png)
 
 
 ## Overview
