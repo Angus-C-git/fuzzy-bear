@@ -18,8 +18,7 @@ console = Console()
 
 def render_summary(campaign_data):
 	""" render summary table """
-	summary_table = Table(
-						#title="Campaign Summary", 
+	summary_table = Table( 
 						box=box.SIMPLE_HEAVY,
 						collapse_padding=True,
 						padding=(1, 30),

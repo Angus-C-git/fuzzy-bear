@@ -26,13 +26,25 @@ class Logs():
 		self.logs.append(starting_log)
 
 	
-	def add_log(self, log):
+	def add_startup_log(self, log):
 		self.logs.append(log)
 		if len(self.logs) > MAX_RECENT_LOGS:
 			# pop the oldest log
 			self.logs.pop(0)
 
 
+	def add_event_log(self, event_log):
+		pass
+
+	
+	def add_debug_log(self, debug_log):
+		pass
+
+
+	def add_error_log(self, error_log):
+		pass
+
+	
 	def construct_renderable(self):
 		# construct the renderable
 		pass
