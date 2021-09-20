@@ -21,7 +21,7 @@ def render_summary(campaign_data):
 	summary_table = Table( 
 						box=box.SIMPLE_HEAVY,
 						collapse_padding=True,
-						padding=(1, 30),
+						padding=(1, 40),
 						pad_edge=False,
 					)
 
@@ -34,10 +34,10 @@ def render_summary(campaign_data):
 	summary_table.add_column(" ", justify="left", no_wrap=True)
 
 	# TMP
-	summary_table.add_row(
-		"[b]‣ Crashing Strategy", 
-		campaign_data["crashing_strategy"]
-	)
+	# summary_table.add_row(
+	# 	"[b]‣ Crashing Strategy", 
+	# 	campaign_data["crashing_strategy"]
+	# )
 
 	summary_table.add_row(
 		"[b]‣ Unique Crashes", 

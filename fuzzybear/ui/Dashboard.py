@@ -15,11 +15,10 @@ from rich.table import Table
 from rich.text import Text
 from rich.tree import Tree
 from rich.measure import Measurement
-from rich.logging import RichHandler
 from rich.live import Live
 
-from time import sleep
-import logging
+from time import sleep, time
+from fuzzybear.ui.Logs import Logs
 
 console = Console()
 
@@ -27,16 +26,7 @@ console = Console()
 
 
 # - CONFIG - #
-
-LOGGER_FORMAT = "%(messages)s%"
-logging.basicConfig(
-    level="NOTSET",
-    format=LOGGER_FORMAT,
-    datefmt="[%X]",
-    handlers=[RichHandler()]
-)
-
-log = logging.getLogger("rich")
+logger = Logs()
 
 
 '''
@@ -191,15 +181,14 @@ class RowOne():
 
 class RowTwo():
     """ Display lower row of panels """
-    logs = [
-            'Fuzzer spooling up ...'
-        ]
+    logs = []
 
     def __init__(self, strategy_progress, functions, log_msg):
         self.strategy_progress = strategy_progress
         self.coverage_tree = build_coverage_tree(functions)
         if log_msg is not None:
-            self.logs.append(log_msg)
+            # self.logs.append(log_msg)
+            logger.add_startup_log(log_msg)
 
 
     def __rich__(self) -> Table:
@@ -217,7 +206,8 @@ class RowTwo():
             ),
             # Display logging data
             Panel(
-                f"{self.logs[-1]}", 
+                # f"{self.logs[-1]}",
+                logger.construct_renderable(), 
                 title="[b]Logs", 
                 border_style="cyan",
                 padding=(1, 1),

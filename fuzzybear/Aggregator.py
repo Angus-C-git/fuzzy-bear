@@ -10,7 +10,7 @@ from colorama import Fore, Style
 # run UI
 from .ui.UiRunner import UiRunner, init_layout
 from rich.live import Live
-from time import sleep
+from time import sleep, time
 from rich.console import Console, RenderGroup
 from fuzzybear.ui.Summary import render_summary
 
@@ -32,7 +32,7 @@ console = Console()
 def write_crash(crashing_input):
 	""" write crashing input to file """
 	console.print(
-		f"{'':1}[>>] [b red]CRASH DETECTED[/b red], writing [b green] crash.txt[/b green]"
+		f"{'':1}[>>] [b red]CRASH DETECTED[/b red], writing [b green]crash.txt[/b green]"
 	)
 
 	with open('./crash.txt', 'w') as crash:
@@ -40,44 +40,60 @@ def write_crash(crashing_input):
 	
 
 # TODO :: finish implementing	
-def prepare_summary(crashing_strategy):
+def prepare_summary(crashing_strategy, runtime, unique_crashes=0):
 	""" construct campaign summary """
 	console.print(
 		f"{'':1}[>>] [b]Fuzzing campaign ended[/b]"
 	)
 	summary_data = {
 		'crashing_strategy': crashing_strategy,
-		'unique_crashes': str(0),
-		'total_crashes': str(0),
+		'unique_crashes': str(unique_crashes),
+		'total_crashes': str(unique_crashes),
 		'hangs': str(0),
 		'codepaths': str(0),
 		'coverage': '0%',
-		'runtime': '0:00'
+		'runtime': f'{str(round(runtime, 2))}s'
 	}
 
 	render_summary(summary_data)
 
 
 class Aggregator():
-	def __init__(self, binary, input_file):
+	def __init__(
+			self, 
+			binary, 
+			input_file, 
+			display_ui=True, 
+			full_logs=False, 
+			run_coverage=True
+		):
 		self.binary = binary
 		self.harness = Harness(binary)
 		self.codec = codec.detect(input_file)
-		self.base_file = input_file
-		self.ui_runner = UiRunner()
-		self.coverage_runner = Coverage(binary)
+		self.base_file = input_file		
+		
+		self.start_clock = time()
 
+		# if gui
+		self.ui_runner = UiRunner()
+		
+		# if verbose
+		self.log_runner = None
+
+		# if coverage
+		self.coverage_runner = Coverage(binary)
+	
 
 	def run_fuzzer(self):
 		Generator = get_generator(self.codec, self.base_file)
 
 		## Tmp handler
 		if (Generator is None): 
-			console.print(f"[b] [>>] The format of [b red]{self.base_file}[/b red] is not supported")
+			console.print(f"[b][>>] The format of [b red]{self.base_file}[/b red] is not supported")
 			return None
 		
-		startup_log = f"Running fuzzer against [b green] <{self.binary.split('/')[-1]}> [/b green]" + \
-					  f" mutating [b green] <{self.base_file.split('/')[-1]}> [/b green]"
+		startup_log = f"Running fuzzer against [b green]<{self.binary.split('/')[-1]}>[/b green]" + \
+					  f" mutating [b green]<{self.base_file.split('/')[-1]}> [/b green]"
 
 		DashboardUI = self.ui_runner.register_events(Generator.ui_events)
 		strategy_progress = DashboardUI.strategy_progress
@@ -123,21 +139,26 @@ class Aggregator():
 						if (response_code == -11):
 							gui.stop()
 							write_crash(input)
+							self.runtime = time() - self.start_clock
 							prepare_summary(
-								jobs[current_job].description
+								jobs[current_job].description,
+								self.runtime,
+								unique_crashes=1
 							)
 							exit(0)
 					
 					
 					# DEBUG
-					# sleep(0.4)
+					# sleep(0.6)
 					
 					# Kill the gui on next iteration
 					# gui.stop()
 
 		# Display summary on exit
+		self.runtime = time() - self.start_clock
 		prepare_summary(
-			"None"
+			"None",
+			self.runtime
 		)
 
 
