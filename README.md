@@ -1,6 +1,6 @@
 # Fuzzy Bear
 
-> "The fuzzer nobody wanted but everyone needed..."
+> "fuzzFVCK will FVCK proprietary software for you"
 
 ![tmp-logo](https://user-images.githubusercontent.com/23151341/133920343-22895b32-635f-4b05-bdd5-2e6820441c3a.png)
 
