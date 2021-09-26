@@ -129,7 +129,6 @@ class RowOne():
     def __init__(self, strategy_progress, overall_progress):
         self.strategy_progress = strategy_progress
         self.overall_progress = overall_progress
-        self.stat_events = tmp_stats()
         self.quote = next(quote())
 
 
