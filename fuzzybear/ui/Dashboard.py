@@ -19,6 +19,7 @@ from rich.live import Live
 
 from time import sleep, time
 from fuzzybear.ui.Logs import Logs
+from fuzzybear.ui.Stats import Stats
 
 console = Console()
 
@@ -27,7 +28,7 @@ console = Console()
 
 # - CONFIG - #
 logger = Logs()
-
+stats = Stats(0)
 
 '''
 Structure:
@@ -60,17 +61,6 @@ def build_coverage_tree(code_paths=None):
     # paths_tree.add(Text("vuln", UNEXPLORED))
 
     return paths_tree
-       
-
-
-def tmp_stats():
-
-    return (
-"""
-[ 1 ] Hangs 
-[ 0 ] Aborts
-"""
-    )
 
 
 # TODO :: finish implementing
@@ -167,10 +157,10 @@ class RowOne():
             ),
             # Display runtime stats
             Panel(
-                self.stat_events, 
+                stats.render(), 
                 title="[b]Stats", 
                 border_style="red", 
-                padding=(1, 1),
+                padding=(2, 1),
                 height=15,
                 width=60 
             ),
@@ -206,7 +196,6 @@ class RowTwo():
             ),
             # Display logging data
             Panel(
-                # f"{self.logs[-1]}",
                 logger.construct_renderable(), 
                 title="[b]Logs", 
                 border_style="cyan",

@@ -64,7 +64,7 @@ class Aggregator():
 			binary, 
 			input_file, 
 			display_ui=True, 
-			full_logs=False, 
+			full_logs=True, 
 			run_coverage=True
 		):
 		self.binary = binary
@@ -79,6 +79,7 @@ class Aggregator():
 		
 		# if verbose
 		self.log_runner = None
+		self.full_logs = full_logs
 
 		# if coverage
 		self.coverage_runner = Coverage(binary)
@@ -116,7 +117,7 @@ class Aggregator():
 					coverage_paths,
 					startup_log
 				), 
-				refresh_per_second=2, 
+				refresh_per_second=6, 
 				screen=True
 			) as gui:
 				while not DashboardUI.overall_progress.finished:					
@@ -130,9 +131,13 @@ class Aggregator():
 							if not jobs[current_job].finished:
 								DashboardUI.strategy_progress.advance(jobs[current_job].id)
 							else:
+								# Log strategy switch if verbouse
+								if self.full_logs:
+									pass
+									# DashboardUI. = 'Strategy done, switching'
+									
 								current_job += 1
 							
-					
 							completed = sum(task.completed for task in DashboardUI.strategy_progress.tasks)
 							DashboardUI.overall_progress.update(DashboardUI.overall_tasks, completed=completed)
 

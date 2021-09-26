@@ -40,27 +40,27 @@ def render_summary(campaign_data):
 	# )
 
 	summary_table.add_row(
-		"[b]‣ Unique Crashes", 
+		"[b]‣ :zap: Unique Crashes", 
 		campaign_data["unique_crashes"]
 	)
 	summary_table.add_row(
-		"[b]‣ Total Crashes", 
+		"[b]‣ :atom_symbol:  Total Crashes", 
 		campaign_data["total_crashes"]
 	)	
 	summary_table.add_row(
-		"[b]‣ Total Hangs", 
+		"[b]‣ :hourglass_done: Total Hangs", 
 		campaign_data["hangs"]
 	)
 	summary_table.add_row(
-		"[b]‣ Explored Codepaths", 
+		"[b]‣ :world_map:  Explored Codepaths", 
 		campaign_data["codepaths"]
 	)
 	summary_table.add_row(
-		"[b]‣ Coverage", 
+		"[b]‣ :scales:  Coverage", 
 		campaign_data["coverage"]
 	)
 	summary_table.add_row(
-		"[b]‣ Total Fuzzing Time", 
+		"[b]‣ :watch: Total Fuzzing Time", 
 		campaign_data["runtime"]
 	)	
 
