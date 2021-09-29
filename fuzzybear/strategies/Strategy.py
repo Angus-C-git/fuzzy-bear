@@ -27,29 +27,23 @@ class Strategy():
 	BYTE_8_MAX = 18446744073709551615
 	INSTRUCTION_SIZE = 32
 
+	# strategy registrar + counts
+	strategy_cases = {
+		'emoji': 4,
+		'chonk': 5,
+		'format_strings': INSTRUCTION_SIZE,
+		'system_words': 9,
+		'system_paths': 7,
+		'polyglots': 10,
+		'constants': 10,
+		'large_negatives': INSTRUCTION_SIZE,
+		'large_positives': INSTRUCTION_SIZE
+	}
+
 
 	def __init__(self):
-		# self.ui_runner = 
+		# self.ui_events = {}
 		return
-
-
-	def ui_event(self, event, boost=10, target=100):
-		""" handels triggering strategy progress for UI """
-		global tmp_cumulative
-		tmp_cumulative += boost
-		""" handels triggering strategy progress for UI """
-		print(f'   [>>] Updating {event} progress %{tmp_cumulative} done')
-		if tmp_cumulative >= target:
-			tmp_cumulative = 0
-
-
-	def register_ui_events(self, events):
-		""" Register a list of UI events """
-		
-		# initialise UI manager with 
-		# used strategies
-		
-		# self.ui_runner.add_strategy_targets()
 
 
 	def emoji(self):
@@ -160,7 +154,7 @@ class Strategy():
 	def rand_int_range(self, lower, upper):
 		""" Gen random integers in a range """
 		int_list = []
-		for i in range(0, self.gen_max):
+		for i in range(0, self.GEN_MAX):
 			num = randrange(lower, upper)
 			if(num in int_list):
 				i -= 1

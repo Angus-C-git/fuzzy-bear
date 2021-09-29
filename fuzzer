@@ -4,18 +4,17 @@ import argparse
 from argparse import FileType
 from fuzzybear import Aggregator
 from colorama import Fore, Style
-
+from rich import print
 
 def print_banner():
-    print(Fore.CYAN + '''
-    ____    _____ _   _ ____________   __  ____  _____    _    ____   
-    \ \ \  |  ___| | | |__  /__  /\ \ / / | __ )| ____|  / \  |  _ \  
-     \ \ \ | |_  | | | | / /  / /  \ V /  |  _ \|  _|   / _ \ | |_) | 
-     / / / |  _| | |_| |/ /_ / /_   | |   | |_) | |___ / ___ \|  _ <  
-    /_/_/  |_|    \___//____/____|  |_|   |____/|_____/_/   \_\_| \_\ 
+    print(''' [b cyan]
+ ____    _____ _   _ ____________   __  ____  _____    _    ____   
+ \ \ \  |  ___| | | |__  /__  /\ \ / / | __ )| ____|  / \  |  _ \  
+  \ \ \ | |_  | | | | / /  / /  \ V /  |  _ \|  _|   / _ \ | |_) | 
+  / / / |  _| | |_| |/ /_ / /_   | |   | |_) | |___ / ___ \|  _ <  
+ /_/_/  |_|    \___//____/____|  |_|   |____/|_____/_/   \_\_| \_\ 
     
-    ''')
-    print(Style.RESET_ALL)
+    [/b cyan]''')
 
 
 # TODO :: indent this help txt

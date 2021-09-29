@@ -1,41 +1,37 @@
-# Fuzzy Bear
-
-> "fuzzFVCK will FVCK proprietary software for you"
-
-![tmp-logo](https://user-images.githubusercontent.com/23151341/133920343-22895b32-635f-4b05-bdd5-2e6820441c3a.png)
 
 
-## Overview
+<p align="center">
+  <a href="#" target="blank"><img src="https://i.imgur.com/TJU6XXK.gif" alt="Fuzzy Bear Logo" /></a>
+</p>
 
-+  A pythonic blackbox fuzzer for ELF binaries. 
+<p align="center">
+    A pythonic blackbox (soon to be) coverage guided fuzzer. 
+</p>
+
+<p align="center">
+  <!-- badges -->
+</p>
+
+## Install
+
+### From Release
+
+1. Download the latest build from releases 
+2. `unzip <release>.zip`
+3. `cd fuzzy-bear/ && ./install.sh`
+4. `./fuzzer -h`
+
+### From Git
+
+1. `git clone https://github.com/Angus-C-git/fuzzy-bear.git`
+2. `cd fuzzy-bear/ && ./install.sh`
+3. `./fuzzer -h`
 
 ## Usage
 
-![fuzzybear_usage](https://user-images.githubusercontent.com/44337835/124685226-2ea77b00-df14-11eb-81db-94254b33e30c.png)
+`./fuzzer <binary> <input>`
 
-
-`./fuzzer <input> <binary>`
-
-## Components/Modules
-
-```
-fuzzer [Entry point]
-|  
-|  Harness <--> Binary
-|   ^  |
-V   |  V
-Aggregator --> Strategies ---
-    ^                       |
-    |_______________________|
-
-```
-
-### Harness
-
-Responsible for feeding input to the binary through `stdin` and collecting the response from the binary to return to the aggregator. The harness also implements a **health check** function which is used by the aggregator to attempt to detect hangs and infinite loops in the binary. 
-### Strategies
-
-The set of broad tactics and techniques used in attempts to produce crashing inputs for the target binary as well as format specific techniques. Supported formats are:
+The following are (specifically) supported input corpus':
 
 + TXT
 + CSV
@@ -43,6 +39,27 @@ The set of broad tactics and techniques used in attempts to produce crashing inp
 + XML
 + PDF
 + JPEG
+
+## Fuzzer Structure/Modules
+
+![FuzzerStructureDiagram](https://user-images.githubusercontent.com/44337835/135193498-ffc403d4-db82-464a-ba4b-53b1cc444035.png)
+
+
+### Harness
+
+Responsible for feeding input to the binary through `stdin` and collecting the response from the binary to return to the aggregator. The harness also implements a **health check** function which is used by the aggregator to attempt to detect hangs and infinite loops in the binary. 
+
+### Strategies
+
+The set of broad tactics and techniques used in attempts to produce crashing inputs for the target binary as well as format specific techniques. Currently supported formats are:
+
++ TXT
++ CSV
++ JSON
++ XML
++ PDF
++ JPEG
+
 ## Aggregator
 
 The aggregator is the component of the fuzzer responsible for bridging the gap between the generators (strategies) and the harness. It functions as the manager for the fuzzing campaign taking in user supplied parameters and orchestrating the calling of generators whose output it then feeds to the harness. It then monitors the response from the harness to deicide if a crash file should be written and the campaign halted, or if the program is hanging / stuck in an infinite loop in which case the strategy should be evolved.
@@ -53,10 +70,9 @@ The aggregator is the component of the fuzzer responsible for bridging the gap b
 + [python-magic](#) for input file detection
 
 
-## Structure
+## Project Structure
 
-+ Project structure is based off various best practice docs
-    + Mainly [Structuring](https://docs.python-guide.org/writing/structure/)
+*Note: soon to change*
 
 ```
 .

@@ -71,10 +71,32 @@ class TXT(Strategy.Strategy):
         try:
             with open(sample_input) as f:
                 self.candidate_input = f.readlines()
+        
+            self.fuzzcases = super().strategy_cases
+
+            num_lines = len(self.candidate_input)
+
+            # register ui events for used fuzzcases
+            self.ui_events = {
+                'chonk': [0, self.fuzzcases['chonk']],
+                'format strings': [0, self.fuzzcases['format_strings']],
+                '2x length': [0, num_lines],
+                'controll characters': [0, num_lines],
+                'newlines': [0, num_lines],
+                'blank space': [0, num_lines],
+                'system words': [0, self.fuzzcases['system_words']],
+                'xor': [0, (num_lines * 4) + 9],
+                'polyglots': [0, (self.fuzzcases['polyglots'] * 3)],
+                'constants': [0, self.fuzzcases['constants']],
+                'large negatives': [0, (self.fuzzcases['large_negatives'])],
+                'large positives': [0, self.fuzzcases['large_positives']],
+            }
+
         except FileNotFoundError as err:
             # propper error logic goes here.
             print(f' [>>] File not found, {err}')
             exit(0)
+
 
     def run(self):
         """ run TXT generator """
@@ -144,7 +166,7 @@ class TXT(Strategy.Strategy):
             for value in values():
                 for mutation in xor_bytes(stream, line, value):
                     yield mutation
-                
+
         # append polyglots
         for polyglot in super().polyglots():
             mutation = copy.deepcopy(self.candidate_input)
