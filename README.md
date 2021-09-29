@@ -5,9 +5,7 @@
 ![tmp-logo](https://user-images.githubusercontent.com/44337835/122902328-b7a9a880-d391-11eb-96f2-a3c0a019de58.jpeg)
 
 
-## Overview
-
-+  A pythonic blackbox fuzzer for ELF binaries. 
++  A pythonic blackbox (soon to be coverage guided) fuzzer for ELF binaries. 
 
 ## Usage
 
@@ -16,26 +14,18 @@
 
 `./fuzzer <input> <binary>`
 
-## Components/Modules
+## Fuzzer Structure/Modules
 
-```
-fuzzer [Entry point]
-|  
-|  Harness <--> Binary
-|   ^  |
-V   |  V
-Aggregator --> Strategies ---
-    ^                       |
-    |_______________________|
+![FuzzerStructureDiagram](https://user-images.githubusercontent.com/44337835/135193498-ffc403d4-db82-464a-ba4b-53b1cc444035.png)
 
-```
 
 ### Harness
 
 Responsible for feeding input to the binary through `stdin` and collecting the response from the binary to return to the aggregator. The harness also implements a **health check** function which is used by the aggregator to attempt to detect hangs and infinite loops in the binary. 
+
 ### Strategies
 
-The set of broad tactics and techniques used in attempts to produce crashing inputs for the target binary as well as format specific techniques. Supported formats are:
+The set of broad tactics and techniques used in attempts to produce crashing inputs for the target binary as well as format specific techniques. Currently supported formats are:
 
 + TXT
 + CSV
@@ -43,6 +33,7 @@ The set of broad tactics and techniques used in attempts to produce crashing inp
 + XML
 + PDF
 + JPEG
+
 ## Aggregator
 
 The aggregator is the component of the fuzzer responsible for bridging the gap between the generators (strategies) and the harness. It functions as the manager for the fuzzing campaign taking in user supplied parameters and orchestrating the calling of generators whose output it then feeds to the harness. It then monitors the response from the harness to deicide if a crash file should be written and the campaign halted, or if the program is hanging / stuck in an infinite loop in which case the strategy should be evolved.
@@ -53,10 +44,9 @@ The aggregator is the component of the fuzzer responsible for bridging the gap b
 + [python-magic](#) for input file detection
 
 
-## Structure
+## Project Structure
 
-+ Project structure is based off various best practice docs
-    + Mainly [Structuring](https://docs.python-guide.org/writing/structure/)
+*Note: soon to change*
 
 ```
 .
