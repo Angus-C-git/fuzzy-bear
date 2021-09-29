@@ -1,8 +1,12 @@
-# Fuzzy Bear
 
-![Logo](https://i.imgur.com/FoEAaTF.gif)
 
-> A pythonic blackbox (soon to be coverage guided) fuzzer. 
+<p align="center">
+  <a href="#" target="blank"><img src="![Logo](https://i.imgur.com/FoEAaTF.gif)" alt="Fuzzy Bear Logo" /></a>
+</p>
+
+<p align="center">
+    A pythonic blackbox (soon to be coverage guided) fuzzer. 
+</p>
 
 ## Install
 
