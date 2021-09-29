@@ -70,7 +70,7 @@ class Aggregator():
 		):
 		self.binary = binary
 		self.harness = Harness(binary)
-		self.codec = codec.detect(input_file)
+		self.codec = detect(input_file)
 		self.base_file = input_file		
 		
 		self.start_clock = time()
