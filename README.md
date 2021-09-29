@@ -1,11 +1,15 @@
 
 
 <p align="center">
-  <a href="#" target="blank"><img src="https://i.imgur.com/FoEAaTF.gif" alt="Fuzzy Bear Logo" /></a>
+  <a href="#" target="blank"><img src="https://i.imgur.com/TJU6XXK.gif" alt="Fuzzy Bear Logo" /></a>
 </p>
 
 <p align="center">
-    A pythonic blackbox (soon to be coverage guided) fuzzer. 
+    A pythonic blackbox (soon to be) coverage guided fuzzer. 
+</p>
+
+<p align="center">
+  <!-- badges -->
 </p>
 
 ## Install
