@@ -1,18 +1,36 @@
 # Fuzzy Bear
 
-> "The fuzzer nobody wanted but everyone needed..."
+![Logo](https://i.imgur.com/FoEAaTF.gif)
 
-![tmp-logo](https://user-images.githubusercontent.com/44337835/122902328-b7a9a880-d391-11eb-96f2-a3c0a019de58.jpeg)
+> A pythonic blackbox (soon to be coverage guided) fuzzer. 
 
+## Install
 
-+  A pythonic blackbox (soon to be coverage guided) fuzzer for ELF binaries. 
+### From Release
+
+1. Download the latest build from releases 
+2. `unzip <release>.zip`
+3. `cd fuzzy-bear/ && ./install.sh`
+4. `./fuzzer -h`
+
+### From Git
+
+1. `git clone https://github.com/Angus-C-git/fuzzy-bear.git`
+2. `cd fuzzy-bear/ && ./install.sh`
+3. `./fuzzer -h`
 
 ## Usage
 
-![fuzzybear_usage](https://user-images.githubusercontent.com/44337835/124685226-2ea77b00-df14-11eb-81db-94254b33e30c.png)
+`./fuzzer <binary> <input>`
 
+The following are (specifically) supported input corpus':
 
-`./fuzzer <input> <binary>`
++ TXT
++ CSV
++ JSON
++ XML
++ PDF
++ JPEG
 
 ## Fuzzer Structure/Modules
 
