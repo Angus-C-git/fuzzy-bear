@@ -23,58 +23,58 @@ MAX_RECENT_LOGS = 5
 
 
 class Logs():
-	
-	logs = []
 
-	def __init__(self):
-		self.start_time = time()
-	
+    logs = []
 
-	# TODO :: TMP METHOD, handled in logging.py
-	def get_time(self):
-		"""
-		Return the time the log was 
-		emitted 
-		"""
-		current_runtime = time() - self.start_time
-		mins = int(current_runtime // 60)
-		secs = int(current_runtime % 60)
-		hours = int(mins // 60)
-		return f'{hours}:{mins:02d}:{secs:02d}'
-	
+    def __init__(self):
+        self.start_time = time()
 
-	def add_startup_log(self, log):
-		
-		self.logs.append(
-			f'[b green][{self.get_time()}][/b green] {log}'
-		)
+    # TODO :: TMP METHOD, handled in logging.py
 
-		if len(self.logs) > MAX_RECENT_LOGS:
-			# pop the oldest log
-			self.logs.pop(0)
+    def get_time(self):
+        """
+        Return the time the log was 
+        emitted 
+        """
+        current_runtime = time() - self.start_time
+        mins = int(current_runtime // 60)
+        secs = int(current_runtime % 60)
+        hours = int(mins // 60)
+        return f'{hours}:{mins:02d}:{secs:02d}'
 
+    def add_startup_log(self, log):
 
-	def add_event_log(self, event_log):
-		pass
+        self.logs.append(
+            f'[b green][{self.get_time()}][/b green] {log}'
+        )
 
-	
-	def add_debug_log(self, debug_log):
-		pass
+        if len(self.logs) > MAX_RECENT_LOGS:
+            # pop the oldest log
+            self.logs.pop(0)
 
+    def add_event_log(self, event_log):
+        if len(self.logs) > MAX_RECENT_LOGS:
+            # pop the oldest log
+            self.logs.pop(0)
+            
+        self.logs.append(event_log)
 
-	def add_error_log(self, error_log):
-		pass
+    def add_debug_log(self, debug_log):
+        pass
 
-	@render_group()
-	def construct_renderable(self):
-		""" 
-		Build a render group of
-		the most recent logs to display 
-		on the logs panel
-		"""
-		for log in self.logs:
-			# log_group.update(log)
-			yield log
+    def add_error_log(self, error_log):
+        pass
+
+    @render_group()
+    def construct_renderable(self):
+        """ 
+        Build a render group of
+        the most recent logs to display 
+        on the logs panel
+        """
+        for log in self.logs:
+            # log_group.update(log)
+            yield log
 
 
 '''devnotes
