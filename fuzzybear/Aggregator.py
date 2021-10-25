@@ -129,9 +129,9 @@ class Aggregator():
                             current_job += 1
                             # TODO broken
                             # Log strategy switch ?if verbouse?
-                            self.ui_adapter.update_logs(
-                                'Strategy done, switching'
-                            )
+                            # self.ui_adapter.update_logs(
+                            #     'Strategy done, switching'
+                            # )
 
                         completed = sum(
                             task.completed for task in DashboardUI.strategy_progress.tasks
@@ -140,6 +140,7 @@ class Aggregator():
                             DashboardUI.overall_tasks, completed=completed
                         )
 
+                    # temporarily halt on crash
                     if (response_code == SEGFUALT_SIGNAL):
                         gui.stop()
                         write_crash(input)
@@ -150,6 +151,12 @@ class Aggregator():
                             unique_crashes=1
                         )
                         exit(0)
+
+                self.ui_adapter.update_logs(
+                    'Generator cycle done'
+                )
+
+                # TODO reset ui
 
 
 '''devnotes

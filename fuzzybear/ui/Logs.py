@@ -19,7 +19,7 @@ console = Console()
 
 # Number of logs to render
 # at a given time
-MAX_RECENT_LOGS = 5
+MAX_RECENT_LOGS = 8
 
 
 class Logs():
@@ -56,7 +56,7 @@ class Logs():
         if len(self.logs) > MAX_RECENT_LOGS:
             # pop the oldest log
             self.logs.pop(0)
-            
+
         self.logs.append(event_log)
 
     def add_debug_log(self, debug_log):

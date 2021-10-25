@@ -16,7 +16,7 @@ class UIAdapter():
     """ stores progress states for components """
 
     def __init__(self):
-        self.logs = []
+        self.logger = Logs()
 
     def run_display(self):
         """ 
@@ -29,7 +29,7 @@ class UIAdapter():
                 self.strategy_progress,
                 self.overall_progress,
                 self.coverage_paths,
-                self.logs
+                self.logger
             ),
             refresh_per_second=6,
             screen=True
@@ -55,7 +55,8 @@ class UIAdapter():
 
     def update_logs(self, log_msg):
         """ feed logging panel """
-        self.logs.append(log_msg)
+        # TODO seed diffrent log types
+        self.logger.add_startup_log(log_msg)
 
     def update_stats(self, stat, value):
         """ feed stats panel """

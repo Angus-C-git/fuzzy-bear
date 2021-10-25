@@ -5,9 +5,9 @@ from rich.console import Console, RenderGroup
 from rich.layout import Layout
 from rich.panel import Panel
 from rich.progress import (
-    Progress, 
-    SpinnerColumn, 
-    BarColumn, 
+    Progress,
+    SpinnerColumn,
+    BarColumn,
     TextColumn
 )
 from rich.syntax import Syntax
@@ -51,7 +51,7 @@ def build_coverage_tree(code_paths=None):
     root = Text("main", EXPLORED)
     # root node
     paths_tree = Tree(root, guide_style="white")
-    
+
     # code paths
     for function_name in code_paths:
         branch = paths_tree.add(Text(function_name, UNEXPLORED))
@@ -85,42 +85,41 @@ class Dashboard():
     def __init__(self, events):
         for event in events.keys():
             self.strategy_progress.add_task(
-                f"[cyan]{event}", 
+                f"[cyan]{event}",
                 total=events[event][1]
             )
 
         net_sum = sum(task.total for task in self.strategy_progress.tasks)
         self.overall_tasks = self.overall_progress.add_task(
-            "Progress", 
+            "Progress",
             total=int(net_sum)
         )
 
 
-
 class Banner():
     """Display banner block"""
+
     def __rich__(self) -> Panel:
         banner = Table(
-            box=box.SIMPLE_HEAVY, 
-            expand=True, 
+            box=box.SIMPLE_HEAVY,
+            expand=True,
             collapse_padding=True
         )
         banner.add_column(
-            f"v1.0{'':15}", 
+            f"v1.0{'':15}",
             justify="left"
         )
         banner.add_column(
-            "[b]Fuzzy Bear[/b]", 
-            justify="center", 
+            "[b]Fuzzy Bear[/b]",
+            justify="center",
             no_wrap=True
         )
         banner.add_column(
-            datetime.now().ctime().replace(":", "[blink]:[/]"), 
-            justify="right", 
+            datetime.now().ctime().replace(":", "[blink]:[/]"),
+            justify="right",
             no_wrap=True
         )
-        return Panel(banner, style="green", box=box.SIMPLE_HEAD)    
-
+        return Panel(banner, style="green", box=box.SIMPLE_HEAD)
 
 
 class RowOne():
@@ -130,7 +129,6 @@ class RowOne():
         self.strategy_progress = strategy_progress
         self.overall_progress = overall_progress
         self.quote = next(quote())
-
 
     def __rich__(self) -> Table:
         progress_table = Table.grid(expand=True)
@@ -143,50 +141,47 @@ class RowOne():
                 # down right
                 padding=(6, 1),
                 height=15,
-                width=60     
+                width=60
             ),
             # Display inspirational 'quotes'
             Panel(
-                f"'{self.quote}'{'':15}", 
-                title="[b]Quotes", 
+                f"'{self.quote}'{'':15}",
+                title="[b]Quotes",
                 border_style="magenta",
                 padding=(6, 1),
                 height=15,
-                width=60 
+                width=60
             ),
             # Display runtime stats
             Panel(
-                stats.render(), 
-                title="[b]Stats", 
-                border_style="red", 
+                stats.render(),
+                title="[b]Stats",
+                border_style="red",
                 padding=(2, 1),
                 height=15,
-                width=60 
+                width=60
             ),
         )
         return progress_table
 
 
-
 class RowTwo():
     """ Display lower row of panels """
-    logs = []
 
-    def __init__(self, strategy_progress, functions, log_msg):
+    def __init__(self, strategy_progress, functions, logger):
         self.strategy_progress = strategy_progress
         self.coverage_tree = build_coverage_tree(functions)
-        if log_msg is not None:
-            # self.logs.append(log_msg)
-            logger.add_startup_log(log_msg)
-
+        self.logger = logger
+        # if log_msg is not None:
+        #     logger.add_startup_log(log_msg)
 
     def __rich__(self) -> Table:
-        
+
         progress_table = Table.grid(expand=True)
         progress_table.add_row(
             # Display strategy progress bar
             Panel(
-                self.strategy_progress, 
+                self.strategy_progress,
                 title="[b]Strategies",
                 border_style="green",
                 padding=(1, 1),
@@ -195,22 +190,22 @@ class RowTwo():
             ),
             # Display logging data
             Panel(
-                logger.construct_renderable(), 
-                title="[b]Logs", 
+                logger.construct_renderable(),
+                title="[b]Logs",
                 border_style="cyan",
                 padding=(1, 1),
                 height=20,
-                width=60 
+                width=60
             ),
             # Display current coverage data
             Panel(
                 self.coverage_tree,
-                title="[b]Coverage", 
-                border_style="red", 
+                title="[b]Coverage",
+                border_style="red",
                 padding=(1, 1),
                 expand=True,
                 height=20,
-                width=60 
+                width=60
             ),
         )
         return progress_table
@@ -220,9 +215,10 @@ class RowTwo():
 
 """ Initialise Dashboard """
 
+
 def make_layout() -> Layout:
     """ Define the layout """
-    
+
     # layout anchor
     layout = Layout(name="root")
 
@@ -232,38 +228,39 @@ def make_layout() -> Layout:
         Layout(name="RowOne", size=16),
         Layout(name="RowTwo", size=21),
     )
-    
+
     return layout
 
 # ======================================= #
 
+
 def init_layout(
-        events, 
-        strategy_progress, 
-        overall_progress, 
-        coverage_paths, 
-        log_msg=None
-    ):
-        layout = make_layout()
+    events,
+    strategy_progress,
+    overall_progress,
+    coverage_paths,
+    logger=None
+):
+    layout = make_layout()
 
-        layout["banner"].update(
-            Banner()
-        )  
-        layout["RowOne"].update(
-            RowOne(
-                strategy_progress, 
-                overall_progress
-            )
-        )                
-        layout["RowTwo"].update(
-            RowTwo(
-                strategy_progress, 
-                coverage_paths, 
-                log_msg
-            )
+    layout["banner"].update(
+        Banner()
+    )
+    layout["RowOne"].update(
+        RowOne(
+            strategy_progress,
+            overall_progress
         )
+    )
+    layout["RowTwo"].update(
+        RowTwo(
+            strategy_progress,
+            coverage_paths,
+            logger
+        )
+    )
 
-        return layout
+    return layout
 
 
 '''devnotes
