@@ -27,8 +27,8 @@ console = Console()
 
 
 # - CONFIG - #
-logger = Logs()
-stats = Stats(0)
+# logger = Logs()
+# stats = Stats(0)
 
 '''
 Structure:
@@ -125,10 +125,16 @@ class Banner():
 class RowOne():
     """Display upper row of panels"""
 
-    def __init__(self, strategy_progress, overall_progress):
+    def __init__(
+        self,
+        strategy_progress,
+        overall_progress,
+        stats
+    ):
         self.strategy_progress = strategy_progress
         self.overall_progress = overall_progress
         self.quote = next(quote())
+        self.stats = stats
 
     def __rich__(self) -> Table:
         progress_table = Table.grid(expand=True)
@@ -154,7 +160,7 @@ class RowOne():
             ),
             # Display runtime stats
             Panel(
-                stats.render(),
+                self.stats.render(),
                 title="[b]Stats",
                 border_style="red",
                 padding=(2, 1),
@@ -168,12 +174,15 @@ class RowOne():
 class RowTwo():
     """ Display lower row of panels """
 
-    def __init__(self, strategy_progress, functions, logger):
+    def __init__(
+        self,
+        strategy_progress,
+        functions,
+        logger
+    ):
         self.strategy_progress = strategy_progress
         self.coverage_tree = build_coverage_tree(functions)
         self.logger = logger
-        # if log_msg is not None:
-        #     logger.add_startup_log(log_msg)
 
     def __rich__(self) -> Table:
 
@@ -190,7 +199,7 @@ class RowTwo():
             ),
             # Display logging data
             Panel(
-                logger.construct_renderable(),
+                self.logger.construct_renderable(),
                 title="[b]Logs",
                 border_style="cyan",
                 padding=(1, 1),
@@ -239,7 +248,8 @@ def init_layout(
     strategy_progress,
     overall_progress,
     coverage_paths,
-    logger=None
+    logger=None,
+    stats=None
 ):
     layout = make_layout()
 
@@ -249,7 +259,8 @@ def init_layout(
     layout["RowOne"].update(
         RowOne(
             strategy_progress,
-            overall_progress
+            overall_progress,
+            stats
         )
     )
     layout["RowTwo"].update(
@@ -282,7 +293,7 @@ ___________________________________________________________________________
     - [-] Coverage: Display tree of decisions for binary and highlight
                    discovered code paths (kinda binja graph)
     - [X] Strategies: Display progress of current strategies
-    - [ ] Logging: Display messages from aggregator and other internals
+    - [X] Logging: Display messages from aggregator and other internals
             + Live feed of detections
             + Strategy changes
             + Optionally debugging
@@ -292,7 +303,7 @@ ___________________________________________________________________________
         + [ ] Loops
         + [ ] Speed (input/sec)
         + [ ] Discovered code paths
-    + Overall Strategy Exhaustion: How many strategies have been exhausted
+    - [X] Overall Strategy Exhaustion: How many strategies have been exhausted
         + Does not indicate a halt in fuzzing just that all strategies have been
           exhausted in there basic forms
 

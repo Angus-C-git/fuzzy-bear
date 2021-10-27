@@ -1,3 +1,5 @@
+from signal import signal, SIGINT
+
 from .Harness import Harness
 from .utility import response_codes
 from .utility.codec import detect
@@ -31,24 +33,13 @@ console = Console()
 SEGFUALT_SIGNAL = -11
 
 
-def write_crash(crashing_input):
-    """ write crashing input to file """
-    console.print(
-        f"{'':1}[>>] [b red]CRASH DETECTED[/b red], writing [b green]crash.txt[/b green]"
-    )
-
-    with open('./crash.txt', 'w') as crash:
-        crash.write(crashing_input)
-
-
 # TODO :: finish implementing
-def prepare_summary(crashing_strategy, runtime, unique_crashes=0):
+def prepare_summary(runtime, unique_crashes=0):
     """ construct campaign summary """
     console.print(
         f"{'':1}[>>] [b]Fuzzing campaign ended[/b]"
     )
     summary_data = {
-        'crashing_strategy': crashing_strategy,
         'unique_crashes': str(unique_crashes),
         'total_crashes': str(unique_crashes),
         'hangs': str(0),
@@ -58,6 +49,7 @@ def prepare_summary(crashing_strategy, runtime, unique_crashes=0):
     }
 
     render_summary(summary_data)
+    # exit(0)
 
 
 class Aggregator():
@@ -86,7 +78,29 @@ class Aggregator():
         # if coverage
         self.coverage_runner = Coverage(binary)
 
+    def end_campaign(self, signal, frame):
+        """ end the campaign """
+        self.gui.stop()
+        self.runtime = time() - self.start_clock
+        prepare_summary(
+            self.runtime,
+            self.ui_adapter.stats.unique_crashes
+        )
+        exit(0)
+
+    def write_crash(self, crashing_input):
+        """ write crashing input to file """
+        crash_msg = f"[b red]CRASH DETECTED[/b red], writing [b green]crash.txt[/b green]"
+        self.ui_adapter.update_logs(crash_msg)
+
+        with open('./crash.txt', 'w') as crash:
+            crash.write(crashing_input)
+
     def run_fuzzer(self):
+        """ start the fuzzing campaign """
+
+        # exit handler
+        signal(SIGINT, self.end_campaign)
         Generator = get_generator(self.codec, self.base_file)
 
         # Tmp handler
@@ -107,9 +121,9 @@ class Aggregator():
 
         self.ui_adapter.register_coverage(coverage_paths)
 
-        ## <<-	 TMP RUNNER 	->> ##
-
+        ## <<-	 BETA RUNNER 	->> ##
         with self.ui_adapter.run_display() as gui:
+            self.gui = gui
             while True:
                 # while not DashboardUI.overall_progress.finished:
                 inputs = Generator.run()
@@ -119,6 +133,9 @@ class Aggregator():
                 for input in inputs:
                     response_code = self.harness.open_pipe(input)
 
+                    # push the runtime forwards (move?)
+                    self.ui_adapter.update_clock()
+
                     if current_job < len(jobs):
                         if not jobs[current_job].finished:
                             DashboardUI.strategy_progress.advance(
@@ -127,7 +144,6 @@ class Aggregator():
 
                         else:
                             current_job += 1
-                            # TODO broken
                             # Log strategy switch ?if verbouse?
                             # self.ui_adapter.update_logs(
                             #     'Strategy done, switching'
@@ -142,15 +158,9 @@ class Aggregator():
 
                     # temporarily halt on crash
                     if (response_code == SEGFUALT_SIGNAL):
-                        gui.stop()
-                        write_crash(input)
-                        self.runtime = time() - self.start_clock
-                        prepare_summary(
-                            jobs[current_job].description,
-                            self.runtime,
-                            unique_crashes=1
-                        )
-                        exit(0)
+                        self.ui_adapter.update_unique_crashes()
+                        # TODO - write unique crash files
+                        self.write_crash(input)
 
                 self.ui_adapter.update_logs(
                     'Generator cycle done'
@@ -163,12 +173,8 @@ class Aggregator():
 
 - TODO - 
 
-+ Port live render to another file
-+ Use UiRunner to handle events and manage
-  UI component updates
-+ Add the ability to cycle the UI to run
-  'forever'
 + Update write crash to support writing
   multiple crashes over campaign lifetime
++ rest the ui on new cycles
 
 '''

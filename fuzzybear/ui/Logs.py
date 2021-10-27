@@ -1,6 +1,7 @@
 from datetime import datetime
 from time import time, sleep
 
+
 from rich.text import Text
 from rich.console import Console, RenderGroup, render_group
 from rich import print
@@ -19,33 +20,32 @@ console = Console()
 
 # Number of logs to render
 # at a given time
-MAX_RECENT_LOGS = 8
+MAX_RECENT_LOGS = 15
 
 
 class Logs():
 
     logs = []
 
-    def __init__(self):
-        self.start_time = time()
+    def __init__(self, clock):
+        self.clock = clock
+    #     self.start_time = time()
 
-    # TODO :: TMP METHOD, handled in logging.py
-
-    def get_time(self):
-        """
-        Return the time the log was 
-        emitted 
-        """
-        current_runtime = time() - self.start_time
-        mins = int(current_runtime // 60)
-        secs = int(current_runtime % 60)
-        hours = int(mins // 60)
-        return f'{hours}:{mins:02d}:{secs:02d}'
+    # def get_time(self):
+    #     """
+    #     Return the time the log was
+    #     emitted
+    #     """
+    #     current_runtime = time() - self.start_time
+    #     mins = int(current_runtime // 60)
+    #     secs = int(current_runtime % 60)
+    #     hours = int(mins // 60)
+    #     return f'{hours}:{mins:02d}:{secs:02d}'
 
     def add_startup_log(self, log):
 
         self.logs.append(
-            f'[b green][{self.get_time()}][/b green] {log}'
+            f'[b green][{self.clock.get_time()}][/b green] {log}'
         )
 
         if len(self.logs) > MAX_RECENT_LOGS:

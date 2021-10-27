@@ -10,13 +10,16 @@ from fuzzybear.ui.Dashboard import Dashboard, init_layout
 from fuzzybear.ui.Summary import render_summary
 from fuzzybear.ui.Logs import Logs
 from fuzzybear.ui.Stats import Stats
+from fuzzybear.ui.Clock import Clock
 
 
 class UIAdapter():
     """ stores progress states for components """
 
     def __init__(self):
-        self.logger = Logs()
+        self.clock = Clock()
+        self.logger = Logs(self.clock)
+        self.stats = Stats(self.clock)
 
     def run_display(self):
         """ 
@@ -29,7 +32,8 @@ class UIAdapter():
                 self.strategy_progress,
                 self.overall_progress,
                 self.coverage_paths,
-                self.logger
+                self.logger,
+                self.stats
             ),
             refresh_per_second=6,
             screen=True
@@ -60,4 +64,11 @@ class UIAdapter():
 
     def update_stats(self, stat, value):
         """ feed stats panel """
+        # self.stats.update_stats(stat, value)
         pass
+
+    def update_clock(self):
+        self.stats.update_clock()
+
+    def update_unique_crashes(self):
+        self.stats.update_unique_crashes()
