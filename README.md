@@ -1,5 +1,3 @@
-
-
 <p align="center">
   <a href="#" target="blank"><img src="https://i.imgur.com/TJU6XXK.gif" alt="Fuzzy Bear Logo" /></a>
 </p>
@@ -12,11 +10,36 @@
   <!-- badges -->
 </p>
 
+<hr style='width: 90%;'/>
+<br />
+
+## Contents
+
+### ‣ [Install](#install)
+
+### ‣ [Usage](#usage)
+
+### ‣ [Fuzzer Structure/Modules](#fuzzer-structuremodules)
+
+### ‣ [Libraries](#libraries)
+
+### ‣ [Project Structure](#project-structure)
+
+<br/>
+<br/>
+<p align="center">
+    <img 
+        src="https://i.imgur.com/pd4W61D.png" 
+        alt="Fuzzy Bear Demo"
+        width='80%' 
+    />
+</p>
+
 ## Install
 
 ### From Release
 
-1. Download the latest build from releases 
+1. Download the latest build from releases
 2. `unzip <release>.zip`
 3. `cd fuzzy-bear/ && ./install.sh`
 4. `./fuzzer -h`
@@ -33,46 +56,44 @@
 
 The following are (specifically) supported input corpus':
 
-+ TXT
-+ CSV
-+ JSON
-+ XML
-+ PDF
-+ JPEG
+-   TXT
+-   CSV
+-   JSON
+-   XML
+-   PDF
+-   JPEG
 
 ## Fuzzer Structure/Modules
 
 ![FuzzerStructureDiagram](https://user-images.githubusercontent.com/44337835/135193498-ffc403d4-db82-464a-ba4b-53b1cc444035.png)
 
-
 ### Harness
 
-Responsible for feeding input to the binary through `stdin` and collecting the response from the binary to return to the aggregator. The harness also implements a **health check** function which is used by the aggregator to attempt to detect hangs and infinite loops in the binary. 
+Responsible for feeding input to the binary through `stdin` and collecting the response from the binary to return to the aggregator. The harness also implements a **health check** function which is used by the aggregator to attempt to detect hangs and infinite loops in the binary.
 
 ### Strategies
 
 The set of broad tactics and techniques used in attempts to produce crashing inputs for the target binary as well as format specific techniques. Currently supported formats are:
 
-+ TXT
-+ CSV
-+ JSON
-+ XML
-+ PDF
-+ JPEG
+-   TXT
+-   CSV
+-   JSON
+-   XML
+-   PDF
+-   JPEG
 
-## Aggregator
+### Aggregator
 
 The aggregator is the component of the fuzzer responsible for bridging the gap between the generators (strategies) and the harness. It functions as the manager for the fuzzing campaign taking in user supplied parameters and orchestrating the calling of generators whose output it then feeds to the harness. It then monitors the response from the harness to deicide if a crash file should be written and the campaign halted, or if the program is hanging / stuck in an infinite loop in which case the strategy should be evolved.
 
 ## Libraries
 
-+ [rich](https://github.com/willmcgugan/rich) for GUI
-+ [python-magic](#) for input file detection
-
+-   [rich](https://github.com/willmcgugan/rich) for GUI
+-   [python-magic](#) for input file detection
 
 ## Project Structure
 
-*Note: soon to change*
+_Note: soon to change_
 
 ```
 .
