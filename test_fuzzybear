@@ -17,7 +17,6 @@ import sys
 # from colorama import Fore, Style
 
 from fuzzybear import Harness
-from fuzzybear import HarnessV2
 import argparse
 from pathlib import Path
 
@@ -31,7 +30,7 @@ from fuzzybear.strategies import ELF
 from fuzzybear.strategies import JPEG
 
 ## JSON Test ##
-from fuzzybear.strategies import JSON 
+from fuzzybear.strategies import JSON
 
 ## PDF Test ##
 from fuzzybear.strategies import PDF
@@ -42,7 +41,7 @@ from fuzzybear.strategies import TXT
 ## XML Test ##
 from fuzzybear.strategies import XML
 
-## ADD TEST IMPORT ## ^
+# ADD TEST IMPORT ## ^
 
 
 # Fore.RED +
@@ -104,7 +103,7 @@ def test_coverage():
     txt_worker = TXT.TXT(TEST_SAMPLE)
     for u in txt_worker.run():
         # try:
-            # print(f'[DEBUG] test mutation was:\n{u}')
+        # print(f'[DEBUG] test mutation was:\n{u}')
         retCode = harness.open_pipe(u)
         # print(f"\n  Piping to harness, res was {retCode}\n")
         if retCode == -11:
@@ -112,7 +111,7 @@ def test_coverage():
             return
         # except:
         #     print('Either the generators are empty, or I fucked up')
-        #     break    
+        #     break
 
 
 # test csv1
@@ -127,7 +126,7 @@ def test_csv():
 
     harness = Harness.Harness(TEST_BINARY)
     csv_worker = CSV.CSV(TEST_SAMPLE)
-    
+
     for x in csv_worker.run():
         # print(f'[DEBUG] test mutation was\n{x}')
         ret_code = harness.open_pipe(x)
@@ -277,17 +276,17 @@ def test_jpeg():
     harness = Harness.Harness(TEST_BINARY)
     jpeg_worker = JPEG.JPEG(TEST_SAMPLE)
 
-    data = [0,0,0]
+    data = [0, 0, 0]
     for x in range(100):
         for x in jpeg_worker.run():
 
-            # @ here would mark the place the 
+            # @ here would mark the place the
             # aggregator feeds harness
             #print(f'[DEBUG] test mutation was {x}')
             exitcode = harness.open_pipe(x, codec='jpeg')
-            
+
             if (exitcode == 0):
-                #print("Success")
+                # print("Success")
                 data[0] += 1
             elif (exitcode == 1):
                 data[1] += 1
@@ -295,17 +294,17 @@ def test_jpeg():
                 data[2] += 1
                 print(f'ERROR!!!! OUTCOME {exitcode}')
 
-            
             #print(f"\nPiping to harness, res was {harness.open_pipe(x, codec='jpeg')}\n")
     print(exitcode)
-    print(f'\nNoramal exit: {data[0]}\nError input: {data[1]}\nSegfault: {data[2]}')
+    print(
+        f'\nNoramal exit: {data[0]}\nError input: {data[1]}\nSegfault: {data[2]}')
 
 #             ret_code = harness.open_pipe(x)
 #             # print(f"\nPiping to harness, res was {ret_code}\n")
 #             if ret_code == -11:
 #                 print(f"{'':10}[+] CRASH? {ret_code}")
 #                 break
-        
+
 
 def test_pdf():
     TEST_DIR = './tests/complete'
@@ -331,8 +330,7 @@ def test_pdf():
         except:
             print('[>>] Failed to run worker, is generator empty?')
             break
-    
-    
+
 
 def test_xml():
 
@@ -354,7 +352,6 @@ def test_xml():
             print(f"{'':10}[+] CRASH? {ret_code}")
             break
 
-    
     TEST_BINARY = f'{TEST_DIR}/xml2'
     TEST_SAMPLE = f'{TEST_DIR}/codecs/xml2.txt'
 
@@ -391,7 +388,7 @@ def test_xml():
             print(f"{'':10}[+] CRASH? {ret_code}")
             break
 
-            
+
 def test_negate():
 
     from fuzzybear.strategies import Strategy
@@ -418,20 +415,18 @@ def test_negate():
             print(f'Flipped {test} :: {s}')
 
 
-
 def test_bit_flips():
     from fuzzybear.strategies import Strategy
 
     print(f"""
         [>>] Running bit flip tests
     """
-    )
+          )
 
     strategy_driver = Strategy.Strategy()
     for x in range(100):
         res = strategy_driver.bit_flip(x)
         print(f'Flipped {x} to {res}')
-
 
 
 def test_xor_data():
@@ -440,12 +435,12 @@ def test_xor_data():
     print(f"""
         [>>] Running xor tests
     """
-    )
+          )
 
     strategy_driver = Strategy.Strategy()
 
     candidate_strings = [
-        "-1", "2", "2000", "lol", 
+        "-1", "2", "2000", "lol",
         "fizz", "buzz", "adam", "trivial"
     ]
 
@@ -454,19 +449,18 @@ def test_xor_data():
         print(f'XOR\'d {x} to {res}')
 
 
-
 def test_byte_flips():
     from fuzzybear.strategies import Strategy
 
     print(f"""
         [>>] Running byte flip tests
     """
-    )
+          )
 
     strategy_driver = Strategy.Strategy()
 
     candidate_strings = [
-        "-1", "2", "2000", "lol", 
+        "-1", "2", "2000", "lol",
         "fizz", "buzz", "adam", "trivial",
         "c", "d", "$", "-", "y"
     ]
@@ -476,9 +470,7 @@ def test_byte_flips():
         print(f'Byte flipped {x} to {res}')
 
 
-
 ###########################################################################
-
 print_banner()
 
 parser = argparse.ArgumentParser()
@@ -493,91 +485,92 @@ parser.add_argument('-P', '--your-test',
 '''
 
 parser.add_argument('-CT', '--coverage-tracking',
-                    dest = 'coverage',
+                    dest='coverage',
                     action='store_true',
-                    help = 'test coverage tracking'
+                    help='test coverage tracking'
                     )
 
 parser.add_argument('-H', '--harness',
-                    dest = 'harness',
+                    dest='harness',
                     action='store_true',
-                    help = 'test harness'
+                    help='test harness'
                     )
 
 parser.add_argument('-BF', '--bit-flips',
-                    dest = 'bitflips',
+                    dest='bitflips',
                     action='store_true',
-                    help = 'test bit flips strategy'
+                    help='test bit flips strategy'
                     )
 
 parser.add_argument('-NEGATE', '--negate-test',
-                    dest = 'NEGATE',
+                    dest='NEGATE',
                     action='store_true',
-                    help = 'test the negation strategy'
+                    help='test the negation strategy'
                     )
 
 parser.add_argument('-BYTEFLIP', '--byte-flips',
-                    dest = 'byteflips',
+                    dest='byteflips',
                     action='store_true',
-                    help = 'test bit flips strategy'
+                    help='test bit flips strategy'
                     )
 
 parser.add_argument('-XOR', '--xor-chars',
-                    dest = 'xor',
+                    dest='xor',
                     action='store_true',
-                    help = 'Test XOR'
+                    help='Test XOR'
                     )
 
 # :::::::::::::::::::::: [Codec Tests] :::::::::::::::::::::::::::
 
 parser.add_argument('-AC', '--all-codecs',
-                    dest = 'all_codec',
+                    dest='all_codec',
                     action='store_true',
-                    help = 'Test all the supported generators'
+                    help='Test all the supported generators'
                     )
 
 parser.add_argument('-TXT', '--TXT-codec',
-                    dest = 'TXT',
+                    dest='TXT',
                     action='store_true',
-                    help = 'Test plaintext codec binaries'
+                    help='Test plaintext codec binaries'
                     )
 
 parser.add_argument('-CSV', '--CSV-codec',
-                    dest = 'CSV',
+                    dest='CSV',
                     action='store_true',
-                    help = 'Test csv codec binaries'
+                    help='Test csv codec binaries'
                     )
 
 parser.add_argument('-JSON', '--JSON-codec',
-                    dest = 'JSON',
+                    dest='JSON',
                     action='store_true',
-                    help = 'Test json codec binaries'
+                    help='Test json codec binaries'
                     )
 
 parser.add_argument('-JPEG', '--JPEG-codec',
-                    dest = 'JPEG',
+                    dest='JPEG',
                     action='store_true',
-                    help = 'Test jpeg codec binaries'
+                    help='Test jpeg codec binaries'
                     )
 
 parser.add_argument('-XML', '--XML-codec',
-                    dest = 'XML',
+                    dest='XML',
                     action='store_true',
-                    help = 'Test xml codec binaries'
+                    help='Test xml codec binaries'
                     )
 
 parser.add_argument('-PDF', '--PDF-test',
-                    dest = 'PDF',
+                    dest='PDF',
                     action='store_true',
-                    help = 'Test PDF generator'
+                    help='Test PDF generator'
                     )
 
 
-## Add command line args for your test ^
+# Add command line args for your test ^
 
 args = parser.parse_args()
 
-if (len(sys.argv) == 1): parser.print_help()
+if (len(sys.argv) == 1):
+    parser.print_help()
 
 '''
 :::::::::::: Call Tests ::::::::::::
@@ -585,15 +578,19 @@ if (len(sys.argv) == 1): parser.print_help()
  ► if (args.test): test_name()
 '''
 
-if (args.harness): test_harness()
+if (args.harness):
+    test_harness()
 
-if (args.bitflips): test_bit_flips()
+if (args.bitflips):
+    test_bit_flips()
 
-if (args.byteflips): test_byte_flips()
+if (args.byteflips):
+    test_byte_flips()
 
-if (args.xor): test_xor_data()
+if (args.xor):
+    test_xor_data()
 
-# codec tests 
+# codec tests
 
 if (args.all_codec):
     test_csv()
@@ -601,20 +598,28 @@ if (args.all_codec):
     test_plaintext()
     test_pdf()
     test_xml()
-    #test_jpeg()
+    # test_jpeg()
 
-if (args.CSV): test_csv()
+if (args.CSV):
+    test_csv()
 
-if (args.JSON): test_json()
+if (args.JSON):
+    test_json()
 
-if (args.XML): test_xml()
+if (args.XML):
+    test_xml()
 
-if (args.NEGATE): test_negate()
+if (args.NEGATE):
+    test_negate()
 
-if (args.JPEG): test_jpeg()
+if (args.JPEG):
+    test_jpeg()
 
-if (args.TXT): test_plaintext()
+if (args.TXT):
+    test_plaintext()
 
-if (args.PDF): test_pdf()
+if (args.PDF):
+    test_pdf()
 
-if (args.coverage): test_coverage()
+if (args.coverage):
+    test_coverage()
