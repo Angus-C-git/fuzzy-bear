@@ -2,10 +2,7 @@
 
 ## Overview
 
-+ Testing is setup and awful :) 
-  + Someone can fix it if they so desire <3
-+ Idk how to use pytest
-
+-   Ideally switch this to use pytest this is a temporary test engine
 
 ## Setting Up A Test
 
@@ -62,7 +59,6 @@ from fuzzybear.<subdir> import <file/class>
 csv_worker = CSV.CSV(TEST_FILE)
 ```
 
-
 ## Running A Test
 
 `./test_fuzzybear -h`
@@ -72,16 +68,16 @@ csv_worker = CSV.CSV(TEST_FILE)
 
           ____    _____ _____ ____ _____   _____ _   _ ____________   __
           \ \ \  |_   _| ____/ ___|_   _| |  ___| | | |__  /__  /\ \ / /
-           \ \ \   | | |  _| \___ \ | |   | |_  | | | | / /  / /  \ V / 
-           / / /   | | | |___ ___) || |   |  _| | |_| |/ /_ / /_   | |  
-          /_/_/    |_| |_____|____/ |_|   |_|    \___//____/____|  |_|  
-                                                              
-          ____  _____    _    ____  
-         | __ )| ____|  / \  |  _ \ 
+           \ \ \   | | |  _| \___ \ | |   | |_  | | | | / /  / /  \ V /
+           / / /   | | | |___ ___) || |   |  _| | |_| |/ /_ / /_   | |
+          /_/_/    |_| |_____|____/ |_|   |_|    \___//____/____|  |_|
+
+          ____  _____    _    ____
+         | __ )| ____|  / \  |  _ \
          |  _ \|  _|   / _ \ | |_) |
-         | |_) | |___ / ___ \|  _ < 
-         |____/|_____/_/   \_\_| \_                           
-    
+         | |_) | |___ / ___ \|  _ <
+         |____/|_____/_/   \_\_| \_
+
 usage: test_fuzzybear [-h] [-H] [-CSV]
 
 optional arguments:
@@ -91,5 +87,5 @@ optional arguments:
 
 ```
 
-+ To run the `CSV` test for example
-  + `./test_fuzzybear -CSV`
+-   To run the `CSV` test for example
+    -   `./test_fuzzybear -CSV`

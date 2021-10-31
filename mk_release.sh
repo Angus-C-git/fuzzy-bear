@@ -6,4 +6,6 @@ echo
 
 # probably want to pip freeze into requirments too 
 
-tar -cf releases/fuzzer.tar fuzzer fuzzybear/ install.sh README.md requirements.txt
+tar -cf releases/fuzzybear.tar fuzzer fuzzybear/ install.sh README.md requirements.txt
+
+echo "Done 🐻"
