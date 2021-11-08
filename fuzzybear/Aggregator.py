@@ -156,7 +156,6 @@ class Aggregator():
                             DashboardUI.overall_tasks, completed=completed
                         )
 
-                    # temporarily halt on crash
                     if (response_code == SEGFUALT_SIGNAL):
                         self.ui_adapter.update_unique_crashes()
                         # TODO - write unique crash files
