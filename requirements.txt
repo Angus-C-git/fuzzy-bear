@@ -1,3 +1,6 @@
-pwntools==4.5.1
-python-magic==0.4.24
-rich==10.6.0
+capstone==6.0.0a2
+colorama==0.4.6
+pexpect==4.9.0
+pwntools==4.13.1
+python_magic==0.4.24
+rich==13.9.4
